@@ -130,8 +130,11 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       currentStatus === 'PAYMENT_PROCESSING') &&
     Boolean(application.fee_assessment);
 
-  // Scrutiny, scheduling, and testing are officer actions; guide the trader
-  // there directly instead of leaving them stranded on this dashboard.
+  // Scrutiny, scheduling, and testing are officer actions; guide officers
+  // directly there. Consumers (OWNER/APPLICANT) cannot access the Officer
+  // Workspace after role-gating, so they get a plain status note instead.
+  const isOfficerRole = ['LMO', 'GATC_VERIFIER', 'SUPERVISOR', 'CONTROLLER', 'ADMIN'].includes(user.actorRole);
+
   const goToOfficerWorkspace = () => {
     window.location.hash = '#officer';
   };
@@ -220,16 +223,23 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-indigo-600 shrink-0" />
             <div>
-              <span className="font-bold">Application Filed with Department:</span> Next step is technical scrutiny. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to assess statutory fees and accept the filing.
+              <span className="font-bold">Application Filed with Department:</span>{' '}
+              {isOfficerRole ? (
+                <>Next step is technical scrutiny. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to assess statutory fees and accept the filing.</>
+              ) : (
+                <>The application is awaiting departmental technical scrutiny.</>
+              )}
             </div>
           </div>
-          <button
-            onClick={goToOfficerWorkspace}
-            className="px-3 py-1 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shrink-0 flex items-center gap-1"
-          >
-            <ArrowRight className="w-3 h-3" />
-            <span>Go to Officer Workspace</span>
-          </button>
+          {isOfficerRole && (
+            <button
+              onClick={goToOfficerWorkspace}
+              className="px-3 py-1 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shrink-0 flex items-center gap-1"
+            >
+              <ArrowRight className="w-3 h-3" />
+              <span>Go to Officer Workspace</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -256,16 +266,23 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <div>
-              <span className="font-bold">Payment Reconciled:</span> Treasury fee confirmed. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to schedule the physical verification slot.
+              <span className="font-bold">Payment Reconciled:</span>{' '}
+              {isOfficerRole ? (
+                <>Treasury fee confirmed. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to schedule the physical verification slot.</>
+              ) : (
+                <>Treasury fee confirmed. Awaiting the verification slot to be scheduled.</>
+              )}
             </div>
           </div>
-          <button
-            onClick={goToOfficerWorkspace}
-            className="px-3 py-1 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-1"
-          >
-            <ArrowRight className="w-3 h-3" />
-            <span>Go to Officer Workspace</span>
-          </button>
+          {isOfficerRole && (
+            <button
+              onClick={goToOfficerWorkspace}
+              className="px-3 py-1 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-1"
+            >
+              <ArrowRight className="w-3 h-3" />
+              <span>Go to Officer Workspace</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -274,16 +291,23 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
             <div>
-              <span className="font-bold">Verification Slot Scheduled:</span> Inspection slot allocated. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to start the NAWI verification worksheet.
+              <span className="font-bold">Verification Slot Scheduled:</span>{' '}
+              {isOfficerRole ? (
+                <>Inspection slot allocated. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to start the NAWI verification worksheet.</>
+              ) : (
+                <>An inspection slot has been allocated for your instrument.</>
+              )}
             </div>
           </div>
-          <button
-            onClick={goToOfficerWorkspace}
-            className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-blue-800 transition-colors shrink-0 flex items-center gap-1"
-          >
-            <ArrowRight className="w-3 h-3" />
-            <span>Go to Officer Workspace</span>
-          </button>
+          {isOfficerRole && (
+            <button
+              onClick={goToOfficerWorkspace}
+              className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-blue-800 transition-colors shrink-0 flex items-center gap-1"
+            >
+              <ArrowRight className="w-3 h-3" />
+              <span>Go to Officer Workspace</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -292,16 +316,23 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <div className="flex items-center gap-2">
             <Scale className="w-4 h-4 text-purple-600 shrink-0" />
             <div>
-              <span className="font-bold">Verification Test In Progress:</span> Worksheet active. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to record observations, physical seals, and legal disposition.
+              <span className="font-bold">Verification Test In Progress:</span>{' '}
+              {isOfficerRole ? (
+                <>Worksheet active. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to record observations, physical seals, and legal disposition.</>
+              ) : (
+                <>Statutory verification testing is in progress. No action is required from the applicant at this stage.</>
+              )}
             </div>
           </div>
-          <button
-            onClick={goToOfficerWorkspace}
-            className="px-3 py-1 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors shrink-0 flex items-center gap-1"
-          >
-            <ArrowRight className="w-3 h-3" />
-            <span>Go to Officer Workspace</span>
-          </button>
+          {isOfficerRole && (
+            <button
+              onClick={goToOfficerWorkspace}
+              className="px-3 py-1 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors shrink-0 flex items-center gap-1"
+            >
+              <ArrowRight className="w-3 h-3" />
+              <span>Go to Officer Workspace</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -408,15 +439,9 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
         </div>
       </div>
 
-      {/* Additional Schedule Notice */}
-      {application.scheduled_slot_start && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-gov-blue flex-shrink-0" />
-          <span>
-            Inspection Scheduled for <strong className="font-semibold">{formatDateTime(application.scheduled_slot_start)}</strong>. Assigned Inspecting Officer: <strong className="font-semibold">{application.assigned_lmo_id || 'Legal Metrology Officer'}</strong>.
-          </span>
-        </div>
-      )}
+      {/* Additional Schedule Notice removed — the SCHEDULED status banner above
+          already carries the inspection slot notice; the duplicate card-footer
+          banner bloated the trader home screen. */}
     </div>
   );
 };

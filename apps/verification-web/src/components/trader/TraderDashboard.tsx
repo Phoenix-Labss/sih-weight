@@ -50,6 +50,10 @@ export const TraderDashboard: React.FC = () => {
   const [activeApplication, setActiveApplication] = useState<Application | null>(null);
   const [activeCertificate, setActiveCertificate] = useState<Certificate | null>(null);
 
+  // Certificate quick-table pagination: 8 per "page"
+  const CERTS_PER_PAGE = 8;
+  const [certPage, setCertPage] = useState(1);
+
   const loadData = useCallback(async () => {
     try {
       const [instRes, appRes, certRes] = await Promise.all([
@@ -86,6 +90,10 @@ export const TraderDashboard: React.FC = () => {
   const dueInstruments = instruments.filter(
     (i) => i.current_status === 'VERIFICATION_DUE' || i.current_status === 'OVERDUE'
   ).length;
+  // Certificate quick-table pagination
+  const certTotalPages = Math.max(1, Math.ceil(certificates.length / CERTS_PER_PAGE));
+  const safeCertPage = Math.min(certPage, certTotalPages);
+  const visibleCertificates = certificates.slice((safeCertPage - 1) * CERTS_PER_PAGE, safeCertPage * CERTS_PER_PAGE);
 
   const handleOpenPayment = (app: Application) => {
     setActiveApplication(app);
@@ -273,7 +281,7 @@ export const TraderDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* Issued Certificates Quick Table */}
+          {/* Issued Certificates Quick Table, paginated 8/page */}
           {certificates.length > 0 && (
             <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-3 mt-6">
               <div className="flex items-center justify-between border-b pb-3">
@@ -287,7 +295,7 @@ export const TraderDashboard: React.FC = () => {
               </div>
 
               <div className="divide-y divide-slate-100">
-                {certificates.map((cert) => (
+                {visibleCertificates.map((cert) => (
                   <div key={cert.certificate_id} className="py-3 flex items-center justify-between text-xs">
                     <div>
                       <div className="font-mono font-bold text-slate-900">{cert.certificate_number}</div>
@@ -310,6 +318,41 @@ export const TraderDashboard: React.FC = () => {
                   </div>
                 ))}
               </div>
+
+              {certTotalPages > 1 && (
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <span className="text-[11px] text-slate-500">
+                    Page {safeCertPage} of {certTotalPages} (showing {visibleCertificates.length} of {certificates.length})
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setCertPage((p) => Math.max(1, p - 1))}
+                      disabled={safeCertPage <= 1}
+                      className="px-2.5 py-1 rounded-md border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      ← Prev
+                    </button>
+                    {Array.from({ length: certTotalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCertPage(page)}
+                        className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                          page === safeCertPage ? 'bg-gov-navy text-white' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setCertPage((p) => Math.min(certTotalPages, p + 1))}
+                      disabled={safeCertPage >= certTotalPages}
+                      className="px-2.5 py-1 rounded-md border border-slate-200 text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Python caches
+__pycache__/
+.pytest_cache/
+
+# Agent session artifacts
+.agents/
+
+# TestSprite transient session data (tunnel creds, logs, raw runs)
+testsprite_tests/tmp/

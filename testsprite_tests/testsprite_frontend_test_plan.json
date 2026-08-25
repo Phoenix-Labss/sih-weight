@@ -1,0 +1,341 @@
+[
+  {
+    "id": "TC001",
+    "title": "Portal home loads with Trader dashboard",
+    "description": "Open http://127.0.0.1:5173/ . IMPORTANT: this portal has NO login page and NO authentication - do not look for a login form or credentials; a persona is pre-selected automatically. Verify the application shell renders: header brand 'National e-Metrology', a navigation bar with tabs such as Trader/Officer/Public Verification, and the Trader dashboard content area visible showing instrument/application sections.",
+    "category": "Application Workflow",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Verify the app shell renders: header brand, navigation bar with tabs such as Trader / Officer / Public Verification"
+      },
+      {
+        "type": "assertion",
+        "description": "Trader dashboard content area is visible showing instrument/application sections"
+      },
+      {
+        "type": "assertion",
+        "description": "No error overlay or blank screen"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Register a new instrument from the Trader dashboard",
+    "description": "Open http://127.0.0.1:5173/ (no login needed). On the Trader dashboard find the instrument registration form (fields like model, serial number). Choose any approved model from the available options, enter a unique serial number like SN-UI-<random digits>, fill any other required fields, and submit. Verify a success indication appears and/or the new instrument appears in the instrument list on the page.",
+    "category": "Instrument Registry",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "On the Trader dashboard locate the instrument registration form with model and serial number fields"
+      },
+      {
+        "type": "action",
+        "description": "Select any approved model from available options and enter a unique serial number like SN-UI-4821"
+      },
+      {
+        "type": "action",
+        "description": "Fill other required fields and submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "A success indication appears and/or the new instrument appears in the instrument list"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Public verification page shows certificate status for a valid token",
+    "description": "Open http://127.0.0.1:5173/#/verify/TOKEN_VALID_2026 (no login needed; this hash route opens the Public Verification view directly). Alternatively open http://127.0.0.1:5173/ and click the 'Public Verification' tab then ensure token field contains TOKEN_VALID_2026 and trigger verify. Verify the public certificate status view renders certificate details/status information without requiring authentication.",
+    "category": "Public QR Verification",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open http://127.0.0.1:5173/#/verify/TOKEN_VALID_2026 - no login needed; this hash route opens the Public Verification view"
+      },
+      {
+        "type": "assertion",
+        "description": "Public certificate status view renders certificate details or status information"
+      },
+      {
+        "type": "assertion",
+        "description": "No authentication was required to see it"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Public verification shows not-found feedback for an unknown token",
+    "description": "Open http://127.0.0.1:5173/ , go to the Public Verification tab, replace the token with an obviously invalid value such as INVALID-TOKEN-XYZ-123 and trigger verification. Verify the UI shows an error / not-found / invalid result state rather than certificate details.",
+    "category": "Public QR Verification",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Go to the Public Verification tab and replace the token with INVALID-TOKEN-XYZ-123, then trigger verification"
+      },
+      {
+        "type": "assertion",
+        "description": "UI shows an error / not-found / invalid result state instead of certificate details"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Officer workspace renders verification sessions",
+    "description": "Open http://127.0.0.1:5173/#officer (no login needed - this deep link switches to the officer workspace as Legal Metrology Officer). Verify the Officer workspace renders with statutory workflow sections/lists such as applications for scrutiny, verification sessions, or testing tools, and no crash/error overlay appears.",
+    "category": "Verification Sessions",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open http://127.0.0.1:5173/#officer - deep link switches to officer workspace as Legal Metrology Officer; no login needed"
+      },
+      {
+        "type": "assertion",
+        "description": "Officer workspace renders statutory sections such as applications for scrutiny, verification sessions, or testing tools"
+      },
+      {
+        "type": "assertion",
+        "description": "No crash or error overlay appears"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Create and submit an application via the Trader dashboard",
+    "description": "Open http://127.0.0.1:5173/ (no login). On the Trader dashboard locate the applications section, start creating a new verification application for one of the listed/registered instruments, complete any declaration checkbox if present, and submit it. Verify the application appears in the list with a submitted/pending state indication.",
+    "category": "Application Workflow",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "On the Trader dashboard open the applications section and start creating a new verification application for a listed instrument"
+      },
+      {
+        "type": "action",
+        "description": "Complete any declaration checkbox if present and submit the application"
+      },
+      {
+        "type": "assertion",
+        "description": "The application appears in the list with a submitted/pending state indication"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Role persona switcher changes active persona",
+    "description": "Open http://127.0.0.1:5173/ (no login). Use the persona/role selector in the navigation bar (labels include 'Trader / Instrument Owner' and 'Legal Metrology Officer (LMO)'). Switch to 'Legal Metrology Officer (LMO)' and verify the app reflects the LMO persona (e.g. officer workspace becomes active or persona label updates). Then switch back to the trader persona and verify it changes again.",
+    "category": "Identity & Access",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Use the persona/role selector in the navbar (labels include 'Trader / Instrument Owner' and 'Legal Metrology Officer (LMO)') and switch to LMO"
+      },
+      {
+        "type": "assertion",
+        "description": "App reflects the LMO persona (officer workspace active or persona label updates)"
+      },
+      {
+        "type": "action",
+        "description": "Switch back to the trader persona"
+      },
+      {
+        "type": "assertion",
+        "description": "Persona changes back accordingly"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Language toggle switches interface language",
+    "description": "Open http://127.0.0.1:5173/ (no login). Find the language switcher in the navigation bar supporting English and Hindi. Toggle the language and verify visible interface text changes language accordingly (e.g. headings/nav labels translate), then toggle back.",
+    "category": "Accessibility & i18n",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Find the language switcher supporting English and Hindi and toggle the language"
+      },
+      {
+        "type": "assertion",
+        "description": "Visible interface text changes language accordingly"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the language back"
+      },
+      {
+        "type": "assertion",
+        "description": "Interface returns to the original language"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "API mode indicator shows live backend connectivity",
+    "description": "Open http://127.0.0.1:5173/ (no login). Locate the API mode control/indicator (Mock/Live toggle or a status label mentioning LIVE API or backend connection). Ensure Live mode is active (or activate it) and verify the UI indicates a live/connected state rather than mock mode.",
+    "category": "Health Check",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Locate the Mock/Live API mode control or status label mentioning LIVE API or backend connection and ensure/activate Live mode"
+      },
+      {
+        "type": "assertion",
+        "description": "UI indicates live/connected backend mode rather than mock mode"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Supervisor dashboard renders",
+    "description": "Open http://127.0.0.1:5173/#supervisor (no login needed). If the hash does not switch views, use the navigation menu to reach the Supervisor dashboard. Verify the supervisor dashboard renders its oversight/review content without errors.",
+    "category": "Application Workflow",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open http://127.0.0.1:5173/#supervisor - if the hash does not switch views use the navigation menu to reach the Supervisor dashboard; no login needed"
+      },
+      {
+        "type": "assertion",
+        "description": "Supervisor dashboard renders oversight/review content without errors"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "GATC management console renders",
+    "description": "Open http://127.0.0.1:5173/ (no login) and navigate to the GATC management tab/view from the navigation. Verify the GATC management console renders its content without errors.",
+    "category": "Verification Sessions",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the GATC management tab/view from the navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "GATC management console renders its content without errors"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Trader dashboard lists registered instruments",
+    "description": "Open http://127.0.0.1:5173/ (no login). On the Trader dashboard locate the instruments list/table. Verify at least one instrument record is displayed with identifiable details (serial number, model, or status). Do not modify anything.",
+    "category": "Instrument Registry",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "On the Trader dashboard locate the instruments list/table"
+      },
+      {
+        "type": "assertion",
+        "description": "At least one instrument record is displayed with identifiable details such as serial number, model, or status"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Hash deep-link opens public verification view",
+    "description": "Open http://127.0.0.1:5173/#public directly (no login). Verify the Public Verification view is displayed (token input and/or certificate verification content), confirming hash-based deep linking works.",
+    "category": "Public QR Verification",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open http://127.0.0.1:5173/#public directly - no login needed"
+      },
+      {
+        "type": "assertion",
+        "description": "Public Verification view is displayed with token input and/or certificate verification content"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Legacy migration console renders",
+    "description": "Open http://127.0.0.1:5173/ (no login) and navigate to the migration/legacy data console from the navigation if present. Verify it renders without errors. If no such section exists in the navigation, report that gracefully.",
+    "category": "Application Workflow",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "If present in the navigation, open the migration/legacy data console"
+      },
+      {
+        "type": "assertion",
+        "description": "It renders without errors; if no such section exists report gracefully without failing"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Footer renders with project attribution",
+    "description": "Open http://127.0.0.1:5173/ (no login). Scroll to the bottom of the page and verify a footer element is present with some text content. No interaction required.",
+    "category": "Health Check",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the portal URL directly in the browser - there is NO login page and NO authentication in this app; do not search for login forms or credentials"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the page"
+      },
+      {
+        "type": "assertion",
+        "description": "A footer element is present with text content"
+      }
+    ]
+  }
+]

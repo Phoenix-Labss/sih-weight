@@ -1,0 +1,735 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+enum TenantStateEnum {
+  ACTIVE
+  SUSPENDED
+  MAINTENANCE
+}
+
+enum JurisdictionLevelEnum {
+  ZONE
+  REGION
+  DISTRICT
+  OFFICE
+  SUB_OFFICE
+}
+
+enum RoleEnum {
+  OWNER
+  LMO
+  GATC_VERIFIER
+  SUPERVISOR
+  CONTROLLER
+  ADMIN
+  APPLICANT
+  AUDITOR
+  PUBLIC_VERIFIER
+}
+
+enum StakeholderTypeEnum {
+  OWNER_USER
+  MANUFACTURER
+  DEALER
+  REPAIRER
+  GATC_OPERATOR
+}
+
+enum AccuracyClassEnum {
+  CLASS_I
+  CLASS_II
+  CLASS_III
+  CLASS_IIII
+}
+
+enum InstrumentStatusEnum {
+  DRAFT
+  UNVERIFIED
+  ACTIVE_VERIFIED
+  VERIFIED
+  VERIFICATION_DUE
+  OVERDUE
+  VERIFICATION_EXPIRED
+  UNDER_REPAIR
+  DECOMMISSIONED
+  SEIZED
+  REJECTED
+  SEALED_OUT_OF_SERVICE
+  RETIRED
+}
+
+enum LegacyTrustStatusEnum {
+  VERIFIED_LEGACY
+  DIGITIZED_FROM_SOURCE
+  UNVERIFIED_LEGACY
+  CONFLICTED
+}
+
+enum ApplicationStatusEnum {
+  DRAFT
+  SUBMITTED
+  UNDER_SCRUTINY
+  QUERY_RAISED
+  QUERY_RESPONDED
+  CORRECTION_SUBMITTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  FEE_PENDING
+  FEE_PAID
+  PAYMENT_PROCESSING
+  PAYMENT_RECONCILED
+  SCHEDULED
+  VERIFICATION_IN_PROGRESS
+  COMPLETED
+}
+
+enum ApplicationTypeEnum {
+  INITIAL_VERIFICATION
+  RE_VERIFICATION
+  PERIODICAL_REVERIFICATION
+  AFTER_REPAIR_VERIFICATION
+  VERIFICATION_AFTER_REPAIR
+  VOLUNTARY_VERIFICATION
+}
+
+enum ServiceModeEnum {
+  ON_SITE
+  DEPARTMENTAL_LAB
+  GATC_CENTRE
+}
+
+enum PaymentStatusEnum {
+  NOT_ASSESSED
+  PAYMENT_PENDING
+  PENDING
+  PAYMENT_INITIATED
+  INITIATED
+  PAYMENT_AUTHORIZED
+  AUTHORIZED
+  PAYMENT_RECONCILED
+  SUCCESS
+  RECONCILED
+  PAYMENT_FAILED
+  FAILED
+  REFUND_INITIATED
+  REFUNDED
+  WAIVED
+}
+
+enum SessionStatusEnum {
+  PLANNED
+  IDENTITY_CONFIRMED
+  IN_PROGRESS
+  SUBMITTED
+  FINALIZED
+}
+
+enum VerificationOutcomeEnum {
+  VERIFICATION_PASSED_PENDING_AUTHORIZATION
+  VERIFICATION_FAILED
+  NEEDS_REVIEW
+  INCOMPLETE_VERIFICATION
+  OUTSIDE_AUTHORIZATION_SCOPE
+}
+
+enum StepTypeEnum {
+  ZERO_TEST
+  INCREASING_LOAD
+  DECREASING_LOAD
+  ECCENTRICITY
+  REPEATABILITY
+  TARE_TEST
+}
+
+enum PhysicalSealActionEnum {
+  SEAL_APPLIED
+  SEAL_BROKEN_OLD
+  SEAL_INTACT_VERIFIED
+  SEAL_INSPECTED_INTACT
+  SEAL_DEFECTIVE_REPLACED
+  SEAL_LOST_RECORDED
+  SEAL_BROKEN_RECORDED
+  SEAL_REPLACED
+}
+
+enum SealTypeEnum {
+  LEAD_WIRE_SEAL
+  SECURITY_STICKER_HOLOGRAM
+  TAMPER_EVIDENT_STICKER
+  METALLIC_PUNCH_MARK
+  BARCODED_TAMPER_SEAL
+  HEAT_SHRINK_SEAL
+  SECURITY_LABEL
+}
+
+enum CertificateStatusEnum {
+  DRAFT
+  PENDING_SIGNATURE
+  ISSUED
+  SIGNING_FAILED
+  EXPIRED
+  SUSPENDED
+  REVOKED
+  SUPERSEDED
+}
+
+enum ReferenceStandardStatusEnum {
+  ACTIVE
+  DUE_CALIBRATION
+  UNDER_CALIBRATION
+  QUARANTINED
+  EXPIRED
+  RETIRED
+}
+
+enum CustodianTypeEnum {
+  DEPARTMENTAL_LAB
+  GATC
+  ACCREDITED_CAL_LAB
+}
+
+// -----------------------------------------------------------------------------
+// Models
+// -----------------------------------------------------------------------------
+
+model Tenant {
+  tenant_id    String          @id @default(uuid())
+  state_code   String          @unique
+  state_name   String
+  status       TenantStateEnum @default(ACTIVE)
+  config       String          @default("{}") // JSON string for SQLite compatibility
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+
+  jurisdictions       Jurisdiction[]
+  stakeholders        Stakeholder[]
+  facilities          Facility[]
+  users               User[]
+  instruments         Instrument[]
+  applications        VerificationApplication[]
+  fee_assessments     FeeAssessment[]
+  sessions            VerificationSession[]
+  certificates        Certificate[]
+  reference_standards ReferenceStandard[]
+  stamp_actions       PhysicalStampAction[]
+
+  @@map("tenants")
+}
+
+model Jurisdiction {
+  jurisdiction_id        String                @id @default(uuid())
+  tenant_id              String
+  parent_jurisdiction_id String?
+  name                   String
+  code                   String
+  level                  JurisdictionLevelEnum
+  boundary_geo           String?               // JSON string
+  created_at             DateTime              @default(now())
+  updated_at             DateTime              @updatedAt
+
+  tenant              Tenant                    @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  parent_jurisdiction Jurisdiction?             @relation("JurisdictionHierarchy", fields: [parent_jurisdiction_id], references: [jurisdiction_id], onDelete: Restrict)
+  sub_jurisdictions   Jurisdiction[]            @relation("JurisdictionHierarchy")
+  stakeholders        Stakeholder[]
+  instruments         Instrument[]
+  applications        VerificationApplication[]
+  lmo_profiles        LMOProfile[]
+
+  @@unique([tenant_id, code], name: "uq_tenant_jurisdiction_code")
+  @@map("jurisdictions")
+}
+
+model Stakeholder {
+  stakeholder_id   String              @id @default(uuid())
+  tenant_id        String
+  jurisdiction_id  String
+  legal_name       String
+  trade_name       String?
+  stakeholder_type StakeholderTypeEnum
+  identifier_type  String?             // GSTIN, PAN, CIN
+  identifier_value String?
+  email            String
+  phone            String
+  address_line1    String
+  address_line2    String?
+  city             String
+  pincode          String
+  is_active        Boolean             @default(true)
+  created_at       DateTime            @default(now())
+  updated_at       DateTime            @updatedAt
+
+  tenant       Tenant                    @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  jurisdiction Jurisdiction              @relation(fields: [jurisdiction_id], references: [jurisdiction_id], onDelete: Restrict)
+  facilities   Facility[]
+  instruments  Instrument[]
+  applications VerificationApplication[]
+  users        User[]
+  certificates Certificate[]
+
+  @@unique([tenant_id, identifier_type, identifier_value], name: "uq_tenant_identifier")
+  @@map("stakeholders")
+}
+
+model Facility {
+  facility_id    String   @id @default(uuid())
+  tenant_id      String
+  stakeholder_id String
+  facility_name  String
+  address_line   String
+  district       String
+  pincode        String
+  gps_latitude   Decimal?
+  gps_longitude  Decimal?
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  stakeholder   Stakeholder    @relation(fields: [stakeholder_id], references: [stakeholder_id], onDelete: Restrict)
+  instruments   Instrument[]
+  gatc_profiles GATCProfile[]
+
+  @@map("facilities")
+}
+
+model User {
+  user_id        String    @id @default(uuid())
+  tenant_id      String
+  stakeholder_id String?
+  email          String    @unique
+  full_name      String
+  role           RoleEnum
+  is_active      Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  tenant                Tenant                   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  stakeholder           Stakeholder?             @relation(fields: [stakeholder_id], references: [stakeholder_id], onDelete: Restrict)
+  lmo_profile           LMOProfile?
+  verified_sessions     VerificationSession[]    @relation("SessionVerifier")
+  verified_certificates Certificate[]            @relation("CertificateVerifier")
+  signed_certificates   Certificate[]            @relation("CertificateSigner")
+  stamp_actions         PhysicalStampAction[]
+  status_events         CertificateStatusEvent[]
+
+  @@map("users")
+}
+
+model LMOProfile {
+  user_id                   String    @id
+  tenant_id                 String
+  jurisdiction_id           String
+  designation               String
+  posting_order_number      String
+  authorized_from           DateTime
+  authorized_to             DateTime?
+  digital_signature_cert_id String?
+  is_active                 Boolean   @default(true)
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  user         User                      @relation(fields: [user_id], references: [user_id], onDelete: Restrict)
+  jurisdiction Jurisdiction              @relation(fields: [jurisdiction_id], references: [jurisdiction_id], onDelete: Restrict)
+  applications VerificationApplication[] @relation("AssignedLMO")
+
+  @@map("lmo_profiles")
+}
+
+model GATCProfile {
+  gatc_id               String    @id @default(uuid())
+  tenant_id             String
+  facility_id           String
+  approval_order_number String
+  approved_scope        String    @default("{}") // JSON string
+  valid_from            DateTime
+  valid_to              DateTime
+  status                String    @default("ACTIVE")
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  facility     Facility                  @relation(fields: [facility_id], references: [facility_id], onDelete: Restrict)
+  applications VerificationApplication[] @relation("AssignedGATC")
+
+  @@map("gatc_profiles")
+}
+
+model InstrumentModel {
+  model_id                      String            @id @default(uuid())
+  category                      String
+  subtype                       String
+  manufacturer_name             String
+  model_name                    String
+  model_approval_number         String            @unique
+  accuracy_class                AccuracyClassEnum
+  verification_scale_interval_e Decimal
+  scale_interval_unit           String
+  min_capacity                  Decimal
+  max_capacity                  Decimal
+  capacity_unit                 String
+  number_of_intervals_n         Int?
+  specifications                String            @default("{}") // JSON string
+  is_active                     Boolean           @default(true)
+  created_at                    DateTime          @default(now())
+  updated_at                    DateTime          @updatedAt
+
+  instruments Instrument[]
+
+  @@map("instrument_models")
+}
+
+model Instrument {
+  instrument_id               String                 @id @default(uuid())
+  public_instrument_token     String                 @unique
+  tenant_id                   String
+  jurisdiction_id             String
+  model_id                    String
+  owner_id                    String
+  facility_id                 String
+  serial_number               String
+  year_of_manufacture         Int
+  intended_use                String?
+  installation_location_notes String?
+  current_status              InstrumentStatusEnum   @default(UNVERIFIED)
+  latest_certificate_id       String?
+  verification_due_date       DateTime?
+  legacy_trust                LegacyTrustStatusEnum?
+  created_at                  DateTime               @default(now())
+  updated_at                  DateTime               @updatedAt
+
+  tenant        Tenant                    @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  jurisdiction  Jurisdiction              @relation(fields: [jurisdiction_id], references: [jurisdiction_id], onDelete: Restrict)
+  model         InstrumentModel           @relation(fields: [model_id], references: [model_id], onDelete: Restrict)
+  owner         Stakeholder               @relation(fields: [owner_id], references: [stakeholder_id], onDelete: Restrict)
+  facility      Facility                  @relation(fields: [facility_id], references: [facility_id], onDelete: Restrict)
+  applications  VerificationApplication[]
+  sessions      VerificationSession[]
+  certificates  Certificate[]
+  stamp_actions PhysicalStampAction[]
+
+  @@unique([model_id, serial_number], name: "uq_model_serial")
+  @@index([tenant_id])
+  @@index([owner_id])
+  @@index([verification_due_date])
+  @@map("instruments")
+}
+
+model FeeAssessment {
+  fee_assessment_id       String            @id @default(uuid())
+  tenant_id               String
+  policy_version          String
+  base_verification_fee   Decimal
+  user_charge             Decimal           @default(0.00)
+  late_fee                Decimal           @default(0.00)
+  total_assessed_amount   Decimal
+  currency                String            @default("INR")
+  payment_status          PaymentStatusEnum @default(PENDING)
+  payment_gateway_ref     String?
+  treasury_challan_number String?
+  paid_at                 DateTime?
+  receipt_number          String?           @unique
+  created_at              DateTime          @default(now())
+  updated_at              DateTime          @updatedAt
+
+  tenant       Tenant                    @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  applications VerificationApplication[]
+
+  @@map("fee_assessments")
+}
+
+model VerificationApplication {
+  application_id                 String                @id @default(uuid())
+  application_number             String                @unique
+  tenant_id                      String
+  jurisdiction_id                String
+  instrument_id                  String
+  applicant_id                   String
+  application_type               ApplicationTypeEnum
+  service_mode                   ServiceModeEnum
+  preferred_verification_date    DateTime?
+  scheduled_slot_start           DateTime?
+  scheduled_slot_end             DateTime?
+  assigned_lmo_id                String?
+  assigned_gatc_id               String?
+  fee_assessment_id              String?
+  current_status                 ApplicationStatusEnum @default(DRAFT)
+  scrutiny_notes                 String?
+  rejection_reason               String?
+  active_query                   String?
+  query_raised_at                DateTime?
+  applicant_declaration_accepted Boolean               @default(false)
+  version                        Int                   @default(1)
+  created_at                     DateTime              @default(now())
+  updated_at                     DateTime              @updatedAt
+
+  tenant         Tenant                @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  jurisdiction   Jurisdiction          @relation(fields: [jurisdiction_id], references: [jurisdiction_id], onDelete: Restrict)
+  instrument     Instrument            @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
+  applicant      Stakeholder           @relation(fields: [applicant_id], references: [stakeholder_id], onDelete: Restrict)
+  fee_assessment FeeAssessment?        @relation(fields: [fee_assessment_id], references: [fee_assessment_id], onDelete: Restrict)
+  assigned_lmo   LMOProfile?           @relation("AssignedLMO", fields: [assigned_lmo_id], references: [user_id], onDelete: Restrict)
+  assigned_gatc  GATCProfile?          @relation("AssignedGATC", fields: [assigned_gatc_id], references: [gatc_id], onDelete: Restrict)
+  sessions       VerificationSession[]
+
+  @@index([tenant_id])
+  @@index([applicant_id])
+  @@index([current_status])
+  @@map("verification_applications")
+}
+
+model ReferenceStandard {
+  standard_id                    String                      @id
+  tenant_id                      String
+  custodian_type                 CustodianTypeEnum
+  custodian_id                   String
+  asset_tag                      String
+  denomination_mass              Decimal
+  mass_unit                      String
+  accuracy_class                 String                      // E1, E2, F1, F2, M1, M2, M3
+  serial_number                  String
+  calibration_certificate_number String
+  calibrating_laboratory         String
+  calibrated_at                  DateTime
+  valid_until                    DateTime
+  expanded_uncertainty           Decimal                     @default(0.0)
+  calibration_status             ReferenceStandardStatusEnum @default(ACTIVE)
+  created_at                     DateTime                    @default(now())
+  updated_at                     DateTime                    @updatedAt
+
+  tenant            Tenant                     @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  session_standards SessionReferenceStandard[]
+
+  @@map("reference_standards")
+}
+
+model VerificationSession {
+  session_id                     String                   @id @default(uuid())
+  tenant_id                      String
+  application_id                 String
+  instrument_id                  String
+  procedure_pack_id              String
+  procedure_pack_checksum        String
+  verifier_id                    String
+  verifier_role                  String
+  scheduled_date                 DateTime
+  actual_test_timestamp          DateTime?
+  test_location_geo              String?                  // JSON string
+  environmental_temp_celsius     Decimal?
+  environmental_humidity_percent Decimal?
+  status                         SessionStatusEnum        @default(PLANNED)
+  automated_evaluation_flag      Boolean?
+  outcome                        VerificationOutcomeEnum?
+  officer_disposition_notes      String?
+  finalized_at                   DateTime?
+  created_at                     DateTime                 @default(now())
+  updated_at                     DateTime                 @updatedAt
+
+  tenant              Tenant                     @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  application         VerificationApplication    @relation(fields: [application_id], references: [application_id], onDelete: Restrict)
+  instrument          Instrument                 @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
+  verifier            User                       @relation("SessionVerifier", fields: [verifier_id], references: [user_id], onDelete: Restrict)
+  reference_standards SessionReferenceStandard[]
+  observations        TestObservation[]
+  stamp_actions       PhysicalStampAction[]
+  certificates        Certificate[]
+
+  @@index([tenant_id])
+  @@index([status])
+  @@map("verification_sessions")
+}
+
+model SessionReferenceStandard {
+  session_id                       String
+  standard_id                      String
+  snapshot_calibration_certificate String
+  snapshot_valid_until             DateTime
+  verified_suitable                Boolean  @default(true)
+
+  session  VerificationSession @relation(fields: [session_id], references: [session_id], onDelete: Restrict)
+  standard ReferenceStandard   @relation(fields: [standard_id], references: [standard_id], onDelete: Restrict)
+
+  @@id([session_id, standard_id])
+  @@map("session_reference_standards")
+}
+
+model TestObservation {
+  observation_id         String       @id @default(uuid())
+  session_id             String
+  step_type              StepTypeEnum
+  step_sequence          Int
+  nominal_load           Decimal
+  load_unit              String
+  raw_indication_reading Decimal
+  normalized_indication  Decimal
+  reading_unit           String
+  observed_error         Decimal
+  mpe_allowed            Decimal
+  is_within_mpe          Boolean
+  repetition_index       Int          @default(1)
+  eccentricity_position  String?
+  calculation_trace      String       @default("{}") // JSON string
+  is_immutable           Boolean      @default(true)
+  recorded_at            DateTime     @default(now())
+
+  session VerificationSession @relation(fields: [session_id], references: [session_id], onDelete: Restrict)
+
+  @@unique([session_id, step_type, step_sequence, repetition_index, eccentricity_position], name: "uq_session_step_repetition")
+  @@map("test_observations")
+}
+
+model PhysicalStampAction {
+  stamp_action_id            String                 @id @default(uuid())
+  tenant_id                  String
+  session_id                 String
+  instrument_id              String
+  verifier_id                String
+  action_type                PhysicalSealActionEnum
+  seal_type                  SealTypeEnum
+  seal_identification_number String
+  seal_position              String
+  photo_evidence_hash        String?
+  photo_storage_path         String?
+  action_timestamp           DateTime               @default(now())
+  notes                      String?
+
+  tenant     Tenant              @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  session    VerificationSession @relation(fields: [session_id], references: [session_id], onDelete: Restrict)
+  instrument Instrument          @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
+  verifier   User                @relation(fields: [verifier_id], references: [user_id], onDelete: Restrict)
+
+  @@index([tenant_id])
+  @@index([seal_identification_number])
+  @@map("physical_stamp_actions")
+}
+
+model Certificate {
+  certificate_id              String                @id @default(uuid())
+  certificate_number          String                @unique
+  public_verification_token   String                @unique
+  tenant_id                   String
+  session_id                  String
+  instrument_id               String
+  owner_id                    String
+  procedure_pack_id           String
+  verifier_id                 String
+  signer_id                   String?
+  issue_date                  DateTime
+  valid_until                 DateTime
+  certificate_status          CertificateStatusEnum @default(DRAFT)
+  certificate_bytes_sha256    String?
+  pdf_storage_path            String?
+  digital_signature_reference String?
+  signature_timestamp         DateTime?
+  qr_code_payload             String
+  superseding_certificate_id  String?
+  created_at                  DateTime              @default(now())
+  updated_at                  DateTime              @updatedAt
+
+  tenant                  Tenant                   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Restrict)
+  session                 VerificationSession      @relation(fields: [session_id], references: [session_id], onDelete: Restrict)
+  instrument              Instrument               @relation(fields: [instrument_id], references: [instrument_id], onDelete: Restrict)
+  owner                   Stakeholder              @relation(fields: [owner_id], references: [stakeholder_id], onDelete: Restrict)
+  verifier                User                     @relation("CertificateVerifier", fields: [verifier_id], references: [user_id], onDelete: Restrict)
+  signer                  User?                    @relation("CertificateSigner", fields: [signer_id], references: [user_id], onDelete: Restrict)
+  superseding_certificate Certificate?             @relation("CertificateSupersession", fields: [superseding_certificate_id], references: [certificate_id], onDelete: Restrict)
+  superseded_certificates Certificate[]            @relation("CertificateSupersession")
+  status_events           CertificateStatusEvent[]
+
+  @@index([tenant_id])
+  @@index([certificate_status])
+  @@index([valid_until])
+  @@map("certificates")
+}
+
+model CertificateStatusEvent {
+  status_event_id               String                @id @default(uuid())
+  certificate_id                String
+  previous_status               CertificateStatusEnum
+  new_status                    CertificateStatusEnum
+  actor_id                      String
+  reason                        String
+  statutory_authority_reference String?
+  event_timestamp               DateTime              @default(now())
+
+  certificate Certificate @relation(fields: [certificate_id], references: [certificate_id], onDelete: Restrict)
+  actor       User        @relation(fields: [actor_id], references: [user_id], onDelete: Restrict)
+
+  @@index([certificate_id])
+  @@map("certificate_status_events")
+}
+
+model AuditLog {
+  audit_id       String   @id @default(uuid())
+  tenant_id      String
+  actor_id       String
+  actor_role     String
+  action         String
+  entity_type    String
+  entity_id      String
+  correlation_id String
+  causation_id   String?
+  before_state   String?  // JSON string
+  after_state    String?  // JSON string
+  client_ip      String?
+  user_agent     String?
+  recorded_at    DateTime @default(now())
+
+  @@index([tenant_id])
+  @@index([entity_type, entity_id])
+  @@index([correlation_id])
+  @@map("audit_logs")
+}
+
+model Delegation {
+  delegation_id    String   @id @default(uuid())
+  tenant_id        String
+  granter_user_id  String
+  delegatee_user_id String
+  jurisdiction_id  String
+  valid_from       DateTime
+  valid_to         DateTime
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("delegations")
+}
+
+model ProcedurePack {
+  pack_id             String   @id
+  version             String
+  legal_source_id     String
+  checksum_sha256     String
+  name                String
+  accuracy_class_scope String  // comma separated or JSON
+  status              String   @default("ACTIVE")
+  effective_from      DateTime
+  effective_until     DateTime?
+  schema_definition   String   @default("{}")
+  created_at          DateTime @default(now())
+
+  @@map("procedure_packs")
+}
+
+model LegalSourceRecord {
+  legal_source_id     String   @id
+  act_name            String
+  section_rule        String
+  title               String
+  effective_date      DateTime
+  checksum_sha256     String
+  source_document_url String?
+  created_at          DateTime @default(now())
+
+  @@map("legal_source_records")
+}

@@ -310,6 +310,7 @@ model User {
   email          String    @unique
   full_name      String
   role           RoleEnum
+  password_hash  String?
   is_active      Boolean   @default(true)
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
@@ -322,6 +323,7 @@ model User {
   signed_certificates   Certificate[]            @relation("CertificateSigner")
   stamp_actions         PhysicalStampAction[]
   status_events         CertificateStatusEvent[]
+  refresh_tokens        RefreshToken[]
 
   @@map("users")
 }
@@ -703,6 +705,29 @@ model Delegation {
   updated_at       DateTime @updatedAt
 
   @@map("delegations")
+}
+
+/// Refresh-token family for rotating session refresh cookies.
+/// A token row is immutable once created; rotation revokes the predecessor and
+/// inserts a successor in the same family. Reuse of a revoked token revokes the
+/// whole family (theft signal).
+model RefreshToken {
+  token_id       String    @id @default(uuid())
+  user_id        String
+  family_id      String
+  token_hash     String    @unique
+  expires_at     DateTime
+  revoked_at     DateTime?
+  replaced_by_id String?
+  created_by_ip  String?
+  user_agent     String?
+  created_at     DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([family_id])
+  @@map("refresh_tokens")
 }
 
 model ProcedurePack {

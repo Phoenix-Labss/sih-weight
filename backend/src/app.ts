@@ -13,6 +13,7 @@ import { stampRoutes } from './routes/stamps.routes.js';
 import { certificateRoutes } from './routes/certificates.routes.js';
 import { publicRoutes } from './routes/public.routes.js';
 import { adminRoutes } from './routes/admin.routes.js';
+import { authRoutes } from './auth/auth.routes.js';
 
 /**
  * Builds and configures the Fastify Application instance
@@ -106,6 +107,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await v1.register(certificateRoutes);
       await v1.register(publicRoutes);
       await v1.register(adminRoutes);
+      await v1.register(authRoutes);
     },
     { prefix: '/api/v1' }
   );

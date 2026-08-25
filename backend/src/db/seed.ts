@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from 'decimal.js';
+import { hashPassword } from '../auth/password.js';
 
 const prisma = new PrismaClient();
 
@@ -83,7 +84,7 @@ export async function seedDatabase() {
   // 4. Users
   const userTrader = await prisma.user.upsert({
     where: { email: 'trader@example.com' },
-    update: {},
+    update: { password_hash: hashPassword('Trader@2026') },
     create: {
       user_id: 'usr-trader-01',
       tenant_id: tenant.tenant_id,
@@ -91,49 +92,82 @@ export async function seedDatabase() {
       email: 'trader@example.com',
       full_name: 'Rajesh Kumar',
       role: 'OWNER',
+      password_hash: hashPassword('Trader@2026'),
       is_active: true,
     },
   });
 
   const userLmo = await prisma.user.upsert({
     where: { email: 'lmo.delhi@gov.in' },
-    update: {},
+    update: { password_hash: hashPassword('LMO@2026') },
     create: {
       user_id: 'lmo-officer-01',
       tenant_id: tenant.tenant_id,
       email: 'lmo.delhi@gov.in',
       full_name: 'Dr. Ramesh Kumar',
       role: 'LMO',
+      password_hash: hashPassword('LMO@2026'),
       is_active: true,
     },
   });
 
   const userSupervisor = await prisma.user.upsert({
     where: { email: 'supervisor.delhi@gov.in' },
-    update: {},
+    update: { password_hash: hashPassword('Supervisor@2026') },
     create: {
       user_id: 'sup-officer-01',
       tenant_id: tenant.tenant_id,
       email: 'supervisor.delhi@gov.in',
       full_name: 'Smt. Sunita Sharma',
       role: 'SUPERVISOR',
+      password_hash: hashPassword('Supervisor@2026'),
       is_active: true,
     },
   });
 
   const userAdmin = await prisma.user.upsert({
     where: { email: 'admin.delhi@gov.in' },
-    update: {},
+    update: { password_hash: hashPassword('Admin@2026') },
     create: {
       user_id: 'adm-system-01',
       tenant_id: tenant.tenant_id,
       email: 'admin.delhi@gov.in',
       full_name: 'System Administrator',
       role: 'ADMIN',
+      password_hash: hashPassword('Admin@2026'),
       is_active: true,
     },
   });
-  console.log(`✓ Seeded Users: Trader (${userTrader.user_id}), LMO (${userLmo.user_id}), Supervisor (${userSupervisor.user_id}), Admin (${userAdmin.user_id})`);
+
+  const userApplicant = await prisma.user.upsert({
+    where: { email: 'applicant.delhi@example.com' },
+    update: { password_hash: hashPassword('Applicant@2026') },
+    create: {
+      user_id: 'usr-applicant-02',
+      tenant_id: tenant.tenant_id,
+      email: 'applicant.delhi@example.com',
+      full_name: 'Suresh Verma',
+      role: 'APPLICANT',
+      password_hash: hashPassword('Applicant@2026'),
+      is_active: true,
+    },
+  });
+
+  const userGatc = await prisma.user.upsert({
+    where: { email: 'gatc.delhi@gov.in' },
+    update: { password_hash: hashPassword('GATC@2026') },
+    create: {
+      user_id: 'gatc-verifier-01',
+      tenant_id: tenant.tenant_id,
+      email: 'gatc.delhi@gov.in',
+      full_name: 'Dr. Priya Nair',
+      role: 'GATC_VERIFIER',
+      password_hash: hashPassword('GATC@2026'),
+      is_active: true,
+    },
+  });
+
+  console.log(`✓ Seeded Users: Trader (${userTrader.user_id}), LMO (${userLmo.user_id}), Supervisor (${userSupervisor.user_id}), Admin (${userAdmin.user_id}), Applicant (${userApplicant.user_id}), GATC (${userGatc.user_id})`);
 
   // 5. LMO Profile
   await prisma.lMOProfile.upsert({

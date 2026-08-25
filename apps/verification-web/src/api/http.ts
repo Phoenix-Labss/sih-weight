@@ -1,7 +1,7 @@
 import { env } from '../config/env';
+import { getAccessToken, setAccessToken } from '../context/AuthContext';
 import { PaginatedResponse } from '../types/api';
 import { Instrument, InstrumentModel, InstrumentRegisterRequest } from '../types/instrument';
-import { mockModels } from './mock/mockFixtures';
 import {
   Application,
   ApplicationCorrectionRequest,
@@ -36,60 +36,87 @@ class HttpError extends Error {
   }
 }
 
+const API = env.API_BASE_URL.replace(/\/+$/, '');
+let _refreshPromise: Promise<boolean> | null = null;
+
+async function trySilentRefresh(): Promise<boolean> {
+  if (_refreshPromise) return _refreshPromise;
+  _refreshPromise = (async () => {
+    try {
+      const res = await fetch(`${API}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) return false;
+      const body = await res.json();
+      if (body.accessToken) {
+        setAccessToken(body.accessToken);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    } finally {
+      _refreshPromise = null;
+    }
+  })();
+  return _refreshPromise;
+}
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const url = `${env.API_BASE_URL}${endpoint}`;
-  
-  let activeRole = 'OWNER';
-  let activeActorId = 'usr-trader-01';
-  let activeTenant = env.DEFAULT_TENANT_ID;
-
-  try {
-    activeRole = localStorage.getItem('auth_role') || 'OWNER';
-    activeActorId = localStorage.getItem('auth_actor_id') || (activeRole === 'LMO' ? 'lmo-officer-01' : 'usr-trader-01');
-    activeTenant = localStorage.getItem('auth_tenant_id') || env.DEFAULT_TENANT_ID;
-  } catch {
-    // Ignore
-  }
-
+  const url = `${API}${endpoint}`;
+  const token = getAccessToken();
   const explicitHeaders = (options.headers || {}) as Record<string, string>;
-  const finalRole = explicitHeaders['X-Actor-Role'] || explicitHeaders['X-Test-Role'] || activeRole;
-  const finalActorId = explicitHeaders['X-Actor-Id'] || explicitHeaders['X-Test-User-Id'] || (finalRole === 'LMO' ? 'lmo-officer-01' : activeActorId);
-  const finalTenant = explicitHeaders['X-Tenant-Id'] || explicitHeaders['X-Test-Tenant-Id'] || activeTenant;
 
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
-    'X-Actor-Id': finalActorId,
-    'X-Test-User-Id': finalActorId,
-    'X-Actor-Role': finalRole,
-    'X-Test-Role': finalRole,
-    'X-Jurisdiction-Id': env.DEFAULT_JURISDICTION_ID,
-    'X-Test-Jurisdiction-Id': env.DEFAULT_JURISDICTION_ID,
-    'X-Tenant-Id': finalTenant,
-    'X-Test-Tenant-Id': finalTenant,
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...explicitHeaders,
-    },
-  });
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  } else {
+    // Dev fallback for backward compatibility
+    let activeRole = 'OWNER';
+    let activeActorId = 'usr-trader-01';
+    let activeTenant = env.DEFAULT_TENANT_ID;
+    try {
+      activeRole = localStorage.getItem('auth_role') || 'OWNER';
+      activeActorId = localStorage.getItem('auth_actor_id') || 'usr-trader-01';
+      activeTenant = localStorage.getItem('auth_tenant_id') || env.DEFAULT_TENANT_ID;
+    } catch { /* ignore */ }
+    defaultHeaders['X-Actor-Id'] = explicitHeaders['X-Actor-Id'] || activeActorId;
+    defaultHeaders['X-Actor-Role'] = explicitHeaders['X-Actor-Role'] || activeRole;
+    defaultHeaders['X-Tenant-Id'] = explicitHeaders['X-Tenant-Id'] || activeTenant;
+    defaultHeaders['X-Jurisdiction-Id'] = env.DEFAULT_JURISDICTION_ID;
+  }
+
+  const response = await fetch(url, { ...options, headers: { ...defaultHeaders, ...explicitHeaders } });
+
+  if (response.status === 401 && token) {
+    const refreshed = await trySilentRefresh();
+    if (refreshed) {
+      const newToken = getAccessToken();
+      if (newToken) {
+        defaultHeaders['Authorization'] = `Bearer ${newToken}`;
+        const retryRes = await fetch(url, { ...options, headers: { ...defaultHeaders, ...explicitHeaders } });
+        if (retryRes.ok) return retryRes.json();
+        let detail = retryRes.statusText;
+        try { const ej = await retryRes.json(); detail = ej.detail || JSON.stringify(ej); } catch { /* */ }
+        throw new HttpError(retryRes.status, `API error (${retryRes.status}): ${detail}`);
+      }
+    }
+    throw new HttpError(401, 'Session expired. Please log in again.');
+  }
 
   if (!response.ok) {
-    let errorDetail = response.statusText;
-    try {
-      const errorJson = await response.json();
-      errorDetail = errorJson.detail || JSON.stringify(errorJson);
-    } catch {
-      // Ignore
-    }
-    throw new HttpError(response.status, `API error (${response.status}): ${errorDetail}`);
+    let detail = response.statusText;
+    try { const ej = await response.json(); detail = ej.detail || JSON.stringify(ej); } catch { /* */ }
+    throw new HttpError(response.status, `API error (${response.status}): ${detail}`);
   }
 
   return response.json();
 }
-
 export const httpInstrumentService: IInstrumentService = {
   async listInstruments(tenantId: string, page = 1, pageSize = 50): Promise<PaginatedResponse<Instrument>> {
     return request<PaginatedResponse<Instrument>>(`/tenants/${tenantId}/instruments?page=${page}&page_size=${pageSize}`);
@@ -104,13 +131,7 @@ export const httpInstrumentService: IInstrumentService = {
     });
   },
   async listModels(): Promise<InstrumentModel[]> {
-    try {
-      const activeTenant = localStorage.getItem('auth_tenant_id') || env.DEFAULT_TENANT_ID;
-      const res = await request<InstrumentModel[]>(`/tenants/${activeTenant}/instruments/models`);
-      return res && res.length > 0 ? res : mockModels;
-    } catch {
-      return mockModels;
-    }
+    return request<InstrumentModel[]>('/tenants/tenant-delhi-central/instruments/models');
   },
 };
 
@@ -130,15 +151,12 @@ export const httpApplicationService: IApplicationService = {
   async submitApplication(tenantId: string, id: string): Promise<Application> {
     return request<Application>(`/tenants/${tenantId}/applications/${id}/submit`, {
       method: 'POST',
-      // Fastify rejects a POST that carries Content-Type: application/json
-      // with an empty body, so always send an explicit empty object.
       body: JSON.stringify({}),
     });
   },
   async scrutinizeApplication(tenantId: string, id: string, payload: ApplicationScrutinyRequest): Promise<Application> {
     return request<Application>(`/tenants/${tenantId}/applications/${id}/scrutiny`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
@@ -151,7 +169,6 @@ export const httpApplicationService: IApplicationService = {
   async assessFee(tenantId: string, id: string, payload: FeeAssessmentCreate): Promise<Application> {
     return request<Application>(`/tenants/${tenantId}/applications/${id}/fee`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
@@ -164,7 +181,6 @@ export const httpApplicationService: IApplicationService = {
   async scheduleApplication(tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application> {
     return request<Application>(`/tenants/${tenantId}/applications/${id}/schedule`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
@@ -180,39 +196,30 @@ export const httpVerificationService: IVerificationService = {
   async createSession(tenantId: string, payload: SessionCreateRequest): Promise<VerificationSession> {
     return request<VerificationSession>(`/tenants/${tenantId}/sessions`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
   async confirmIdentity(tenantId: string, id: string, serialVerified: boolean): Promise<VerificationSession> {
     return request<VerificationSession>(`/tenants/${tenantId}/sessions/${id}/identity?serial_verified=${serialVerified}`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify({}),
     });
   },
   async startSession(tenantId: string, id: string): Promise<VerificationSession> {
     return request<VerificationSession>(`/tenants/${tenantId}/sessions/${id}/start`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify({}),
     });
   },
-  async submitObservations(
-    tenantId: string,
-    id: string,
-    payload: SessionObservationSubmitRequest
-  ): Promise<VerificationSession> {
+  async submitObservations(tenantId: string, id: string, payload: SessionObservationSubmitRequest): Promise<VerificationSession> {
     return request<VerificationSession>(`/tenants/${tenantId}/sessions/${id}/observations`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
   async recordDisposition(tenantId: string, id: string, payload: SessionDispositionRequest): Promise<VerificationSession> {
     return request<VerificationSession>(`/tenants/${tenantId}/sessions/${id}/disposition`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
@@ -222,7 +229,6 @@ export const httpStampService: IStampService = {
   async recordStampAction(tenantId: string, sessionId: string, payload: PhysicalStampRecordRequest): Promise<PhysicalStamp> {
     return request<PhysicalStamp>(`/tenants/${tenantId}/sessions/${sessionId}/stamps`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
@@ -241,14 +247,12 @@ export const httpCertificateService: ICertificateService = {
   async issueCertificate(tenantId: string, payload: CertificateIssueRequest): Promise<Certificate> {
     return request<Certificate>(`/tenants/${tenantId}/certificates/issue`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },
   async updateStatus(tenantId: string, id: string, payload: CertificateStatusUpdateRequest): Promise<Certificate> {
     return request<Certificate>(`/tenants/${tenantId}/certificates/${id}/status`, {
       method: 'POST',
-      headers: { 'X-Actor-Role': 'LMO' },
       body: JSON.stringify(payload),
     });
   },

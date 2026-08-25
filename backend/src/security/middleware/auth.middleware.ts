@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { RoleEnum, SecurityContext } from '../../core/types.js';
+import { verifyAccessToken } from '../../auth/token.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -18,22 +19,72 @@ const VALID_ROLES: Set<RoleEnum> = new Set([
   'PUBLIC',
 ]);
 
+const ANONYMOUS: SecurityContext = {
+  userId: 'public-anonymous',
+  tenantId: 'tenant-delhi-central',
+  role: 'PUBLIC',
+  jurisdictionId: 'jur-dl-01',
+  email: '',
+  fullName: '',
+  isActive: false,
+};
+
+function bearerToken(request: FastifyRequest): string | undefined {
+  const auth = request.headers.authorization;
+  const value = Array.isArray(auth) ? auth[0] : auth;
+  if (value?.startsWith('Bearer ')) return value.slice(7);
+  return undefined;
+}
+
 /**
- * Authentication and Context Extraction Middleware
+ * Authentication and Context Extraction Middleware.
  *
- * Reads statutory headers from incoming HTTP requests with resilient fallbacks
- * for demonstration, integration testing, and local development.
+ * Resolution order:
+ *  1. `Authorization: Bearer <jwt>` — verified signature/expiry; context is built
+ *     from token claims ONLY (never trusting client-supplied role headers).
+ *  2. Legacy `X-Actor-*` headers — honored ONLY when `ALLOW_DEV_HEADERS=true`
+ *     AND `NODE_ENV !== 'production'`. This closes the demo impersonation gap:
+ *     in production any request reaching a protected route without a valid token
+ *     is treated as the unauthenticated `PUBLIC` role.
+ *  3. No token & dev headers disabled -> anonymous `PUBLIC` context.
  */
 export async function authMiddleware(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
   const headers = request.headers;
 
-  // Extract Actor ID
+  // 1. Bearer JWT
+  const token = bearerToken(request);
+  const secret = process.env.JWT_SECRET_KEY;
+  if (token && secret) {
+    try {
+      const claims = verifyAccessToken(token, secret);
+      request.securityContext = {
+        userId: claims.sub,
+        tenantId: claims.tenantId,
+        role: claims.role,
+        jurisdictionId: claims.jurisdictionId,
+        email: '',
+        fullName: '',
+        isActive: true,
+      };
+      return;
+    } catch {
+      // Invalid/expired token: fall through to dev headers or anonymous.
+      // Guarded routes reject with 401/403; public routes remain reachable.
+    }
+  }
+
+  const allowDevHeaders = process.env.ALLOW_DEV_HEADERS !== 'false' && process.env.NODE_ENV !== 'production';
+  if (!allowDevHeaders) {
+    request.securityContext = { ...ANONYMOUS };
+    return;
+  }
+
+  // 2. Legacy dev/testing header impersonation (dev only).
   const actorIdHeader =
     (headers['x-actor-id'] as string) ||
     (headers['x-test-user-id'] as string) ||
     (headers['x-user-id'] as string);
 
-  // Extract Role
   const roleHeaderRaw =
     (headers['x-actor-role'] as string) ||
     (headers['x-test-role'] as string) ||
@@ -50,19 +101,16 @@ export async function authMiddleware(request: FastifyRequest, _reply: FastifyRep
     role = 'ADMIN';
   }
 
-  // Extract Tenant ID
   const tenantId =
     (headers['x-tenant-id'] as string) ||
     (headers['x-test-tenant-id'] as string) ||
     'tenant-delhi-central';
 
-  // Extract Jurisdiction ID
   const jurisdictionId =
     (headers['x-jurisdiction-id'] as string) ||
     (headers['x-test-jurisdiction-id'] as string) ||
     'jur-dl-01';
 
-  // Default User ID
   const userId = actorIdHeader || (role === 'LMO' ? 'lmo-officer-01' : 'usr-trader-01');
 
   request.securityContext = {

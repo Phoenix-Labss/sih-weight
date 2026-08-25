@@ -6,7 +6,9 @@ export type RoleEnum =
   | 'SUPERVISOR'
   | 'CONTROLLER'
   | 'ADMIN'
-  | 'PUBLIC';
+  | 'PUBLIC'
+  | 'AUDITOR'
+  | 'PUBLIC_VERIFIER';
 
 export type AccuracyClassEnum = 'CLASS_I' | 'CLASS_II' | 'CLASS_III' | 'CLASS_IIII';
 

@@ -97,6 +97,18 @@ export interface Translations {
   statusExpired: string;
   statusRevoked: string;
   statusSuperseded: string;
+
+  // Login
+  loginTitle: string;
+  loginSubtitle: string;
+  loginEmailLabel: string;
+  loginPasswordLabel: string;
+  loginButton: string;
+  loginError: string;
+  loginRequired: string;
+  loginDemoCredentials: string;
+  logoutButton: string;
+  loggedInAs: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -183,6 +195,17 @@ const translations: Record<Language, Translations> = {
     statusExpired: 'EXPIRED',
     statusRevoked: 'REVOKED',
     statusSuperseded: 'SUPERSEDED',
+
+    loginTitle: 'Sign In — e-Metrology Portal',
+    loginSubtitle: 'National Legal Metrology Verification & Digital Certification Platform',
+    loginEmailLabel: 'Email Address',
+    loginPasswordLabel: 'Password',
+    loginButton: 'Sign In',
+    loginError: 'Invalid email or password',
+    loginRequired: 'Please enter your email and password to continue.',
+    loginDemoCredentials: 'Demo credentials: trader@example.com / Trader@2026',
+    logoutButton: 'Sign Out',
+    loggedInAs: 'Signed in as',
   },
   hi: {
     govOfIndia: 'भारत सरकार',
@@ -267,6 +290,17 @@ const translations: Record<Language, Translations> = {
     statusExpired: 'अवधि पूर्ण (समाप्त)',
     statusRevoked: 'निरस्त (रद्द)',
     statusSuperseded: 'प्रतिस्थापित (सुपरसीड)',
+
+    loginTitle: 'साइन इन — ई-मेट्रोलॉजी पोर्टल',
+    loginSubtitle: 'राष्ट्रीय विधिक मापविज्ञान सत्यापन एवं डिजिटल प्रमाणन प्लेटफॉर्म',
+    loginEmailLabel: 'ईमेल पता',
+    loginPasswordLabel: 'पासवर्ड',
+    loginButton: 'साइन इन',
+    loginError: 'अमान्य ईमेल या पासवर्ड',
+    loginRequired: 'कृपया अपना ईमेल और पासवर्ड दर्ज करें।',
+    loginDemoCredentials: 'डेमो क्रेडेंशियल: trader@example.com / Trader@2026',
+    logoutButton: 'साइन आउट',
+    loggedInAs: 'के रूप में साइन इन किया गया',
   },
 };
 

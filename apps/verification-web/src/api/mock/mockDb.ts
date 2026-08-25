@@ -185,7 +185,23 @@ export class MockDatabase {
       app.current_status = 'FEE_PENDING';
       app.scrutiny_notes = req.notes || 'Accepted after statutory document verification.';
       app.active_query = undefined;
-      if (app.fee_assessment) {
+      // Create a default fee_assessment so the Pay Fees button appears on the
+      // trader dashboard. Without it, `isFeePending` stays false because
+      // `Boolean(application.fee_assessment)` is false.
+      if (!app.fee_assessment) {
+        app.fee_assessment = {
+          fee_assessment_id: `FEE-${Date.now().toString().slice(-4)}`,
+          tenant_id: app.tenant_id,
+          policy_version: 'POL-FEES-2026.1',
+          base_verification_fee: 750,
+          user_charge: 50,
+          late_fee: 0,
+          total_assessed_amount: 800,
+          currency: 'INR',
+          payment_status: 'PAYMENT_PENDING',
+          created_at: new Date().toISOString(),
+        };
+      } else {
         app.fee_assessment.payment_status = 'PAYMENT_PENDING';
       }
     } else if (req.action === 'QUERY') {

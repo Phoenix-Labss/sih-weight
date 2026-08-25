@@ -77,6 +77,9 @@ export const TraderDashboard: React.FC = () => {
   // Derived metrics
   const totalInstruments = instruments.length;
   const activeApplications = applications.filter((a) => a.current_status !== 'COMPLETED' && a.current_status !== 'REJECTED').length;
+  // Once verification is COMPLETED the timeline card disappears from the home
+  // screen; the issued certificate remains available below in the quick table.
+  const visibleApplications = applications.filter((a) => a.current_status !== 'COMPLETED');
   const pendingFees = applications
     .filter((a) => a.fee_assessment && a.fee_assessment.payment_status === 'PAYMENT_PENDING')
     .reduce((sum, a) => sum + (a.fee_assessment?.total_assessed_amount || 0), 0);
@@ -247,13 +250,13 @@ export const TraderDashboard: React.FC = () => {
             </button>
           </div>
 
-          {applications.length === 0 ? (
+          {visibleApplications.length === 0 ? (
             <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500 text-xs">
-              No verification applications found. Click "File Application" to submit.
+              No active verification applications in progress.
             </div>
           ) : (
             <div className="space-y-4">
-              {applications.map((app) => (
+              {visibleApplications.map((app) => (
                 <ApplicationTimeline
                   key={app.application_id}
                   application={app}

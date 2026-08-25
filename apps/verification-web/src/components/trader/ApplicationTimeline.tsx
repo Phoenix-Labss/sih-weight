@@ -244,20 +244,11 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       )}
 
       {isFeePending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-amber-900">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900">
           <div className="flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />
-            <div>
-              <span className="font-bold">Statutory Fee Assessed:</span> Statutory fee of <span className="font-bold text-slate-900">{formatCurrency(application.fee_assessment?.total_assessed_amount || 750)}</span> is pending payment. Click "Pay Fees" to complete treasury transaction.
-            </div>
+            <span className="font-bold">Statutory Fee Assessed:</span> Statutory fee of <span className="font-bold text-slate-900">{formatCurrency(application.fee_assessment?.total_assessed_amount || 750)}</span> is pending payment. Use the <span className="font-bold text-slate-900">Pay Fees</span> button above to complete the treasury transaction.
           </div>
-          <button
-            onClick={() => onOpenPaymentModal(application)}
-            className="px-3 py-1 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-1"
-          >
-            <CreditCard className="w-3 h-3" />
-            <span>Pay Fees</span>
-          </button>
         </div>
       )}
 

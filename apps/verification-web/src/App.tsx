@@ -53,39 +53,65 @@ const AppContent: React.FC = () => {
     }
   }, [session]);
 
-  // Handle URL hash navigation
+  // Handle URL hash & query navigation (e.g. #public?token=..., ?token=..., #/verify/...)
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      if (hash.startsWith('#/verify/') || hash.startsWith('#verify/')) {
-        const token = hash.replace(/^#\/verify\//, '').replace(/^#verify\//, '');
+    const handleNavigation = () => {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+
+      // Check query params in search (?token=... or ?qr=...)
+      const urlParams = new URLSearchParams(search);
+      let extractedToken = urlParams.get('token') || urlParams.get('qr');
+
+      // Check query params inside hash (#public?token=... or #/public?token=... or #verify?token=...)
+      if (!extractedToken && hash.includes('?')) {
+        const hashQuery = hash.substring(hash.indexOf('?'));
+        const hashParams = new URLSearchParams(hashQuery);
+        extractedToken = hashParams.get('token') || hashParams.get('qr');
+      }
+
+      const cleanHash = hash.split('?')[0];
+
+      if (extractedToken) {
+        setPublicToken(decodeURIComponent(extractedToken));
+        setActiveTab('public');
+        return;
+      }
+
+      if (cleanHash.startsWith('#/verify/') || cleanHash.startsWith('#verify/')) {
+        const token = cleanHash.replace(/^#\/verify\//, '').replace(/^#verify\//, '');
         if (token) {
           setPublicToken(decodeURIComponent(token));
           setActiveTab('public');
         }
-      } else if (hash === '#officer') {
+      } else if (cleanHash === '#officer') {
         setActiveTab('officer');
-      } else if (hash === '#trader') {
+      } else if (cleanHash === '#trader') {
         setActiveTab('trader');
-      } else if (hash === '#supervisor') {
+      } else if (cleanHash === '#supervisor') {
         setActiveTab('supervisor');
-      } else if (hash === '#gatc') {
+      } else if (cleanHash === '#gatc') {
         setActiveTab('gatc');
-      } else if (hash === '#migration') {
+      } else if (cleanHash === '#migration') {
         setActiveTab('migration');
-      } else if (hash === '#public') {
+      } else if (cleanHash === '#public' || cleanHash === '#/public') {
         setActiveTab('public');
       }
     };
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+
+    handleNavigation();
+    window.addEventListener('hashchange', handleNavigation);
+    window.addEventListener('popstate', handleNavigation);
+    return () => {
+      window.removeEventListener('hashchange', handleNavigation);
+      window.removeEventListener('popstate', handleNavigation);
+    };
   }, []);
 
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
     if (tab === 'public') {
-      window.location.hash = '#/verify/' + publicToken;
+      window.location.hash = '#public?token=' + encodeURIComponent(publicToken);
     } else {
       window.location.hash = '#' + tab;
     }
@@ -94,11 +120,57 @@ const AppContent: React.FC = () => {
   if (loading) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-slate-100'>
-        <div className='text-slate-500 text-sm'>Loading...</div>
+        <div className='text-slate-500 text-sm font-semibold'>Loading e-Metrology Portal...</div>
       </div>
     );
   }
 
+  // 1. If public verification tab is active and user is NOT logged in, show standalone public layout
+  if (activeTab === 'public' && !session) {
+    return (
+      <div className='min-h-screen flex flex-col bg-slate-100/70 text-slate-900 selection:bg-amber-500 selection:text-slate-950 font-sans'>
+        {/* Public National Header */}
+        <header className='bg-gov-navy text-white border-b border-slate-700 shadow-md sticky top-0 z-30'>
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between'>
+            <div className='flex items-center gap-3'>
+              <div className='w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center font-serif text-amber-400 font-bold text-lg'>
+                ⚖
+              </div>
+              <div>
+                <h1 className='text-sm font-bold text-white leading-tight flex items-center gap-1.5'>
+                  <span>e-Metrology Public Verification</span>
+                  <span className='text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-400/30 font-semibold'>
+                    OFFICIAL
+                  </span>
+                </h1>
+                <p className='text-[11px] text-slate-300'>Department of Legal Metrology • Government of India</p>
+              </div>
+            </div>
+
+            <div className='flex items-center gap-2.5'>
+              <button
+                onClick={() => {
+                  window.location.hash = '#trader';
+                  setActiveTab('trader');
+                }}
+                className='px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-xs font-bold text-slate-950 shadow-xs transition-colors'
+              >
+                Sign In / Portal Login
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className='flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+          <PublicVerificationPage initialToken={publicToken} />
+        </main>
+        <Footer />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // 2. If authenticated portal tabs are requested without session, show Login Page
   if (!session) {
     return <LoginPage />;
   }

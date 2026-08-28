@@ -52,7 +52,10 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
   }, []);
 
   useEffect(() => {
-    handleVerify(initialToken);
+    if (initialToken) {
+      setTokenInput(initialToken);
+      handleVerify(initialToken);
+    }
   }, [initialToken, handleVerify]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {

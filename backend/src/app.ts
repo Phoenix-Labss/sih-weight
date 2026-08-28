@@ -80,6 +80,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       detail: detailMessage,
       statusCode,
       error: error?.name || 'Error',
+      errorCode: error?.errorCode || undefined,
     });
   });
 

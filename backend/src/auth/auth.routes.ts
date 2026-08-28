@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
-import { authService } from './auth.service.js';
+import { authService, RegisterInput } from './auth.service.js';
+import { otpService } from './otp.service.js';
 import {
   REFRESH_COOKIE,
   CSRF_COOKIE,
@@ -55,6 +56,27 @@ function verifyCsrf(request: { headers: Record<string, string | string[] | undef
 }
 
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
+  // POST /api/v1/auth/register (New User & Trader Registration)
+  fastify.post<{ Body: RegisterInput }>(
+    '/auth/register',
+    { config: { rateLimit: { max: 10, timeWindow: '5 minutes' } } },
+    async (request, reply) => {
+      const body = request.body;
+      if (!body) throw new ValidationError('Registration payload is required');
+
+      const result = await authService.register(body, {
+        ip: request.ip,
+        userAgent: request.headers['user-agent'] as string,
+      });
+
+      reply.header('set-cookie', [
+        serializeCookie(REFRESH_COOKIE, result.refreshToken, refreshCookieOptions()),
+        serializeCookie(CSRF_COOKIE, result.csrf, csrfCookieOptions()),
+      ]);
+      return { accessToken: result.accessToken, user: result.user };
+    }
+  );
+
   // POST /api/v1/auth/login
   fastify.post<{ Body: { email?: string; password?: string } }>(
     '/auth/login',
@@ -75,6 +97,46 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
         serializeCookie(CSRF_COOKIE, result.csrf, csrfCookieOptions()),
       ]);
       return { accessToken: result.accessToken, user: result.user };
+    }
+  );
+
+  // POST /api/v1/auth/send-otp
+  fastify.post<{ Body: { target?: string; purpose?: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET' } }>(
+    '/auth/send-otp',
+    { config: { rateLimit: { max: 5, timeWindow: '5 minutes' } } },
+    async (request) => {
+      const target = request.body?.target;
+      const purpose = request.body?.purpose || 'REGISTRATION';
+      if (!target) throw new ValidationError('target (email or mobile) is required');
+
+      return await otpService.sendOtp(target, purpose);
+    }
+  );
+
+  // POST /api/v1/auth/verify-otp
+  fastify.post<{ Body: { target?: string; code?: string; purpose?: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET' } }>(
+    '/auth/verify-otp',
+    async (request) => {
+      const target = request.body?.target;
+      const code = request.body?.code;
+      const purpose = request.body?.purpose || 'REGISTRATION';
+      if (!target || !code) throw new ValidationError('target and OTP code are required');
+
+      const verified = await otpService.verifyOtp(target, code, purpose);
+      return { verified, message: 'OTP verified successfully' };
+    }
+  );
+
+  // POST /api/v1/auth/check-availability
+  fastify.post<{ Body: { type?: 'email' | 'identifier'; value?: string; tenantId?: string } }>(
+    '/auth/check-availability',
+    async (request) => {
+      const type = request.body?.type;
+      const value = request.body?.value;
+      if (!type || !value) throw new ValidationError('type and value are required');
+      if (type !== 'email' && type !== 'identifier') throw new ValidationError('type must be email or identifier');
+
+      return await authService.checkAvailability(type, value, request.body?.tenantId);
     }
   );
 

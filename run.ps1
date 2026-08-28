@@ -7,4 +7,4 @@ Write-Host "  National e-Metrology Verification & Digital Certification Platform
 Write-Host "  Launching Backend API (Port 8000) and Frontend Portal (Port 5173)..." -ForegroundColor Cyan
 Write-Host "======================================================================" -ForegroundColor Cyan
 
-python run.py @args
+node run.js @args

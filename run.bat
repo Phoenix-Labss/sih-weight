@@ -10,10 +10,10 @@ echo   Add --admin to also start the ADMIN Control Plane (Port 5174).
 echo ======================================================================
 echo.
 
-python run.py %*
+node run.js %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo [RUNNER] Python runner exited. Press any key to close.
+    echo [RUNNER] Node runner exited. Press any key to close.
     pause >nul
 )

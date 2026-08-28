@@ -10,4 +10,4 @@ echo "  National e-Metrology Verification & Digital Certification Platform"
 echo "  Launching Backend API (Port 8000) and Frontend Portal (Port 5173)..."
 echo "======================================================================"
 
-python3 run.py || python run.py
+node run.js "$@"

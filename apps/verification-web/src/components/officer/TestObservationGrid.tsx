@@ -431,8 +431,10 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Affixed
                   </span>
+                ) : session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+                  <span className="text-amber-600 font-semibold text-[11px]">Seal Required</span>
                 ) : (
-                  <span className="text-amber-600 font-semibold text-[11px]">Pending Seal</span>
+                  <span className="text-slate-400 font-medium text-[10px] uppercase">Locked</span>
                 )}
               </div>
               {recordedStamps.length > 0 ? (
@@ -444,31 +446,47 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     Pos: {recordedStamps[0].seal_position}
                   </div>
                 </div>
+              ) : session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+                <p className="text-slate-600 text-[11px]">
+                  Testing complete. Lead wire seal required on calibration port.
+                </p>
               ) : (
-                <p className="text-slate-500 text-[11px]">
-                  Lead wire seal required on calibration port after testing.
+                <p className="text-slate-400 text-[11px]">
+                  Lead wire seal option unlocks after test observations are completed and submitted.
                 </p>
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsStampModalOpen(true)}
-              className={`w-full py-1.5 rounded text-[11px] font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1 ${
-                recordedStamps.length > 0
-                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
-                  : 'bg-amber-600 hover:bg-amber-700 text-white'
-              }`}
-            >
-              <Stamp className="w-3.5 h-3.5" />
-              <span>
-                {recordedStamps.length > 0
-                  ? recordedStamps.length > 1
-                    ? `Manage Seals (${recordedStamps.length})`
-                    : 'Manage Seal'
-                  : 'Affix Physical Seal'}
-              </span>
-            </button>
+            {session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+              <button
+                type="button"
+                onClick={() => setIsStampModalOpen(true)}
+                className={`w-full py-1.5 rounded text-[11px] font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1 ${
+                  recordedStamps.length > 0
+                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
+                    : 'bg-amber-600 hover:bg-amber-700 text-white'
+                }`}
+              >
+                <Stamp className="w-3.5 h-3.5" />
+                <span>
+                  {recordedStamps.length > 0
+                    ? recordedStamps.length > 1
+                      ? `Manage Seals (${recordedStamps.length})`
+                      : 'Manage Seal'
+                    : 'Affix Physical Seal'}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="w-full py-1.5 rounded text-[11px] font-medium flex items-center justify-center gap-1 mt-1 bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                title="Complete and submit test readings below to unlock physical seal stamping"
+              >
+                <Lock className="w-3 h-3 text-slate-400" />
+                <span>Affix Seal (Locked)</span>
+              </button>
+            )}
           </div>
 
           {/* Card 3: Reference standards check */}

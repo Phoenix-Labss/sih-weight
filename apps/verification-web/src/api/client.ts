@@ -26,6 +26,7 @@ import {
   mockPublicVerifyService,
   mockStampService,
   mockVerificationService,
+  mockEvidenceService,
 } from './mock/mockService';
 import {
   httpApplicationService,
@@ -34,6 +35,7 @@ import {
   httpPublicVerifyService,
   httpStampService,
   httpVerificationService,
+  httpEvidenceService,
 } from './http';
 
 export interface IInstrumentService {
@@ -100,6 +102,38 @@ export interface ICertificateService {
   updateStatus(tenantId: string, id: string, payload: CertificateStatusUpdateRequest): Promise<Certificate>;
 }
 
+export interface VerifiedEvidenceResponse {
+  evidence_id: string;
+  tenant_id: string;
+  session_id?: string;
+  instrument_id?: string;
+  file_name: string;
+  mime_type: string;
+  file_size_bytes: number;
+  sha256_hash: string;
+  claimed_sha256?: string;
+  is_checksum_verified: boolean;
+  server_verified_at: string;
+  verifier_actor_id: string;
+  digital_proof_signature: string;
+  evidence_category: string;
+}
+
+export interface IEvidenceService {
+  verifyAndIngestEvidence(
+    tenantId: string,
+    payload: {
+      file_bytes_base64: string;
+      file_name?: string;
+      mime_type?: string;
+      claimed_sha256?: string;
+      session_id?: string;
+      instrument_id?: string;
+      evidence_category?: string;
+    }
+  ): Promise<VerifiedEvidenceResponse>;
+}
+
 export interface IPublicVerifyService {
   verifyCertificate(qrReference: string): Promise<PublicCertificateVerifyResponse>;
 }
@@ -150,4 +184,5 @@ export const api = {
   stamps: createProxy(mockStampService, httpStampService),
   certificates: createProxy(mockCertificateService, httpCertificateService),
   publicVerify: createProxy(mockPublicVerifyService, httpPublicVerifyService),
+  evidence: createProxy(mockEvidenceService, httpEvidenceService),
 };

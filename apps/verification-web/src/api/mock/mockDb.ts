@@ -810,6 +810,25 @@ export class MockDatabase {
     this.certificates = JSON.parse(JSON.stringify(mockCertificates));
     this.publicMap = JSON.parse(JSON.stringify(mockPublicVerifyMap));
   }
+  public async verifyAndIngestEvidence(tenantId: string, payload: any): Promise<any> {
+    const rawSha256 = payload.claimed_sha256 || '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
+    return {
+      evidence_id: `EVID-${Math.random().toString(36).substring(2, 9)}`,
+      tenant_id: tenantId,
+      session_id: payload.session_id,
+      instrument_id: payload.instrument_id,
+      file_name: payload.file_name || 'evidence_photo.png',
+      mime_type: payload.mime_type || 'image/png',
+      file_size_bytes: 1024 * 145,
+      sha256_hash: rawSha256,
+      claimed_sha256: payload.claimed_sha256,
+      is_checksum_verified: true,
+      server_verified_at: new Date().toISOString(),
+      verifier_actor_id: 'OFFICER-LMO-DELHI',
+      digital_proof_signature: `HMAC-CUSTODY-${Math.random().toString(16).substring(2, 18).toUpperCase()}`,
+      evidence_category: payload.evidence_category || 'SEAL_PHOTO',
+    };
+  }
 }
 
 export const mockDb = new MockDatabase();

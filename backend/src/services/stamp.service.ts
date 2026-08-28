@@ -27,6 +27,14 @@ export class StampService {
       throw new ValidationError('seal_identification_number and seal_position are required');
     }
 
+    if (input.photo_evidence_hash) {
+      const normalized = input.photo_evidence_hash.trim().toLowerCase();
+      if (!/^[a-f0-9]{64}$/.test(normalized)) {
+        throw new ValidationError('photo_evidence_hash must be a valid 64-character hexadecimal SHA-256 digest.');
+      }
+      input.photo_evidence_hash = normalized;
+    }
+
     const session = await prisma.verificationSession.findFirst({
       where: { tenant_id: tenantId, session_id: sessionId },
     });

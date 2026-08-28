@@ -27,6 +27,8 @@ import {
   IPublicVerifyService,
   IStampService,
   IVerificationService,
+  IEvidenceService,
+  VerifiedEvidenceResponse,
 } from './client';
 
 class HttpError extends Error {
@@ -271,5 +273,13 @@ export const httpCertificateService: ICertificateService = {
 export const httpPublicVerifyService: IPublicVerifyService = {
   async verifyCertificate(qrReference: string): Promise<PublicCertificateVerifyResponse> {
     return request<PublicCertificateVerifyResponse>(`/public/certificates/verify/${qrReference}`);
+  },
+};
+export const httpEvidenceService: IEvidenceService = {
+  async verifyAndIngestEvidence(tenantId, payload) {
+    return request<VerifiedEvidenceResponse>(`/tenants/${tenantId}/evidence/verify-and-ingest`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
 };

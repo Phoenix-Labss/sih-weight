@@ -62,6 +62,12 @@ export class UnauthorizedTransitionError extends DomainError {
   }
 }
 
+export class SecurityViolationError extends DomainError {
+  constructor(message = 'Security invariant or cryptographic check failed', errorCode = 'SECURITY_VIOLATION') {
+    super(message, 403, errorCode);
+  }
+}
+
 export function formatErrorDetail(error: unknown): { detail: string; code?: string } {
   if (error instanceof DomainError) {
     return { detail: error.message, code: error.errorCode };

@@ -5,6 +5,7 @@ import {
   IPublicVerifyService,
   IStampService,
   IVerificationService,
+  IEvidenceService,
 } from '../client';
 import { PaginatedResponse } from '../../types/api';
 import { Instrument, InstrumentModel, InstrumentRegisterRequest } from '../../types/instrument';
@@ -170,5 +171,11 @@ export const mockCertificateService: ICertificateService = {
 export const mockPublicVerifyService: IPublicVerifyService = {
   async verifyCertificate(qrReference: string): Promise<PublicCertificateVerifyResponse> {
     return mockDb.verifyPublic(qrReference);
+  },
+};
+
+export const mockEvidenceService: IEvidenceService = {
+  async verifyAndIngestEvidence(tenantId, payload) {
+    return mockDb.verifyAndIngestEvidence(tenantId, payload);
   },
 };

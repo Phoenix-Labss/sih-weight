@@ -11,6 +11,7 @@ import { applicationRoutes } from './routes/applications.routes.js';
 import { sessionRoutes } from './routes/sessions.routes.js';
 import { stampRoutes } from './routes/stamps.routes.js';
 import { certificateRoutes } from './routes/certificates.routes.js';
+import { evidenceRoutes } from './routes/evidence.routes.js';
 import { publicRoutes } from './routes/public.routes.js';
 import { adminRoutes } from './routes/admin.routes.js';
 import { authRoutes } from './auth/auth.routes.js';
@@ -104,6 +105,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await v1.register(applicationRoutes);
       await v1.register(sessionRoutes);
       await v1.register(stampRoutes);
+      await v1.register(evidenceRoutes);
       await v1.register(certificateRoutes);
       await v1.register(publicRoutes);
       await v1.register(adminRoutes);

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { VerificationSession, ObservationItemInput, StepType } from '../../types/session';
+import {
+  VerificationSession,
+  ObservationItemInput,
+  StepType,
+  SessionStatus,
+  VerificationOutcome,
+} from '../../types/session';
 import { Application } from '../../types/application';
 import { Instrument } from '../../types/instrument';
 import { NAWITestStepForm } from './NAWITestStepForm';
@@ -156,6 +162,17 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
 
   const [isSubmittingObservations, setIsSubmittingObservations] = useState(false);
 
+  // Synchronized lifecycle status
+  const [currentStatus, setCurrentStatus] = useState<SessionStatus>(session?.status || 'PLANNED');
+  const [currentOutcome, setCurrentOutcome] = useState<VerificationOutcome | undefined>(session?.outcome);
+
+  useEffect(() => {
+    if (session) {
+      setCurrentStatus(session.status);
+      setCurrentOutcome(session.outcome);
+    }
+  }, [session?.session_id, session?.status, session?.outcome]);
+
   // Find Zero Error E0
   const zeroObs = observations.find((o) => o.step_type === 'ZERO_TEST');
   const zeroErrorE0 = zeroObs ? zeroObs.raw_indication_reading : 0;
@@ -173,6 +190,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
     try {
       const updated = await api.verification.confirmIdentity(user.tenantId, session.session_id, true);
       setSerialVerified(true);
+      setCurrentStatus('IDENTITY_CONFIRMED');
       notify(
         'success',
         'Physical Match Confirmed',
@@ -192,7 +210,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       return;
     }
 
-    if (!serialVerified || session.status === 'PLANNED') {
+    if (!serialVerified || currentStatus === 'PLANNED') {
       notify('warning', 'Physical Verification Required', 'Please inspect the instrument physical serial plate and confirm the matchup before starting test execution.');
       setIsPhysicalMatchModalOpen(true);
       return;
@@ -200,6 +218,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
 
     try {
       const updated = await api.verification.startSession(user.tenantId, session.session_id);
+      setCurrentStatus('IN_PROGRESS');
       notify('success', 'Session In Progress', 'Procedure lock engaged. Record measurement readings on the NAWI worksheet below.');
       onSessionUpdated(updated);
     } catch (err) {
@@ -225,10 +244,29 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         payload
       );
 
+      setCurrentStatus('SUBMITTED');
+      if (updated.outcome) setCurrentOutcome(updated.outcome);
+      if (updated.observations && updated.observations.length > 0) {
+        setObservations(
+          updated.observations.map((o) => ({
+            step_type: o.step_type,
+            step_sequence: Number(o.step_sequence),
+            nominal_load: Number(o.nominal_load),
+            load_unit: o.load_unit || 'kg',
+            raw_indication_reading: Number(o.raw_indication_reading),
+            reading_unit: o.reading_unit || 'kg',
+            normalized_indication: o.normalized_indication ? Number(o.normalized_indication) : undefined,
+            repetition_index: o.repetition_index ? Number(o.repetition_index) : undefined,
+            eccentricity_position: o.eccentricity_position,
+            delta_L: o.delta_L !== undefined ? Number(o.delta_L) : Number((0.5 * scaleIntervalE).toFixed(4)),
+          }))
+        );
+      }
+
       notify(
         'success',
         'Observations Submitted & Evaluated',
-        `Evaluated ${observations.length} readings with exact rational tolerance calculation.`
+        `Evaluated ${observations.length} readings with exact rational tolerance calculation. Next: Affix physical seal or record legal disposition.`
       );
       onSessionUpdated(updated);
     } catch (err) {
@@ -251,8 +289,8 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
     );
   }
 
-  const isFinalized = session.status === 'FINALIZED';
-  const hasPassed = session.outcome === 'VERIFICATION_PASSED_PENDING_AUTHORIZATION';
+  const isFinalized = currentStatus === 'FINALIZED';
+  const hasPassed = currentOutcome === 'VERIFICATION_PASSED_PENDING_AUTHORIZATION';
 
   return (
     <div className="space-y-6">
@@ -267,8 +305,8 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
                 {session.session_id.length > 18 ? `SESS-${session.session_id.slice(0, 8)}` : session.session_id}
               </span>
-              <StatusBadge status={session.status} size="sm" />
-              {session.outcome && <StatusBadge status={session.outcome} size="sm" />}
+              <StatusBadge status={currentStatus} size="sm" />
+              {currentOutcome && <StatusBadge status={currentOutcome} size="sm" />}
             </div>
             <p className="text-xs text-slate-600 mt-1">
               Instrument: <strong className="text-slate-900 font-bold">{instrument?.model?.model_name || 'NAWI Scale'}</strong> (SN: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'N/A'}</span>) | Procedure: <span className="font-mono font-semibold text-slate-700">{session.procedure_pack_id}</span> | Scheduled: {session.scheduled_date} | Verifier: {session.verifier_id}
@@ -278,7 +316,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           {/* Step-by-Step Action Ribbon */}
           <div className="flex items-center gap-2 flex-wrap justify-end">
             {/* Step 1: PLANNED or IDENTITY_CONFIRMED -> Show Start Test Execution */}
-            {(session.status === 'PLANNED' || session.status === 'IDENTITY_CONFIRMED') && (
+            {(currentStatus === 'PLANNED' || currentStatus === 'IDENTITY_CONFIRMED') && (
               <button
                 onClick={handleStartSession}
                 className="px-4 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
@@ -289,7 +327,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             )}
 
             {/* Step 2: IN_PROGRESS -> Show active indicator */}
-            {session.status === 'IN_PROGRESS' && (
+            {currentStatus === 'IN_PROGRESS' && (
               <div className="px-3.5 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                 <span>Testing In Progress — Enter Readings Below</span>
@@ -297,7 +335,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             )}
 
             {/* Physical Seal Action — Remains ALWAYS available for SUBMITTED & FINALIZED sessions */}
-            {(session.status === 'SUBMITTED' || session.status === 'FINALIZED') && (
+            {(currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED') && (
               <button
                 type="button"
                 onClick={() => setIsStampModalOpen(true)}
@@ -318,7 +356,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             )}
 
             {/* Step 3: SUBMITTED -> Show Record Legal Disposition */}
-            {session.status === 'SUBMITTED' && (
+            {currentStatus === 'SUBMITTED' && (
               <button
                 type="button"
                 onClick={() => setIsDispositionModalOpen(true)}
@@ -431,7 +469,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Affixed
                   </span>
-                ) : session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+                ) : currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED' ? (
                   <span className="text-amber-600 font-semibold text-[11px]">Seal Required</span>
                 ) : (
                   <span className="text-slate-400 font-medium text-[10px] uppercase">Locked</span>
@@ -446,7 +484,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     Pos: {recordedStamps[0].seal_position}
                   </div>
                 </div>
-              ) : session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+              ) : currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED' ? (
                 <p className="text-slate-600 text-[11px]">
                   Testing complete. Lead wire seal required on calibration port.
                 </p>
@@ -457,7 +495,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               )}
             </div>
 
-            {session.status === 'SUBMITTED' || session.status === 'FINALIZED' ? (
+            {currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED' ? (
               <button
                 type="button"
                 onClick={() => setIsStampModalOpen(true)}
@@ -664,7 +702,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
 
         {/* Bottom Progression & Action Bar */}
         <div className="pt-4 border-t flex flex-wrap items-center justify-between gap-3">
-          {session.status === 'PLANNED' || session.status === 'IDENTITY_CONFIRMED' || session.status === 'IN_PROGRESS' ? (
+          {currentStatus === 'PLANNED' || currentStatus === 'IDENTITY_CONFIRMED' || currentStatus === 'IN_PROGRESS' ? (
             <>
               <div className="text-xs text-slate-500 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
@@ -679,7 +717,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 <span>{isSubmittingObservations ? 'Evaluating Tolerance...' : 'Submit Observations & Run Evaluation'}</span>
               </button>
             </>
-          ) : session.status === 'SUBMITTED' ? (
+          ) : currentStatus === 'SUBMITTED' ? (
             <>
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
@@ -778,17 +816,22 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       <DispositionModal
         isOpen={isDispositionModalOpen}
         onClose={() => setIsDispositionModalOpen(false)}
-        session={session}
-        onDispositionRecorded={onSessionUpdated}
+        session={{ ...session, status: currentStatus, outcome: currentOutcome }}
+        onDispositionRecorded={(updated) => {
+          setCurrentStatus(updated.status);
+          if (updated.outcome) setCurrentOutcome(updated.outcome);
+          onSessionUpdated(updated);
+        }}
         onStampRecorded={loadStamps}
       />
 
       <CertificateSignModal
         isOpen={isSignModalOpen}
         onClose={() => setIsSignModalOpen(false)}
-        session={session}
+        session={{ ...session, status: currentStatus, outcome: currentOutcome }}
         onCertificateIssued={(cert) => {
           setIsSignModalOpen(false);
+          setCurrentStatus('FINALIZED');
           onCertificateIssued?.(cert);
           onSessionUpdated({ ...session, status: 'FINALIZED' });
         }}

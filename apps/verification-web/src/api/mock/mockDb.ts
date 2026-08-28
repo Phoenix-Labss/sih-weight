@@ -723,12 +723,19 @@ export class MockDatabase {
       verified_suitable: true,
     }));
     session.updated_at = new Date().toISOString();
+
+    const sessIndex = this.sessions.findIndex((s) => s.session_id === session.session_id);
+    if (sessIndex >= 0) {
+      this.sessions[sessIndex] = session;
+    } else {
+      this.sessions.unshift(session);
+    }
     save('sessions', this.sessions);
-    return session;
+    return { ...session };
   }
 
   public recordDisposition(sessionId: string, req: SessionDispositionRequest): VerificationSession {
-    const session = this.getSession(sessionId);
+    let session = this.getSession(sessionId);
     if (!session) throw new Error('Session not found');
 
     session.outcome = req.outcome;
@@ -736,6 +743,13 @@ export class MockDatabase {
     session.status = 'FINALIZED';
     session.finalized_at = new Date().toISOString();
     session.updated_at = new Date().toISOString();
+
+    const sessIndex = this.sessions.findIndex((s) => s.session_id === session.session_id);
+    if (sessIndex >= 0) {
+      this.sessions[sessIndex] = session;
+    } else {
+      this.sessions.unshift(session);
+    }
     save('sessions', this.sessions);
 
     const app = this.getApplication(session.application_id);

@@ -111,8 +111,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   if (!response.ok) {
     let detail = response.statusText;
-    try { const ej = await response.json(); detail = ej.detail || JSON.stringify(ej); } catch { /* */ }
-    throw new HttpError(response.status, `API error (${response.status}): ${detail}`);
+    try {
+      const ej = await response.json();
+      detail =
+        ej.message ||
+        ej.error_description ||
+        ej.detail ||
+        (typeof ej.error === 'string' ? ej.error : '') ||
+        JSON.stringify(ej);
+    } catch {
+      /* ignore */
+    }
+    throw new HttpError(response.status, detail || `HTTP error ${response.status}`);
   }
 
   return response.json();

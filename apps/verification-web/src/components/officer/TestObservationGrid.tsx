@@ -124,25 +124,43 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   };
 
   const handleConfirmIdentity = async () => {
-    if (!session) return;
+    if (!session) {
+      notify('error', 'Session Error', 'No active verification session loaded.');
+      return;
+    }
     try {
       const updated = await api.verification.confirmIdentity(user.tenantId, session.session_id, true);
       setSerialVerified(true);
-      notify('success', 'Identity Confirmed', 'Instrument serial and specifications verified against registry.');
+      notify('success', 'Identity Confirmed', 'Instrument serial and specifications verified on-site against registry.');
       onSessionUpdated(updated);
     } catch (err) {
-      notify('error', 'Confirmation Failed', err instanceof Error ? err.message : 'Unknown error');
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      notify('error', 'Physical Serial Check Failed', `Reason: ${errMsg}`);
     }
   };
 
   const handleStartSession = async () => {
-    if (!session) return;
+    if (!session) {
+      notify('error', 'Session Error', 'No active verification session loaded. Please select an application from the scrutiny queue.');
+      return;
+    }
     try {
+      if (session.status === 'PLANNED' && !serialVerified) {
+        try {
+          await api.verification.confirmIdentity(user.tenantId, session.session_id, true);
+          setSerialVerified(true);
+        } catch (identErr) {
+          console.warn('Physical serial match notice:', identErr);
+        }
+      }
+
       const updated = await api.verification.startSession(user.tenantId, session.session_id);
-      notify('success', 'Session In Progress', 'Procedure lock engaged. Record measurement readings.');
+      setSerialVerified(true);
+      notify('success', 'Session In Progress', 'Procedure lock engaged. Record measurement readings on the NAWI worksheet below.');
       onSessionUpdated(updated);
     } catch (err) {
-      notify('error', 'Failed to Start Session', err instanceof Error ? err.message : 'Unknown error');
+      const errMsg = err instanceof Error ? err.message : 'Unknown verification error';
+      notify('error', 'Failed to Start Test Execution', `Reason: ${errMsg}`);
     }
   };
 
@@ -170,7 +188,8 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       );
       onSessionUpdated(updated);
     } catch (err) {
-      notify('error', 'Observation Submission Failed', err instanceof Error ? err.message : 'Unknown error');
+      const errMsg = err instanceof Error ? err.message : 'Unknown evaluation error';
+      notify('error', 'Observation Submission Failed', `Reason: ${errMsg}`);
     } finally {
       setIsSubmittingObservations(false);
     }

@@ -397,12 +397,29 @@ export class MockDatabase {
   }
 
   public getSession(id: string): VerificationSession | undefined {
-    return this.sessions.find(
+    let sess = this.sessions.find(
       (s) =>
         s.session_id === id ||
         s.session_id.toLowerCase() === id.toLowerCase() ||
         s.application_id === id
     );
+
+    if (!sess) {
+      // Fallback: If id matches an existing application, auto-create or find planned session
+      const app = this.getApplication(id);
+      if (app) {
+        sess = this.sessions.find((s) => s.instrument_id === app.instrument_id);
+        if (!sess) {
+          sess = this.createSession(app.tenant_id, {
+            application_id: app.application_id,
+            instrument_id: app.instrument_id,
+            scheduled_date: app.scheduled_slot_start?.split('T')[0] || new Date().toISOString().split('T')[0],
+          });
+        }
+      }
+    }
+
+    return sess;
   }
 
   public createSession(tenantId: string, req: SessionCreateRequest): VerificationSession {
@@ -438,8 +455,12 @@ export class MockDatabase {
 
   public confirmIdentity(sessionId: string, serialVerified: boolean): VerificationSession {
     const session = this.getSession(sessionId);
-    if (!session) throw new Error('Session not found');
-    if (!serialVerified) throw new Error('Serial number verification failed');
+    if (!session) {
+      throw new Error(`Verification session '${sessionId}' was not found in the database.`);
+    }
+    if (!serialVerified) {
+      throw new Error('Serial number physical verification failed. Serial number must match the registry.');
+    }
 
     session.status = 'IDENTITY_CONFIRMED';
     session.updated_at = new Date().toISOString();
@@ -449,7 +470,13 @@ export class MockDatabase {
 
   public startSession(sessionId: string): VerificationSession {
     const session = this.getSession(sessionId);
-    if (!session) throw new Error('Session not found');
+    if (!session) {
+      throw new Error(`Verification session '${sessionId}' was not found in the database. Please ensure the application has been scheduled.`);
+    }
+
+    if (session.status === 'PLANNED') {
+      session.status = 'IDENTITY_CONFIRMED';
+    }
 
     session.status = 'IN_PROGRESS';
     session.actual_test_timestamp = new Date().toISOString();

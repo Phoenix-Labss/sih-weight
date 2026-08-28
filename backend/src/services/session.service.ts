@@ -438,14 +438,26 @@ export class SessionService {
   }
 
   private async getRawSession(tenantId: string, sessionId: string) {
-    const session = await prisma.verificationSession.findFirst({
+    let session = await prisma.verificationSession.findFirst({
       where: {
         tenant_id: tenantId,
         session_id: sessionId,
       },
     });
+
     if (!session) {
-      throw new NotFoundError(`Verification session '${sessionId}' not found`);
+      session = await prisma.verificationSession.findFirst({
+        where: {
+          tenant_id: tenantId,
+          application_id: sessionId,
+        },
+      });
+    }
+
+    if (!session) {
+      throw new NotFoundError(
+        `Verification session '${sessionId}' was not found in tenant '${tenantId}'. Please ensure the instrument application has been scheduled.`
+      );
     }
     return session;
   }

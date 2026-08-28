@@ -15,6 +15,7 @@ import { StatusBadge } from '../common/StatusBadge';
 import { formatDate, formatDateTime, maskSerialNumber, truncateHash } from '../../utils/formatters';
 import {
   ShieldCheck,
+  CheckCircle2,
   FileCheck2,
   Calendar,
   Scale,
@@ -73,12 +74,17 @@ export const OfficerWorkspace: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Active testing workload: sessions that still need officer testing. Completed/certified sessions move to Ledger
-  const workSessions = sessions.filter(
+  // Active testing workload: sessions that still require officer testing actions
+  const activeWorkSessions = sessions.filter(
     (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
   );
 
-  const activeSession = workSessions.find((s) => s.session_id === selectedSessionId) || workSessions[0];
+  const completedSessions = sessions.filter(
+    (s) => s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id)
+  );
+
+  // If user selected a specific session, display it; otherwise prefer first active workload session, then first completed session
+  const activeSession = sessions.find((s) => s.session_id === selectedSessionId) || activeWorkSessions[0] || sessions[0];
   const activeSessionApp = applications.find((a) => a.application_id === activeSession?.application_id);
   const activeSessionInst = instruments.find((i) => i.instrument_id === (activeSession?.instrument_id || activeSessionApp?.instrument_id));
 
@@ -108,8 +114,8 @@ export const OfficerWorkspace: React.FC = () => {
 
     if (matchedSession) {
       setSelectedSessionId(matchedSession.session_id);
-    } else if (workSessions.length > 0) {
-      setSelectedSessionId(workSessions[0].session_id);
+    } else if (activeWorkSessions.length > 0) {
+      setSelectedSessionId(activeWorkSessions[0].session_id);
     }
     setActiveTab('testing');
   };
@@ -164,7 +170,7 @@ export const OfficerWorkspace: React.FC = () => {
           }`}
         >
           <Scale className="w-4 h-4 text-emerald-300" />
-          <span>Guided NAWI Testing Session Execution ({workSessions.length})</span>
+          <span>Guided NAWI Testing Session Execution ({activeWorkSessions.length} Active)</span>
         </button>
 
         <button
@@ -199,28 +205,57 @@ export const OfficerWorkspace: React.FC = () => {
           <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
               <Calendar className="w-4 h-4 text-gov-blue" />
-              <span>Select Active Verification Session:</span>
+              <span>Select Verification Session:</span>
             </div>
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <select
-                value={selectedSessionId}
+                value={activeSession?.session_id || ''}
                 onChange={(e) => setSelectedSessionId(e.target.value)}
                 className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full sm:min-w-[420px]"
               >
-                {workSessions.map((s) => {
-                  const app = applications.find((a) => a.application_id === s.application_id);
-                  const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
-                  const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
-                  const model = inst?.model?.model_name || 'Weighing Instrument';
-                  const sn = inst?.serial_number || 'N/A';
-                  const status = s.status.replace(/_/g, ' ');
-                  const outcome = s.outcome ? ` • ${s.outcome.replace(/_/g, ' ')}` : '';
-                  return (
-                    <option key={s.session_id} value={s.session_id}>
-                      {appNum} — {model} (SN: {sn}) [{status}{outcome}]
-                    </option>
-                  );
-                })}
+                {activeWorkSessions.length > 0 && (
+                  <optgroup label="⚡ Active Testing Workload (Action Required)">
+                    {activeWorkSessions.map((s) => {
+                      const app = applications.find((a) => a.application_id === s.application_id);
+                      const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
+                      const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
+                      const model = inst?.model?.model_name || 'Weighing Instrument';
+                      const sn = inst?.serial_number || 'N/A';
+                      const status = s.status.replace(/_/g, ' ');
+                      const outcome = s.outcome ? ` • ${s.outcome.replace(/_/g, ' ')}` : '';
+                      return (
+                        <option key={s.session_id} value={s.session_id}>
+                          {appNum} — {model} (SN: {sn}) [{status}{outcome}]
+                        </option>
+                      );
+                    })}
+                  </optgroup>
+                )}
+
+                {completedSessions.length > 0 && (
+                  <optgroup label="✅ Certified & Completed (Master Ledger Archive)">
+                    {completedSessions.map((s) => {
+                      const app = applications.find((a) => a.application_id === s.application_id);
+                      const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
+                      const cert = certificates.find((c) => c.session_id === s.session_id);
+                      const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
+                      const model = inst?.model?.model_name || 'Weighing Instrument';
+                      const sn = inst?.serial_number || 'N/A';
+                      const certNum = cert?.certificate_number ? ` • Cert: ${cert.certificate_number}` : '';
+                      return (
+                        <option key={s.session_id} value={s.session_id}>
+                          {appNum} — {model} (SN: {sn}) [CERTIFIED{certNum}]
+                        </option>
+                      );
+                    })}
+                  </optgroup>
+                )}
+
+                {sessions.length === 0 && (
+                  <option disabled value="">
+                    No verification sessions available
+                  </option>
+                )}
               </select>
               <button
                 onClick={async () => {
@@ -240,7 +275,7 @@ export const OfficerWorkspace: React.FC = () => {
                     notify('error', 'Failed to create session', e instanceof Error ? e.message : 'Unknown error');
                   }
                 }}
-                className="px-3.5 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 whitespace-nowrap shadow-2xs transition-colors"
+                className="px-3.5 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 whitespace-nowrap shadow-2xs transition-colors cursor-pointer"
                 title="Create a fresh session to test the full live procedure from scratch"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -267,9 +302,32 @@ export const OfficerWorkspace: React.FC = () => {
               onNavigateToLedger={() => setActiveTab('ledger')}
             />
           ) : (
-            <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500 text-xs">
-              No active testing session found. Accept and schedule an application from the scrutiny queue first.
-              Finalized sessions with issued certificates are archived in the Ledger tab.
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-2xs text-center space-y-4 max-w-2xl mx-auto my-6">
+              <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-base font-bold text-slate-800">All Scheduled Verification Sessions Completed</h4>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  There are no pending verification sessions in your active inspection queue. All previously completed sessions have had their certificates minted in the Master Ledger.
+                </p>
+              </div>
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  onClick={() => setActiveTab('scrutiny')}
+                  className="px-4 py-2 rounded-lg bg-gov-navy text-white text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <FileCheck2 className="w-4 h-4 text-amber-400" />
+                  <span>Review Scrutiny Queue ({applications.length})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('ledger')}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <Award className="w-4 h-4 text-indigo-200" />
+                  <span>Open Master Ledger ({certificates.length})</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

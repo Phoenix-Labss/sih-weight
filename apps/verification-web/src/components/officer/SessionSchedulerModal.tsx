@@ -101,7 +101,8 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
         updated = await mockApplicationService.scheduleApplication(
           application.tenant_id || user.tenantId,
           application.application_id || application.application_number,
-          payload
+          payload,
+          application
         );
       }
 

@@ -355,9 +355,31 @@ export class MockDatabase {
     };
   }
 
-  public scheduleApplication(appId: string, req: ApplicationScheduleRequest): Application {
-    const app = this.getApplication(appId);
-    if (!app) throw new Error('Application not found');
+  public scheduleApplication(appId: string, req: ApplicationScheduleRequest, fallbackApp?: Application): Application {
+    let app = this.getApplication(appId);
+    if (!app && fallbackApp) {
+      app = this.getApplication(fallbackApp.application_id) || this.getApplication(fallbackApp.application_number);
+    }
+    if (!app && fallbackApp) {
+      app = { ...fallbackApp };
+      this.applications.unshift(app);
+    }
+    if (!app) {
+      app = this.applications.find(
+        (a) =>
+          a.application_id.includes(appId) ||
+          a.application_number.includes(appId) ||
+          (fallbackApp && (a.application_id === fallbackApp.application_id || a.application_number === fallbackApp.application_number))
+      );
+    }
+    if (!app) {
+      if (fallbackApp) {
+        app = { ...fallbackApp };
+        this.applications.unshift(app);
+      } else {
+        throw new Error('Application not found');
+      }
+    }
 
     const dateStr = req.slot_start.split('T')[0];
     const avail = this.getSlotAvailability(app.tenant_id, app.jurisdiction_id, dateStr);

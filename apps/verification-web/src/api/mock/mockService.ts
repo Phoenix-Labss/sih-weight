@@ -96,8 +96,8 @@ export const mockApplicationService: IApplicationService = {
   async reconcilePayment(_tenantId: string, id: string, payload: PaymentReconcileRequest): Promise<Application> {
     return mockDb.reconcilePayment(id, payload);
   },
-  async scheduleApplication(_tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application> {
-    return mockDb.scheduleApplication(id, payload);
+  async scheduleApplication(_tenantId: string, id: string, payload: ApplicationScheduleRequest, fallbackApp?: Application): Promise<Application> {
+    return mockDb.scheduleApplication(id, payload, fallbackApp);
   },
   async getSlotAvailability(tenantId: string, jurisdictionId: string, dateStr: string) {
     return mockDb.getSlotAvailability(tenantId, jurisdictionId, dateStr);

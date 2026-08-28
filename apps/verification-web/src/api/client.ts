@@ -55,7 +55,7 @@ export interface IApplicationService {
   submitCorrection(tenantId: string, id: string, payload: ApplicationCorrectionRequest): Promise<Application>;
   assessFee(tenantId: string, id: string, payload: FeeAssessmentCreate): Promise<Application>;
   reconcilePayment(tenantId: string, id: string, payload: PaymentReconcileRequest): Promise<Application>;
-  scheduleApplication(tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application>;
+  scheduleApplication(tenantId: string, id: string, payload: ApplicationScheduleRequest, fallbackApp?: Application): Promise<Application>;
   getSlotAvailability?(
     tenantId: string,
     jurisdictionId: string,

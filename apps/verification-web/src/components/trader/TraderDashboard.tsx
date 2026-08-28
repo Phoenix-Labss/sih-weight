@@ -14,6 +14,7 @@ import { FeePaymentModal } from './FeePaymentModal';
 import { ReceiptViewer } from './ReceiptViewer';
 import { QueryResponseModal } from './QueryResponseModal';
 import { CertificateModal } from './CertificateModal';
+import { SessionSchedulerModal } from '../officer/SessionSchedulerModal';
 import { ApplicationTimeline } from './ApplicationTimeline';
 import { InstrumentRegistry } from './InstrumentRegistry';
 import { mockModels } from '../../api/mock/mockFixtures';
@@ -46,9 +47,11 @@ export const TraderDashboard: React.FC = () => {
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [isQueryModalOpen, setIsQueryModalOpen] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+  const [isSchedulerModalOpen, setIsSchedulerModalOpen] = useState(false);
 
   const [activeApplication, setActiveApplication] = useState<Application | null>(null);
   const [activeCertificate, setActiveCertificate] = useState<Certificate | null>(null);
+  const [selectedAppForSchedule, setSelectedAppForSchedule] = useState<Application | null>(null);
 
   // Certificate quick-table pagination: 8 per "page"
   const CERTS_PER_PAGE = 8;
@@ -123,6 +126,11 @@ export const TraderDashboard: React.FC = () => {
   const handleOpenQuery = (app: Application) => {
     setActiveApplication(app);
     setIsQueryModalOpen(true);
+  };
+
+  const handleOpenScheduler = (app: Application) => {
+    setSelectedAppForSchedule(app);
+    setIsSchedulerModalOpen(true);
   };
 
   const handleViewCertificate = (certId: string) => {
@@ -286,6 +294,7 @@ export const TraderDashboard: React.FC = () => {
                   onOpenPaymentModal={handleOpenPayment}
                   onOpenReceiptModal={handleOpenReceipt}
                   onOpenQueryModal={handleOpenQuery}
+                  onOpenSchedulerModal={handleOpenScheduler}
                   onApplicationUpdated={loadData}
                   onViewCertificate={(targetApp) => {
                     const cert = certificates.find((c) => c.instrument_id === targetApp.instrument_id) || certificates[0];
@@ -439,6 +448,15 @@ export const TraderDashboard: React.FC = () => {
         onClose={() => setIsCertModalOpen(false)}
         certificate={activeCertificate}
         instrument={instruments.find((i) => i.instrument_id === activeCertificate?.instrument_id)}
+      />
+
+      <SessionSchedulerModal
+        isOpen={isSchedulerModalOpen}
+        onClose={() => setIsSchedulerModalOpen(false)}
+        application={selectedAppForSchedule}
+        onScheduled={() => {
+          loadData();
+        }}
       />
     </div>
   );

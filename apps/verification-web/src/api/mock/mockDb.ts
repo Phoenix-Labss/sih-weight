@@ -288,9 +288,82 @@ export class MockDatabase {
     return { ...app, fee_assessment: { ...app.fee_assessment } };
   }
 
+  public getSlotAvailability(
+    tenantId: string,
+    jurisdictionId: string,
+    dateStr: string
+  ): {
+    date: string;
+    jurisdiction_id: string;
+    jurisdiction_name: string;
+    total_fleet_size: number;
+    slots: Array<{
+      slot_id: string;
+      start_time: string;
+      end_time: string;
+      total_capacity: number;
+      booked_count: number;
+      remaining_slots: number;
+      is_available: boolean;
+    }>;
+  } {
+    const totalFleetSize = 10;
+    const standardSlotWindows = [
+      { slot_id: '09:00-11:00', start_time: '09:00', end_time: '11:00' },
+      { slot_id: '11:00-13:00', start_time: '11:00', end_time: '13:00' },
+      { slot_id: '13:00-15:00', start_time: '13:00', end_time: '15:00' },
+      { slot_id: '15:00-17:00', start_time: '15:00', end_time: '17:00' },
+      { slot_id: '17:00-19:00', start_time: '17:00', end_time: '19:00' },
+    ];
+
+    const bookedCounts: Record<string, number> = {};
+    for (const app of this.applications) {
+      if (app.current_status === 'SCHEDULED' && app.scheduled_slot_start) {
+        const appDate = app.scheduled_slot_start.split('T')[0];
+        if (appDate === dateStr) {
+          const startTime = app.scheduled_slot_start.split('T')[1]?.slice(0, 5);
+          const endTime = app.scheduled_slot_end ? app.scheduled_slot_end.split('T')[1]?.slice(0, 5) : '';
+          const slotKey = `${startTime}-${endTime}`;
+          const matched = standardSlotWindows.find((w) => w.slot_id === slotKey || w.start_time === startTime);
+          if (matched) {
+            bookedCounts[matched.slot_id] = (bookedCounts[matched.slot_id] || 0) + 1;
+          }
+        }
+      }
+    }
+
+    return {
+      date: dateStr,
+      jurisdiction_id: jurisdictionId || 'JUR-DL-01',
+      jurisdiction_name: 'Central Delhi Zone (JUR-DL-01)',
+      total_fleet_size: totalFleetSize,
+      slots: standardSlotWindows.map((w) => {
+        const booked = bookedCounts[w.slot_id] || 0;
+        const remaining = Math.max(0, totalFleetSize - booked);
+        return {
+          slot_id: w.slot_id,
+          start_time: w.start_time,
+          end_time: w.end_time,
+          total_capacity: totalFleetSize,
+          booked_count: booked,
+          remaining_slots: remaining,
+          is_available: remaining > 0,
+        };
+      }),
+    };
+  }
+
   public scheduleApplication(appId: string, req: ApplicationScheduleRequest): Application {
     const app = this.getApplication(appId);
     if (!app) throw new Error('Application not found');
+
+    const dateStr = req.slot_start.split('T')[0];
+    const avail = this.getSlotAvailability(app.tenant_id, app.jurisdiction_id, dateStr);
+    const startHour = req.slot_start.split('T')[1]?.slice(0, 5);
+    const targetSlot = avail.slots.find((s) => s.start_time === startHour || req.slot_start.includes(s.start_time));
+    if (targetSlot && targetSlot.remaining_slots <= 0) {
+      throw new Error(`Time slot ${targetSlot.slot_id} is fully booked (${targetSlot.total_capacity} inspection capacity reached). Please select another slot or date.`);
+    }
 
     app.scheduled_slot_start = req.slot_start;
     app.scheduled_slot_end = req.slot_end;

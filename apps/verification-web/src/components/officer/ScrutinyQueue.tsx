@@ -764,11 +764,8 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
         isOpen={isSchedulerModalOpen}
         onClose={() => setIsSchedulerModalOpen(false)}
         application={selectedAppForSchedule}
-        onScheduled={(updated) => {
+        onScheduled={() => {
           onApplicationUpdated();
-          if (onSelectSessionForTesting && selectedAppForSchedule) {
-            onSelectSessionForTesting(selectedAppForSchedule.application_id);
-          }
         }}
       />
 

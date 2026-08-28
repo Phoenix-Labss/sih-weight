@@ -26,6 +26,7 @@ interface ApplicationTimelineProps {
   onOpenPaymentModal: (app: Application) => void;
   onOpenReceiptModal: (app: Application) => void;
   onOpenQueryModal: (app: Application) => void;
+  onOpenSchedulerModal?: (app: Application) => void;
   onViewCertificate?: (app: Application) => void;
   onApplicationUpdated?: () => void;
 }
@@ -77,6 +78,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
   onOpenPaymentModal,
   onOpenReceiptModal,
   onOpenQueryModal,
+  onOpenSchedulerModal,
   onViewCertificate,
   onApplicationUpdated,
 }) => {
@@ -174,10 +176,20 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
             </button>
           )}
 
+          {isPaid && onOpenSchedulerModal && (
+            <button
+              onClick={() => onOpenSchedulerModal(application)}
+              className="px-3.5 py-1.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-amber-300" />
+              <span>Schedule Inspection Slot</span>
+            </button>
+          )}
+
           {isPaid && (
             <button
               onClick={() => onOpenReceiptModal(application)}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow border border-slate-700"
+              className="px-3.5 py-1.5 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow border border-slate-700 cursor-pointer"
             >
               <Receipt className="w-3.5 h-3.5 text-emerald-400" />
               <span>Payment Receipt</span>
@@ -187,7 +199,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {currentStatus === 'COMPLETED' && onViewCertificate && (
             <button
               onClick={() => onViewCertificate(application)}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all hover:shadow"
+              className="px-4 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all hover:shadow cursor-pointer"
             >
               <Award className="w-3.5 h-3.5 text-amber-300" />
               <span>View Certificate</span>
@@ -208,7 +220,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <button
             onClick={handleSubmitDraft}
             disabled={isSubmitting}
-            className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-blue-800 transition-colors shrink-0 flex items-center gap-1"
+            className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-blue-800 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
           >
             <Send className="w-3 h-3 text-amber-300" />
             <span>Submit Now</span>
@@ -232,7 +244,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isOfficerRole && (
             <button
               onClick={goToOfficerWorkspace}
-              className="px-3 py-1 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shrink-0 flex items-center gap-1"
+              className="px-3 py-1 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
             >
               <ArrowRight className="w-3 h-3" />
               <span>Go to Officer Workspace</span>
@@ -255,27 +267,35 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       )}
 
       {(currentStatus === 'FEE_PAID' || currentStatus === 'PAYMENT_RECONCILED') && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-emerald-900">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-emerald-900">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <div>
               <span className="font-bold">Payment Reconciled:</span>{' '}
               {isOfficerRole ? (
-                <>Treasury fee confirmed. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to schedule the physical verification slot.</>
+                <>Treasury fee confirmed. Open the <span className="font-bold text-gov-navy">Officer Workspace</span> to allocate the verification slot.</>
               ) : (
-                <>Treasury fee confirmed. Awaiting the verification slot to be scheduled.</>
+                <>Treasury fee confirmed. Please select your preferred inspection date and 2-hour testing window.</>
               )}
             </div>
           </div>
-          {isOfficerRole && (
+          {isOfficerRole ? (
             <button
               onClick={goToOfficerWorkspace}
-              className="px-3 py-1 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-1"
+              className="px-3 py-1 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
             >
               <ArrowRight className="w-3 h-3" />
               <span>Go to Officer Workspace</span>
             </button>
-          )}
+          ) : onOpenSchedulerModal ? (
+            <button
+              onClick={() => onOpenSchedulerModal(application)}
+              className="px-3.5 py-1.5 bg-gov-navy text-white font-bold rounded-lg hover:bg-slate-800 transition-colors shrink-0 flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <span>Choose Inspection Slot</span>
+            </button>
+          ) : null}
         </div>
       )}
 

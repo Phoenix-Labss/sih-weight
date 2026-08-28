@@ -98,6 +98,9 @@ export const mockApplicationService: IApplicationService = {
   async scheduleApplication(_tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application> {
     return mockDb.scheduleApplication(id, payload);
   },
+  async getSlotAvailability(tenantId: string, jurisdictionId: string, dateStr: string) {
+    return mockDb.getSlotAvailability(tenantId, jurisdictionId, dateStr);
+  },
 };
 
 export const mockVerificationService: IVerificationService = {

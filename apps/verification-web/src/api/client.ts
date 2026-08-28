@@ -53,6 +53,25 @@ export interface IApplicationService {
   assessFee(tenantId: string, id: string, payload: FeeAssessmentCreate): Promise<Application>;
   reconcilePayment(tenantId: string, id: string, payload: PaymentReconcileRequest): Promise<Application>;
   scheduleApplication(tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application>;
+  getSlotAvailability?(
+    tenantId: string,
+    jurisdictionId: string,
+    dateStr: string
+  ): Promise<{
+    date: string;
+    jurisdiction_id: string;
+    jurisdiction_name: string;
+    total_fleet_size: number;
+    slots: Array<{
+      slot_id: string;
+      start_time: string;
+      end_time: string;
+      total_capacity: number;
+      booked_count: number;
+      remaining_slots: number;
+      is_available: boolean;
+    }>;
+  }>;
 }
 
 export interface IVerificationService {

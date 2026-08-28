@@ -281,9 +281,9 @@ export class ApplicationService {
           data: {
             tenant_id: tenantId,
             base_verification_fee: 750.0,
-            user_charge: 50.0,
+            user_charge: 0.0,
             late_fee: 0.0,
-            total_assessed_amount: 800.0,
+            total_assessed_amount: 750.0,
             policy_version: 'POL-FEES-2026.1',
             payment_status: 'PAYMENT_PENDING',
           },
@@ -471,9 +471,9 @@ export class ApplicationService {
         data: {
           tenant_id: tenantId,
           base_verification_fee: 750.0,
-          user_charge: 50.0,
+          user_charge: 0.0,
           late_fee: 0.0,
-          total_assessed_amount: 800.0,
+          total_assessed_amount: 750.0,
           policy_version: 'POL-FEES-2026.1',
           payment_status: 'PAYMENT_RECONCILED',
           receipt_number: receiptNum,

@@ -101,7 +101,7 @@ export const TraderDashboard: React.FC = () => {
         a.current_status !== 'COMPLETED' &&
         a.current_status !== 'REJECTED'
     )
-    .reduce((sum, a) => sum + (a.fee_assessment?.total_assessed_amount || 800), 0);
+    .reduce((sum, a) => sum + (a.fee_assessment?.total_assessed_amount || 750), 0);
   const dueInstruments = instruments.filter(
     (i) => i.current_status === 'VERIFICATION_DUE' || i.current_status === 'OVERDUE'
   ).length;

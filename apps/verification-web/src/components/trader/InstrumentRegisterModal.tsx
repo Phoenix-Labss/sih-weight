@@ -79,44 +79,181 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
         {/* Model Selection */}
         <div>
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Approved Pattern / Model *
+            Approved Pattern / Model (Section 22 DCA Approval) *
           </label>
           <select
             value={selectedModelId}
-            onChange={(e) => setSelectedModelId(e.target.value)}
-            className="w-full text-sm rounded-lg border border-slate-300 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gov-blue"
+            onChange={(e) => {
+              const newId = e.target.value;
+              setSelectedModelId(newId);
+              const m = models.find((mod) => mod.model_id === newId);
+              if (m?.specifications && typeof m.specifications.application === 'string') {
+                setIntendedUse(m.specifications.application);
+              }
+            }}
+            className="w-full text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gov-blue"
           >
-            {models.map((m) => (
-              <option key={m.model_id} value={m.model_id}>
-                {m.model_name} ({m.model_approval_number} — {m.accuracy_class}, Max {m.max_capacity} {m.capacity_unit})
-              </option>
-            ))}
+            {/* Category Groups */}
+            <optgroup label="🛒 Commercial, Grocery & Retail Scales (Class III)">
+              {models
+                .filter((m) => m.subtype === 'COUNTER_SCALE_ELECTRONIC' || m.subtype === 'PRICE_COMPUTING_SCALE' || m.subtype === 'TABLETOP_SCALE_ELECTRONIC')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="💎 Precious Jewelry & Bullion Balances (Class II High Accuracy)">
+              {models
+                .filter((m) => m.subtype === 'BULLION_BALANCE_HIGH_PRECISION' || m.subtype === 'JEWELRY_CARAT_BALANCE' || m.subtype === 'PRECISION_LABORATORY_BALANCE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🔬 Special Accuracy Analytical Balances (Class I)">
+              {models
+                .filter((m) => m.accuracy_class === 'CLASS_I')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🌾 APMC Mandi, Wholesale & Platform Scales (Class III)">
+              {models
+                .filter((m) => m.subtype === 'INDUSTRIAL_PLATFORM_SCALE' || m.subtype === 'HEAVY_DUTY_PLATFORM_SCALE' || m.subtype === 'AGRICULTURAL_MANDI_SCALE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🥛 Dairy Automated Milk Collection Units (AMCU)">
+              {models
+                .filter((m) => m.subtype === 'AUTOMATED_MILK_COLLECTION_SCALE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🏗️ Heavy Crane & Hanging Scales">
+              {models
+                .filter((m) => m.subtype === 'WIRELESS_CRANE_SCALE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🚛 Highway Truck & Heavy Industrial Weighbridges (Class IIII)">
+              {models
+                .filter((m) => m.subtype === 'HIGHWAY_TRUCK_WEIGHBRIDGE' || m.subtype === 'HEAVY_INDUSTRIAL_WEIGHBRIDGE' || m.accuracy_class === 'CLASS_IIII')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="📦 Automatic Gravimetric Catchweighers & Bagging (AWI)">
+              {models
+                .filter((m) => m.category === 'AWI')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="🏥 Medical & Healthcare Scales">
+              {models
+                .filter((m) => m.subtype === 'MEDICAL_PERSON_SCALE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="⛽ Motor Fuel & Petroleum Flow Meters (OIML R117)">
+              {models
+                .filter((m) => m.category === 'FLOW_METER')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
+
+            <optgroup label="📏 Linear & Dimensional Measures">
+              {models
+                .filter((m) => m.category === 'LINEAR_MEASURE')
+                .map((m) => (
+                  <option key={m.model_id} value={m.model_id}>
+                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
+                  </option>
+                ))}
+            </optgroup>
           </select>
         </div>
 
         {/* Selected Model Technical Specs Preview Card */}
         {selectedModel && (
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div>
-              <span className="text-slate-500 block">Approval Ref:</span>
-              <span className="font-semibold text-slate-800">{selectedModel.model_approval_number}</span>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+              <div>
+                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Manufacturer &amp; Model</span>
+                <strong className="text-slate-900 text-sm">{selectedModel.model_name}</strong>
+                <p className="text-slate-600 text-[11px]">{selectedModel.manufacturer_name}</p>
+              </div>
+              <div className="text-right">
+                <span className="font-mono text-[10px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold border border-amber-300">
+                  {selectedModel.model_approval_number}
+                </span>
+                <span className="block text-[10px] text-slate-500 mt-0.5">Govt Model Approval</span>
+              </div>
             </div>
-            <div>
-              <span className="text-slate-500 block">Accuracy Class:</span>
-              <span className="font-semibold text-slate-800">{selectedModel.accuracy_class}</span>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              <div>
+                <span className="text-slate-500 block text-[10px]">Accuracy Class:</span>
+                <span className="font-bold text-slate-800">{selectedModel.accuracy_class}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[10px]">Max Capacity:</span>
+                <span className="font-bold text-slate-800">
+                  {selectedModel.max_capacity} {selectedModel.capacity_unit}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[10px]">Min Capacity:</span>
+                <span className="font-bold text-slate-800">
+                  {selectedModel.min_capacity} {selectedModel.capacity_unit}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[10px]">Verification Scale Interval (e):</span>
+                <span className="font-bold text-slate-800 font-mono">
+                  {selectedModel.verification_scale_interval_e} {selectedModel.scale_interval_unit}
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-slate-500 block">Max Capacity:</span>
-              <span className="font-semibold text-slate-800">
-                {selectedModel.max_capacity} {selectedModel.capacity_unit}
-              </span>
-            </div>
-            <div>
-              <span className="text-slate-500 block">Scale Interval (e):</span>
-              <span className="font-semibold text-slate-800">
-                {selectedModel.verification_scale_interval_e} {selectedModel.scale_interval_unit}
-              </span>
-            </div>
+
+            {selectedModel.specifications && (
+              <div className="text-[11px] bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700">
+                <strong className="text-slate-900">Statutory Use: </strong>
+                {String(selectedModel.specifications.application || 'Commercial Trade & Legal Metrology Inspection')}
+              </div>
+            )}
           </div>
         )}
 

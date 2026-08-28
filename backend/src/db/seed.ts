@@ -162,6 +162,20 @@ export async function seedDatabase() {
     },
   });
 
+  await prisma.user.upsert({
+    where: { email: 'supervisor.officer@delhi.gov.in' },
+    update: { password_hash: hashPassword('Supervisor@2026') },
+    create: {
+      user_id: 'sup-officer-01',
+      tenant_id: tenant.tenant_id,
+      email: 'supervisor.officer@delhi.gov.in',
+      full_name: 'Smt. Sunita Sharma (Supervisor)',
+      role: 'SUPERVISOR',
+      password_hash: hashPassword('Supervisor@2026'),
+      is_active: true,
+    },
+  });
+
   const userAdmin = await prisma.user.upsert({
     where: { email: 'admin.delhi@gov.in' },
     update: { password_hash: hashPassword('Admin@2026') },

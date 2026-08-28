@@ -74,33 +74,8 @@ export class MockDatabase {
     this.publicMap = loadOrInit('publicMap', mockPublicVerifyMap);
   }
 
-  public resetToDefaults(): void {
-    this.resetDatabase();
-  }
-
   public resetDatabase(): void {
-    try {
-      const keys = ['models', 'instruments', 'applications', 'sessions', 'stamps', 'certificates', 'publicMap'];
-      ['emetrology_clean_v1_', 'emetrology_clean_v2_', 'emetrology_clean_v3_', 'emetrology_clean_v4_', 'emetrology_clean_v5_'].forEach((pref) => {
-        keys.forEach((k) => {
-          localStorage.removeItem(pref + k);
-        });
-      });
-    } catch {}
-    this.models = JSON.parse(JSON.stringify(mockModels));
-    this.instruments = JSON.parse(JSON.stringify(mockInstruments));
-    this.applications = JSON.parse(JSON.stringify(mockApplications));
-    this.sessions = JSON.parse(JSON.stringify(mockSessions));
-    this.stamps = JSON.parse(JSON.stringify(mockStamps));
-    this.certificates = JSON.parse(JSON.stringify(mockCertificates));
-    this.publicMap = JSON.parse(JSON.stringify(mockPublicVerifyMap));
-    save('models', this.models);
-    save('instruments', this.instruments);
-    save('applications', this.applications);
-    save('sessions', this.sessions);
-    save('stamps', this.stamps);
-    save('certificates', this.certificates);
-    save('publicMap', this.publicMap);
+    this.resetToDefaults();
   }
 
   // --- Instruments ---

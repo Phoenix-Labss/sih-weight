@@ -21,14 +21,18 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 }) => {
   if (!certificate) return null;
 
-  const qrMatrix = generateDeterministicMatrix(certificate.public_verification_token || 'TOKEN', 25);
+  const verificationUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/#public?token=${encodeURIComponent(certificate.public_verification_token || '')}`
+      : `https://metrology.gov.in/verify?token=${certificate.public_verification_token}`;
+
+  const qrMatrix = generateDeterministicMatrix(verificationUrl);
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleDownloadPdf = () => {
-    // Open printable / PDF render view
     window.print();
   };
 
@@ -45,7 +49,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         <div className="relative bg-[#FCFDFE] text-slate-900 font-sans rounded-2xl shadow-xl border-2 border-amber-600/30 p-1 sm:p-2 print:border-none print:p-0 print:shadow-none overflow-hidden">
           
           {/* Inner Golden Guilloche Security Border */}
-          <div className="relative border border-gov-navy/20 rounded-xl p-6 sm:p-9 bg-white overflow-hidden">
+          <div className="relative border border-gov-navy/20 rounded-xl p-5 sm:p-8 bg-white overflow-hidden">
             
             {/* Indian National Tricolor Ribbon Header */}
             <div className="absolute top-0 left-0 right-0 h-1.5 flex">
@@ -81,10 +85,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             </div>
 
             {/* Certificate Content */}
-            <div className="relative z-10 space-y-6">
+            <div className="relative z-10 space-y-5">
               
               {/* Header: National Crest & Authority Titles */}
-              <div className="text-center space-y-1.5 pb-4 border-b-2 border-slate-100">
+              <div className="text-center space-y-1 pb-3.5 border-b-2 border-slate-100">
                 {/* Ashoka Lion Emblem Representation */}
                 <div className="flex justify-center mb-1">
                   <div className="inline-flex flex-col items-center justify-center p-2 rounded-full bg-amber-50/60 border border-amber-200/50">
@@ -102,7 +106,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                   <h5 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                     MINISTRY OF CONSUMER AFFAIRS, FOOD & PUBLIC DISTRIBUTION
                   </h5>
-                  <h2 className="text-lg sm:text-xl font-extrabold text-gov-navy uppercase tracking-tight font-serif pt-1">
+                  <h2 className="text-lg sm:text-xl font-extrabold text-gov-navy uppercase tracking-tight font-serif pt-0.5">
                     Department of Legal Metrology
                   </h2>
                   <p className="text-xs font-semibold text-amber-800 tracking-wide">
@@ -121,16 +125,16 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               </div>
 
               {/* Top Row: Certificate Credentials & Interactive QR Seal */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
                 
                 {/* Primary Certificate Particulars */}
-                <div className="md:col-span-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 space-y-3.5 flex flex-col justify-between">
+                <div className="md:col-span-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 space-y-3 flex flex-col justify-between min-w-0">
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         Certificate Number
                       </span>
-                      <span className="font-mono font-extrabold text-sm text-gov-navy tracking-tight">
+                      <span className="font-mono font-extrabold text-sm text-gov-navy tracking-tight truncate block">
                         {certificate.certificate_number}
                       </span>
                     </div>
@@ -140,7 +144,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                         Statutory Status
                       </span>
                       <span className="inline-flex items-center gap-1 font-bold text-xs text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-300">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                         <span>{certificate.certificate_status}</span>
                       </span>
                     </div>
@@ -168,150 +172,160 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                       Issuing Departmental Authority
                     </span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="font-semibold text-slate-800 block truncate">
                       Office of the Controller of Legal Metrology, Delhi Zone (JUR-DL-01)
                     </span>
                   </div>
                 </div>
 
                 {/* Secure QR Verification Code Card */}
-                <div className="bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col items-center justify-between text-center shadow-2xs">
-                  <div className="w-24 h-24 bg-white p-1.5 border border-slate-300 rounded-lg shadow-inner flex items-center justify-center">
-                    <svg viewBox="0 0 25 25" className="w-full h-full">
-                      {qrMatrix.map((row, r) =>
-                        row.map((cell, c) => (
-                          <rect
-                            key={`${r}-${c}`}
-                            x={c}
-                            y={r}
-                            width={1}
-                            height={1}
-                            fill={cell ? '#0B1E36' : '#FFFFFF'}
-                          />
-                        ))
-                      )}
-                    </svg>
-                  </div>
+                <div className="bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col items-center justify-between text-center shadow-2xs min-w-0">
+                  <a
+                    href={verificationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center cursor-pointer"
+                    title="Click or scan to verify on national portal"
+                  >
+                    <div className="w-24 h-24 bg-white p-1.5 border border-slate-300 rounded-lg shadow-inner flex items-center justify-center group-hover:border-gov-blue transition-colors">
+                      <svg viewBox={`0 0 ${qrMatrix.length} ${qrMatrix.length}`} className="w-full h-full">
+                        {qrMatrix.map((row, r) =>
+                          row.map((cell, c) => (
+                            <rect
+                              key={`${r}-${c}`}
+                              x={c}
+                              y={r}
+                              width={1}
+                              height={1}
+                              fill={cell ? '#0B1E36' : '#FFFFFF'}
+                            />
+                          ))
+                        )}
+                      </svg>
+                    </div>
 
-                  <div className="mt-2 space-y-0.5">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gov-blue">
-                      <QrCode className="w-3 h-3" />
-                      <span>National QR Verification</span>
-                    </span>
-                    <p className="text-[9px] font-mono text-slate-500 break-all leading-tight">
-                      Token: {truncateHash(certificate.public_verification_token || 'TOKEN-VERIFIED', 16)}
-                    </p>
-                  </div>
+                    <div className="mt-2 space-y-0.5">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gov-blue group-hover:underline">
+                        <QrCode className="w-3 h-3" />
+                        <span>Scan to Verify</span>
+                      </span>
+                      <p className="text-[9px] font-mono text-slate-500 truncate max-w-[170px]">
+                        {certificate.public_verification_token}
+                      </p>
+                    </div>
+                  </a>
                 </div>
               </div>
 
               {/* Technical Specifications Grid */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-gov-navy" />
+                  <FileCheck className="w-4 h-4 text-gov-navy shrink-0" />
                   <h4 className="font-bold text-gov-navy uppercase tracking-wider text-xs font-serif">
                     Technical Particulars of Verified Instrument
                   </h4>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50/90 p-3.5 rounded-xl border border-slate-200 text-xs">
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Instrument Category:</span>
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-slate-800 truncate block">
                       {instrument?.model?.category || 'NAWI'} — {instrument?.model?.subtype || 'Commercial Counter Scale'}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Model Approval Ref (Sec 22):</span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className="font-mono font-bold text-slate-800 truncate block">
                       {instrument?.model?.model_approval_number || 'IND/09/2024/8842'}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Accuracy Class:</span>
-                    <span className="font-bold text-gov-navy">
+                    <span className="font-bold text-gov-navy block">
                       Class {instrument?.model?.accuracy_class?.replace(/CLASS_/g, '') || 'III'} (Medium)
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Instrument Serial No:</span>
-                    <span className="font-mono font-bold text-slate-900 bg-white px-1.5 py-0.5 rounded border border-slate-200 inline-block">
+                    <span className="font-mono font-bold text-slate-900 bg-white px-1.5 py-0.5 rounded border border-slate-200 inline-block truncate max-w-full">
                       {maskSerialNumber(instrument?.serial_number || 'DL-2026-9042')}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Maximum Capacity (Max):</span>
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-slate-800 block">
                       {instrument?.model?.max_capacity || 30.0} {instrument?.model?.capacity_unit || 'kg'}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Scale Interval (e = d):</span>
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-slate-800 block">
                       {instrument?.model?.verification_scale_interval_e || 0.005} {instrument?.model?.capacity_unit || 'kg'}
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Physical Stamp / Lead Seal:</span>
-                    <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block">
+                    <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block truncate max-w-full">
                       DL-SEAL-2026-0042
                     </span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-[10px] text-slate-400 font-medium block">Procedure Version:</span>
-                    <span className="font-mono text-[10px] text-slate-600">
+                    <span className="font-mono text-[10px] text-slate-600 truncate block">
                       {certificate.procedure_pack_id || 'IND-LM-NAWI-2026.1'}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Statutory Declarations & Cryptographic Attestation Block */}
-              <div className="pt-3 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end text-xs">
+              {/* Statutory Declarations & Cryptographic Attestation Block (Fixed Grid Alignment) */}
+              <div className="pt-2 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-3.5 items-stretch text-xs">
                 
                 {/* Cryptographic Integrity & DSC Box */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5">
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-800">
-                    <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Tamper-Evident Cryptographic eSign Seal</span>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 min-w-0 flex flex-col justify-between overflow-hidden">
+                  <div>
+                    <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-xs">
+                      <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Tamper-Evident eSign Seal</span>
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-500 truncate mt-1">
+                      SHA-256: {truncateHash(certificate.certificate_bytes_sha256 || '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945', 24)}
+                    </p>
                   </div>
-                  <p className="text-[10px] font-mono text-slate-500 break-all leading-snug">
-                    SHA-256 Digest: {truncateHash(certificate.certificate_bytes_sha256 || '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945', 28)}
-                  </p>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/50">
                     Signed & Timestamped: <span className="font-medium text-slate-700">{formatDateTime(certificate.signature_timestamp || certificate.created_at)}</span>
                   </p>
                 </div>
 
                 {/* Authorized Officer Signature Seal */}
-                <div className="flex flex-col items-end text-right space-y-1">
-                  <div className="bg-emerald-50/80 border border-emerald-200 rounded-lg p-2.5 text-right w-full sm:w-auto">
-                    <div className="flex items-center justify-end gap-1 text-emerald-700 font-bold text-[11px] mb-0.5">
-                      <Award className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="bg-emerald-50/90 border border-emerald-200 rounded-xl p-3 space-y-1 min-w-0 flex flex-col justify-between overflow-hidden">
+                  <div>
+                    <div className="flex items-center gap-1 text-emerald-800 font-bold text-xs mb-0.5">
+                      <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       <span>Digitally Approved & Signed</span>
                     </div>
-                    <span className="font-bold text-slate-900 text-xs block">
+                    <span className="font-bold text-slate-900 text-xs block truncate">
                       Shri Arvind Sharma
                     </span>
-                    <span className="text-[10px] text-slate-500 block">
+                    <span className="text-[10px] text-slate-600 block truncate">
                       Legal Metrology Officer (Central Delhi Zone)
                     </span>
-                    <span className="text-[9px] font-mono text-slate-400 block mt-0.5">
-                      DSC ID: {certificate.digital_signature_reference || 'DSC-GOV-IN-DL-LMO-2026-9921'}
-                    </span>
                   </div>
+                  <p className="text-[9px] font-mono text-slate-500 pt-1 border-t border-emerald-200/60 truncate" title={certificate.digital_signature_reference || 'DSC-GOV-IN-DL-LMO-2026-9921'}>
+                    DSC: {truncateHash(certificate.digital_signature_reference || 'DSC-GOV-IN-DL-LMO-2026-9921', 26)}
+                  </p>
                 </div>
               </div>
 
               {/* Official Statutory Footnote */}
-              <div className="text-[10px] text-center text-slate-500 pt-2 border-t border-slate-100 font-medium">
+              <div className="text-[10px] text-center text-slate-500 pt-1.5 border-t border-slate-100 font-medium">
                 This digital certificate is generated and issued under Section 24 of The Legal Metrology Act, 2009. The physical instrument bears the statutory stamp and seal as prescribed in Schedule VIII of The General Rules, 2011.
               </div>
             </div>

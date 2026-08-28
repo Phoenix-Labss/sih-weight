@@ -180,4 +180,41 @@ export const mockEvidenceService: IEvidenceService = {
   },
 };
 
+export const mockAdminService = {
+  async provisionUser(payload: any): Promise<any> {
+    return mockDb.provisionUser(payload);
+  },
+  async registerGATC(payload: any): Promise<any> {
+    return mockDb.registerGATC(payload);
+  },
+  async registerModel(payload: any): Promise<any> {
+    return mockDb.registerModel(payload);
+  },
+  async submitApproval(payload: any): Promise<any> {
+    return mockDb.submitApproval(payload);
+  },
+  async listApprovals(status?: string): Promise<any> {
+    return mockDb.listApprovals(status);
+  },
+  async reviewApproval(requestId: string, action: 'APPROVE' | 'REJECT', notes?: string): Promise<any> {
+    return mockDb.reviewApproval(requestId, action, notes);
+  },
+  async listJurisdictions(): Promise<any> {
+    return mockDb.getJurisdictions();
+  },
+  async listUsers(): Promise<any> {
+    return mockDb.getUsers();
+  },
+  async listGATCCentres(): Promise<any> {
+    return mockDb.getGATCCentres();
+  },
+  async listAuditLogs(page = 1, pageSize = 50): Promise<any> {
+    return mockDb.getAuditLogs(page, pageSize);
+  },
+  async getOverview(): Promise<any> {
+    return mockDb.getOverview();
+  },
+};
+
 export { mockDb };
+

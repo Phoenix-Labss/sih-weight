@@ -758,3 +758,22 @@ model LegalSourceRecord {
 
   @@map("legal_source_records")
 }
+
+model ApprovalRequest {
+  request_id     String    @id @default(uuid())
+  tenant_id      String
+  entity_type    String    // USER_PROVISION | GATC_REGISTRATION | MODEL_APPROVAL | STANDARD_REGISTER
+  title          String
+  payload        String    // JSON string
+  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  requester_id   String
+  requester_name String
+  reviewer_id    String?
+  reviewer_name  String?
+  review_notes   String?
+  reviewed_at    DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  @@map("approval_requests")
+}

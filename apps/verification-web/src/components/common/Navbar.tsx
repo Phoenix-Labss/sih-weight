@@ -13,6 +13,7 @@ interface NavbarProps {
 }
 
 const TAB_LABELS: Record<TabId, string> = {
+  admin: 'Admin & Governance',
   trader: 'Trader Portal',
   officer: 'Officer Workspace',
   supervisor: 'Supervisor / SLA',
@@ -22,6 +23,7 @@ const TAB_LABELS: Record<TabId, string> = {
 };
 
 const TAB_ICONS: Record<TabId, React.ReactNode> = {
+  admin: <ShieldCheck className="h-4 w-4" />,
   trader: <Building2 className="h-4 w-4" />,
   officer: <ShieldCheck className="h-4 w-4" />,
   supervisor: <UserCheck className="h-4 w-4" />,

@@ -27,6 +27,7 @@ import {
   mockStampService,
   mockVerificationService,
   mockEvidenceService,
+  mockAdminService,
   mockDb,
 } from './mock/mockService';
 import {
@@ -37,13 +38,14 @@ import {
   httpStampService,
   httpVerificationService,
   httpEvidenceService,
+  httpAdminService,
 } from './http';
 
 export interface IInstrumentService {
   listInstruments(tenantId: string, page?: number, pageSize?: number): Promise<PaginatedResponse<Instrument>>;
   getInstrument(tenantId: string, id: string): Promise<Instrument>;
   registerInstrument(tenantId: string, payload: InstrumentRegisterRequest): Promise<Instrument>;
-  listModels?(): Promise<InstrumentModel[]>;
+  listModels(): Promise<InstrumentModel[]>;
 }
 
 export interface IApplicationService {
@@ -186,6 +188,7 @@ export const api = {
   certificates: createProxy(mockCertificateService, httpCertificateService),
   publicVerify: createProxy(mockPublicVerifyService, httpPublicVerifyService),
   evidence: createProxy(mockEvidenceService, httpEvidenceService),
+  admin: createProxy(mockAdminService, httpAdminService),
   system: {
     resetAllData: async () => {
       try {

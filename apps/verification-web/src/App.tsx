@@ -11,12 +11,13 @@ import { PublicVerificationPage } from './components/public/PublicVerificationPa
 import { SupervisorDashboard } from './components/supervisor/SupervisorDashboard';
 import { GATCManagement } from './components/gatc/GATCManagement';
 import { LegacyMigrationConsole } from './components/migration/LegacyMigrationConsole';
+import { AdminPortal } from './components/admin/AdminPortal';
 import { RoleType } from './types/api';
 import { I18nProvider } from './i18n';
 import { ApiModeProvider } from './context/ApiModeContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
-export type TabId = 'trader' | 'officer' | 'public' | 'supervisor' | 'gatc' | 'migration';
+export type TabId = 'trader' | 'officer' | 'public' | 'supervisor' | 'gatc' | 'migration' | 'admin';
 
 // Role-to-tab permission matrix: which tabs each role can see
 const ROLE_TABS: Record<string, TabId[]> = {
@@ -24,9 +25,9 @@ const ROLE_TABS: Record<string, TabId[]> = {
   APPLICANT: ['trader', 'public'],
   LMO: ['officer', 'public'],
   GATC_VERIFIER: ['gatc', 'public'],
-  SUPERVISOR: ['supervisor', 'gatc', 'public'],
-  CONTROLLER: ['supervisor', 'gatc', 'public'],
-  ADMIN: ['trader', 'officer', 'supervisor', 'gatc', 'migration', 'public'],
+  SUPERVISOR: ['supervisor', 'admin', 'gatc', 'public'],
+  CONTROLLER: ['admin', 'supervisor', 'gatc', 'public'],
+  ADMIN: ['admin', 'trader', 'officer', 'supervisor', 'gatc', 'migration', 'public'],
 };
 
 function allowedTabs(role: RoleType): TabId[] {
@@ -39,14 +40,15 @@ function defaultTab(role: RoleType): TabId {
       return 'gatc';
     case 'LMO':
       return 'officer';
-    case 'SUPERVISOR':
     case 'CONTROLLER':
+      return 'admin';
+    case 'ADMIN':
+      return 'admin';
+    case 'SUPERVISOR':
       return 'supervisor';
     case 'OWNER':
     case 'APPLICANT':
       return 'trader';
-    case 'ADMIN':
-      return 'officer';
     default: {
       const tabs = allowedTabs(role);
       return tabs[0] || 'public';
@@ -195,6 +197,7 @@ const AppContent: React.FC = () => {
     <div className='min-h-screen flex flex-col bg-slate-100/70 text-slate-900 selection:bg-amber-500 selection:text-slate-950 font-sans'>
       <Navbar activeTab={activeTab} setActiveTab={handleTabChange} allowedTabs={tabs} onLogout={logout} />
       <main className='flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6'>
+        {activeTab === 'admin' && tabs.includes('admin') && <AdminPortal />}
         {activeTab === 'trader' && tabs.includes('trader') && <TraderDashboard />}
         {activeTab === 'officer' && tabs.includes('officer') && <OfficerWorkspace />}
         {activeTab === 'supervisor' && tabs.includes('supervisor') && <SupervisorDashboard />}

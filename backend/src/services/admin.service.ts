@@ -1,6 +1,7 @@
 import { prisma } from '../db/prisma.js';
 import { NotFoundError, ValidationError } from '../core/errors.js';
 import { PaginatedResult } from '../core/types.js';
+import { hashPassword } from '../auth/password.js';
 
 /**
  * ADMIN CONTROL-PLANE SERVICE
@@ -98,12 +99,12 @@ const ADMIN_ENTITY_REGISTRY: Record<string, AdminEntityMeta> = {
     idField: null, idRequiredForCreate: false, kind: 'legal', label: 'Session Reference Standard',
     writable: [],
   },
-  observation: {
+  testObservation: {
     idField: 'observation_id', idRequiredForCreate: false, kind: 'legal', label: 'Test Observation',
     writable: [],
   },
-  stampAction: {
-    idField: 'stamp_action_id', idRequiredForCreate: false, kind: 'legal', label: 'Physical Stamp Action',
+  physicalStampAction: {
+    idField: 'action_id', idRequiredForCreate: false, kind: 'legal', label: 'Physical Stamp Action',
     tenantField: 'tenant_id', writable: [],
   },
   certificate: {
@@ -111,18 +112,18 @@ const ADMIN_ENTITY_REGISTRY: Record<string, AdminEntityMeta> = {
     tenantField: 'tenant_id', writable: [],
   },
   certificateStatusEvent: {
-    idField: 'status_event_id', idRequiredForCreate: false, kind: 'legal', label: 'Certificate Status Event',
+    idField: 'event_id', idRequiredForCreate: false, kind: 'legal', label: 'Certificate Status Event',
     writable: [],
   },
-  auditLog: {
-    idField: 'audit_id', idRequiredForCreate: false, kind: 'legal', label: 'Audit Log',
+  evidenceRecord: {
+    idField: 'evidence_id', idRequiredForCreate: false, kind: 'legal', label: 'Evidence Record',
     tenantField: 'tenant_id', writable: [],
   },
   delegation: {
     idField: 'delegation_id', idRequiredForCreate: false, kind: 'master', label: 'Delegation',
     tenantField: 'tenant_id',
-    writable: ['tenant_id', 'granter_user_id', 'delegatee_user_id', 'jurisdiction_id',
-      'valid_from', 'valid_to', 'is_active'],
+    writable: ['tenant_id', 'delegator_user_id', 'delegate_user_id', 'scope_rules',
+      'starts_at', 'expires_at', 'revoked_at', 'revocation_reason'],
   },
   procedurePack: {
     idField: 'pack_id', idRequiredForCreate: true, kind: 'master', label: 'Procedure Pack',
@@ -134,221 +135,559 @@ const ADMIN_ENTITY_REGISTRY: Record<string, AdminEntityMeta> = {
     writable: ['legal_source_id', 'act_name', 'section_rule', 'title', 'effective_date',
       'checksum_sha256', 'source_document_url'],
   },
+  approvalRequest: {
+    idField: 'request_id', idRequiredForCreate: false, kind: 'master', label: 'Approval Request',
+    tenantField: 'tenant_id',
+    writable: ['tenant_id', 'entity_type', 'title', 'payload', 'status', 'requester_id', 'requester_name',
+      'reviewer_id', 'reviewer_name', 'review_notes', 'reviewed_at'],
+  },
 };
 
-/** Maps a portal entity slug to its Prisma model delegate name. */
-const PRISMA_DELEGATE: Record<string, string> = {
-  tenant: 'tenant', jurisdiction: 'jurisdiction', stakeholder: 'stakeholder', facility: 'facility',
-  user: 'user', lmoProfile: 'lmoProfile', gatcProfile: 'gatcProfile', instrumentModel: 'instrumentModel',
-  instrument: 'instrument', feeAssessment: 'feeAssessment', application: 'verificationApplication',
-  referenceStandard: 'referenceStandard', session: 'verificationSession',
-  sessionReferenceStandard: 'sessionReferenceStandard', observation: 'testObservation',
-  stampAction: 'physicalStampAction', certificate: 'certificate',
-  certificateStatusEvent: 'certificateStatusEvent', auditLog: 'auditLog', delegation: 'delegation',
-  procedurePack: 'procedurePack', legalSourceRecord: 'legalSourceRecord',
-};
-
-function entityMeta(entity: string): AdminEntityMeta {
-  const meta = ADMIN_ENTITY_REGISTRY[entity];
-  if (!meta) {
-    throw new NotFoundError(`Unknown admin entity '${entity}'. See /admin/entities for the whitelist`);
-  }
-  return meta;
+export interface AdminActor {
+  userId: string;
+  role: string;
+  tenantId: string;
+  userName?: string;
 }
-
-function getPrismaModel(delegate: string): any {
-  const model = (prisma as unknown as Record<string, any>)[delegate];
-  if (!model) {
-    throw new Error(`Database model '${delegate}' is not available on the Prisma client`);
-  }
-  return model;
-}
-
-function sanitize(value: unknown): unknown {
-  if (value === null || value === undefined) return value;
-  if (value instanceof Date) return value.toISOString();
-  if (Array.isArray(value)) return value.map(sanitize);
-  if (typeof value === 'object') {
-    if (typeof (value as any).toNumber === 'function') return (value as any).toString();
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = sanitize(v);
-    return out;
-  }
-  return value;
-}
-
-export interface AdminActor { userId: string; role: string; tenantId: string; }
 
 async function writeAudit(
   actor: AdminActor,
   action: string,
   entityType: string,
   entityId: string | null,
-  beforeState?: unknown,
-  afterState?: unknown
+  diff?: Record<string, unknown>
 ): Promise<void> {
-  await prisma.auditLog.create({
-    data: {
-      tenant_id: actor.tenantId,
-      actor_id: actor.userId,
-      actor_role: actor.role,
-      action,
-      entity_type: entityType,
-      entity_id: entityId || '',
-      correlation_id: crypto.randomUUID(),
-      before_state: beforeState !== undefined ? JSON.stringify(sanitize(beforeState)) : null,
-      after_state: afterState !== undefined ? JSON.stringify(sanitize(afterState)) : null,
-      recorded_at: new Date(),
-    },
-  });
+  try {
+    await prisma.auditLog.create({
+      data: {
+        actor_id: actor.userId,
+        actor_role: actor.role,
+        tenant_id: actor.tenantId,
+        action,
+        entity_type: entityType,
+        entity_id: entityId || 'N/A',
+        correlation_id: `corr-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        after_state: diff ? JSON.stringify(diff) : null,
+      },
+    });
+  } catch (err) {
+    console.error('Failed to write admin audit log:', err);
+  }
 }
 
 export class AdminService {
-  async listEntities(): Promise<Array<{ slug: string } & AdminEntityMeta>> {
-    return Object.entries(ADMIN_ENTITY_REGISTRY).map(([slug, meta]) => ({ slug, ...meta }));
+  listEntities(): Array<AdminEntityMeta & { slug: string }> {
+    return Object.entries(ADMIN_ENTITY_REGISTRY).map(([slug, meta]) => ({
+      slug,
+      ...meta,
+    }));
+  }
+
+  private delegate(table: string): any {
+    const d = (prisma as any)[table];
+    if (!d) {
+      throw new NotFoundError(`Unknown entity table '${table}'`);
+    }
+    return d;
   }
 
   async browse(
     actor: AdminActor,
-    entity: string,
+    table: string,
     page = 1,
     pageSize = 50,
     searchId?: string
-  ): Promise<PaginatedResult<any>> {
-    const meta = entityMeta(entity);
-    const model = getPrismaModel(PRISMA_DELEGATE[entity]);
-    const safePage = Math.max(1, page);
-    const safeSize = Math.min(100, Math.max(1, pageSize));
-    const skip = (safePage - 1) * safeSize;
+  ): Promise<any> {
+    const meta = ADMIN_ENTITY_REGISTRY[table];
+    if (!meta) {
+      throw new NotFoundError(`Unknown entity table '${table}'`);
+    }
 
+    const del = this.delegate(table);
     const where: Record<string, unknown> = {};
-    if (meta.tenantField && actor.role !== 'ADMIN') where[meta.tenantField] = actor.tenantId;
-    if (searchId && meta.idField) where[meta.idField] = searchId;
 
-    const [total, raw] = await Promise.all([
-      model.count({ where }),
-      // The only entity with a composite/id-less lens (sessionReferenceStandard)
-      // sorts by its session key; all others use their primary key.
-      model.findMany({ where, skip, take: safeSize, orderBy: { [meta.idField || 'session_id']: 'desc' } }),
+    if (searchId && meta.idField) {
+      where[meta.idField] = searchId;
+    }
+
+    const safePageSize = Math.min(Math.max(pageSize || 50, 1), 100);
+    const skip = (page - 1) * safePageSize;
+    const [total, items] = await Promise.all([
+      del.count({ where }),
+      del.findMany({ where, skip, take: safePageSize }),
     ]);
 
-    await writeAudit(actor, 'ADMIN_ENTITY_BROWSE', entity, searchId || null, null, {
-      page: safePage, page_size: safeSize, total,
-    });
+    await writeAudit(actor, 'ADMIN_BROWSE', table, null, { page, pageSize: safePageSize, searchId, count: items.length });
 
+    const totalPages = Math.ceil(total / safePageSize) || 1;
     return {
-      items: sanitize(raw) as any[],
+      items,
       total,
-      page: safePage,
-      page_size: safeSize,
-      total_pages: Math.max(1, Math.ceil(total / safeSize)),
+      page,
+      page_size: safePageSize,
+      pageSize: safePageSize,
+      total_pages: totalPages,
+      totalPages,
     };
   }
 
-  async getRecord(actor: AdminActor, entity: string, id: string): Promise<any> {
-    const meta = entityMeta(entity);
-    if (!meta.idField) {
-      throw new NotFoundError(`Entity '${entity}' has no single primary key to look up`);
+  async getRecord(actor: AdminActor, table: string, id: string): Promise<any> {
+    const meta = ADMIN_ENTITY_REGISTRY[table];
+    if (!meta || !meta.idField) {
+      throw new NotFoundError(`Entity table '${table}' cannot be queried by single id`);
     }
-    const model = getPrismaModel(PRISMA_DELEGATE[entity]);
-    const where: Record<string, unknown> = { [meta.idField]: id };
-    if (meta.tenantField && actor.role !== 'ADMIN') where[meta.tenantField] = actor.tenantId;
-    const record = await model.findUnique({ where });
-    if (!record) throw new NotFoundError(`${meta.label} '${id}' not found`);
-    await writeAudit(actor, 'ADMIN_ENTITY_READ', entity, id);
-    return sanitize(record);
+
+    const del = this.delegate(table);
+    const record = await del.findUnique({
+      where: { [meta.idField]: id },
+    });
+
+    if (!record) {
+      throw new NotFoundError(`${meta.label} with id '${id}' was not found`);
+    }
+
+    await writeAudit(actor, 'ADMIN_GET_RECORD', table, id);
+    return record;
   }
 
-  async createMaster(actor: AdminActor, entity: string, payload: Record<string, unknown>): Promise<any> {
-    const meta = entityMeta(entity);
+  async createMaster(actor: AdminActor, table: string, input: Record<string, unknown>): Promise<any> {
+    const meta = ADMIN_ENTITY_REGISTRY[table];
+    if (!meta) {
+      throw new NotFoundError(`Unknown entity table '${table}'`);
+    }
     if (meta.kind !== 'master') {
       throw new ValidationError(
-        `Entity '${entity}' is a legal/transactional record and cannot be created through the admin console`
+        `Entity '${table}' is a legal/transactional record and cannot be created via admin master mutation.`
       );
     }
-    const model = getPrismaModel(PRISMA_DELEGATE[entity]);
+
     const data: Record<string, unknown> = {};
-    for (const key of meta.writable) if (payload[key] !== undefined) data[key] = payload[key];
-    if (meta.idRequiredForCreate && meta.idField && !data[meta.idField]) {
-      throw new ValidationError(`Entity '${entity}' requires '${meta.idField}' to be provided`);
+    for (const key of meta.writable) {
+      if (input[key] !== undefined) {
+        data[key] = input[key];
+      }
     }
-    if (meta.tenantField && actor.role !== 'ADMIN' && !data[meta.tenantField]) {
+
+    if (meta.tenantField && !data[meta.tenantField] && actor.tenantId) {
       data[meta.tenantField] = actor.tenantId;
     }
-    const created = await model.create({ data });
-    await writeAudit(actor, 'ADMIN_MASTER_CREATE', entity, (created as any)[meta.idField as string], null, created);
-    return sanitize(created);
+
+    const del = this.delegate(table);
+    const created = await del.create({ data });
+    const newId = meta.idField ? (created as any)[meta.idField] : null;
+
+    await writeAudit(actor, 'ADMIN_MASTER_CREATE', table, newId, { created: data });
+    return created;
   }
 
   async updateMaster(
     actor: AdminActor,
-    entity: string,
+    table: string,
     id: string,
-    payload: Record<string, unknown>
+    input: Record<string, unknown>
   ): Promise<any> {
-    const meta = entityMeta(entity);
+    const meta = ADMIN_ENTITY_REGISTRY[table];
+    if (!meta || !meta.idField) {
+      throw new NotFoundError(`Entity table '${table}' cannot be updated by single id`);
+    }
     if (meta.kind !== 'master') {
       throw new ValidationError(
-        `Entity '${entity}' is a legal/transactional record and cannot be mutated through the admin console`
+        `Entity '${table}' is a legal/transactional record and cannot be updated via admin master mutation.`
       );
     }
-    if (!meta.idField) throw new NotFoundError(`Entity '${entity}' has no primary key to update`);
-    const model = getPrismaModel(PRISMA_DELEGATE[entity]);
-    const where: Record<string, unknown> = { [meta.idField]: id };
-    if (meta.tenantField && actor.role !== 'ADMIN') where[meta.tenantField] = actor.tenantId;
-    const before = await model.findUnique({ where });
-    if (!before) throw new NotFoundError(`${meta.label} '${id}' not found`);
+
+    const del = this.delegate(table);
+    const existing = await del.findUnique({ where: { [meta.idField]: id } });
+    if (!existing) {
+      throw new NotFoundError(`${meta.label} with id '${id}' was not found`);
+    }
 
     const data: Record<string, unknown> = {};
-    for (const key of meta.writable) if (payload[key] !== undefined) data[key] = payload[key];
-    if (Object.keys(data).length === 0) throw new ValidationError('No writable fields provided for update');
+    for (const key of meta.writable) {
+      if (input[key] !== undefined) {
+        data[key] = input[key];
+      }
+    }
 
-    const updated = await model.update({ where, data });
-    await writeAudit(actor, 'ADMIN_MASTER_UPDATE', entity, id, before, updated);
-    return sanitize(updated);
+    const updated = await del.update({
+      where: { [meta.idField]: id },
+      data,
+    });
+
+    await writeAudit(actor, 'ADMIN_MASTER_UPDATE', table, id, {
+      before: existing,
+      after: data,
+    });
+
+    return updated;
+  }
+
+  // --- GOVERNMENT PERSONNEL PROVISIONING ---
+  async provisionUser(actor: AdminActor, payload: {
+    tenant_id?: string;
+    full_name: string;
+    email: string;
+    role: 'LMO' | 'GATC_VERIFIER' | 'SUPERVISOR' | 'CONTROLLER' | 'ADMIN' | 'AUDITOR';
+    password?: string;
+    jurisdiction_id?: string;
+    designation?: string;
+    posting_order_number?: string;
+    digital_signature_cert_id?: string;
+    stakeholder_id?: string;
+  }) {
+    if (!payload.email || !payload.full_name || !payload.role) {
+      throw new ValidationError('Full name, email, and role are required for provisioning.');
+    }
+    const tenantId = payload.tenant_id || actor.tenantId || 'tenant-delhi-central';
+    const pwd = payload.password || 'GovSecure@2026';
+    const password_hash = hashPassword(pwd);
+
+    // Check duplicate email
+    const existing = await prisma.user.findUnique({ where: { email: payload.email.toLowerCase().trim() } });
+    if (existing) {
+      throw new ValidationError(`User with email '${payload.email}' already exists.`);
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        tenant_id: tenantId,
+        full_name: payload.full_name,
+        email: payload.email.toLowerCase().trim(),
+        role: payload.role as any,
+        password_hash,
+        stakeholder_id: payload.stakeholder_id || null,
+        is_active: true,
+      },
+    });
+
+    if (payload.role === 'LMO' || payload.role === 'SUPERVISOR' || payload.role === 'CONTROLLER') {
+      const jurId = payload.jurisdiction_id || 'jur-dl-01';
+      await prisma.lmoProfile.create({
+        data: {
+          user_id: user.user_id,
+          tenant_id: tenantId,
+          jurisdiction_id: jurId,
+          designation: payload.designation || (
+            payload.role === 'LMO'
+              ? 'Legal Metrology Officer (Inspector)'
+              : payload.role === 'SUPERVISOR'
+              ? 'Senior Metrology Supervisor'
+              : 'Controller of Legal Metrology'
+          ),
+          posting_order_number: payload.posting_order_number || `GOV-ORD-${Date.now().toString().slice(-6)}`,
+          authorized_from: new Date(),
+          digital_signature_cert_id: payload.digital_signature_cert_id || `HSM-DL-${user.user_id.slice(0, 4).toUpperCase()}`,
+          is_active: true,
+        },
+      });
+    }
+
+    await writeAudit(actor, 'ADMIN_PROVISION_USER', 'user', user.user_id, {
+      role: payload.role,
+      email: payload.email,
+      jurisdiction_id: payload.jurisdiction_id,
+      hsm_key_slot: payload.digital_signature_cert_id,
+    });
+
+    return user;
+  }
+
+  // --- GATC ACCREDITED TEST CENTRE REGISTRATION ---
+  async registerGATC(actor: AdminActor, payload: {
+    tenant_id?: string;
+    facility_name: string;
+    approval_order_number: string;
+    jurisdiction_id?: string;
+    address_line: string;
+    district: string;
+    pincode: string;
+    max_capacity_kg: number;
+    approved_classes: string[];
+    valid_from?: string;
+    valid_to?: string;
+  }) {
+    if (!payload.facility_name || !payload.approval_order_number) {
+      throw new ValidationError('Facility name and statutory approval order number are required.');
+    }
+    const tenantId = payload.tenant_id || actor.tenantId || 'tenant-delhi-central';
+    const jurId = payload.jurisdiction_id || 'jur-dl-01';
+
+    // 1. Create or find Stakeholder for GATC Lab
+    const stakeholder = await prisma.stakeholder.create({
+      data: {
+        tenant_id: tenantId,
+        jurisdiction_id: jurId,
+        legal_name: payload.facility_name,
+        trade_name: `${payload.facility_name} (Accredited Test Centre)`,
+        stakeholder_type: 'MANUFACTURER',
+        email: `contact@${payload.facility_name.toLowerCase().replace(/[^a-z0-9]/g, '')}.gov.in`,
+        phone: '+91-11-23389000',
+        address_line1: payload.address_line,
+        city: payload.district,
+        pincode: payload.pincode,
+        is_active: true,
+      },
+    });
+
+    // 2. Create Facility
+    const facility = await prisma.facility.create({
+      data: {
+        tenant_id: tenantId,
+        stakeholder_id: stakeholder.stakeholder_id,
+        facility_name: payload.facility_name,
+        address_line: payload.address_line,
+        district: payload.district,
+        pincode: payload.pincode,
+        is_active: true,
+      },
+    });
+
+    // 3. Create GATC Profile
+    const validFrom = payload.valid_from ? new Date(payload.valid_from) : new Date();
+    const validTo = payload.valid_to ? new Date(payload.valid_to) : new Date(Date.now() + 3 * 365 * 24 * 3600 * 1000);
+
+    const gatc = await prisma.gatcProfile.create({
+      data: {
+        tenant_id: tenantId,
+        facility_id: facility.facility_id,
+        approval_order_number: payload.approval_order_number,
+        approved_scope: JSON.stringify({
+          max_capacity_kg: payload.max_capacity_kg || 50000,
+          approved_classes: payload.approved_classes || ['Class II', 'Class III'],
+        }),
+        valid_from: validFrom,
+        valid_to: validTo,
+        status: 'ACTIVE',
+      },
+      include: { facility: true },
+    });
+
+    await writeAudit(actor, 'ADMIN_REGISTER_GATC', 'gatc_profiles', gatc.gatc_id, {
+      facility_name: payload.facility_name,
+      approval_order: payload.approval_order_number,
+      max_capacity: payload.max_capacity_kg,
+    });
+
+    return gatc;
+  }
+
+  // --- STATUTORY MODEL APPROVAL REGISTRATION ---
+  async registerModelApproval(actor: AdminActor, payload: {
+    category?: string;
+    subtype?: string;
+    manufacturer_name: string;
+    model_name: string;
+    model_approval_number: string;
+    accuracy_class: 'CLASS_I' | 'CLASS_II' | 'CLASS_III' | 'CLASS_IIII';
+    min_capacity: number | string;
+    max_capacity: number | string;
+    capacity_unit?: string;
+    verification_scale_interval_e: number | string;
+    scale_interval_unit?: string;
+    specifications?: Record<string, unknown>;
+  }) {
+    if (!payload.model_approval_number || !payload.model_name || !payload.manufacturer_name) {
+      throw new ValidationError('Model approval number, model name, and manufacturer are required.');
+    }
+
+    const model = await prisma.instrumentModel.create({
+      data: {
+        category: payload.category || 'WEIGHING',
+        subtype: payload.subtype || 'NON_AUTOMATIC',
+        manufacturer_name: payload.manufacturer_name,
+        model_name: payload.model_name,
+        model_approval_number: payload.model_approval_number,
+        accuracy_class: payload.accuracy_class as any,
+        min_capacity: String(payload.min_capacity),
+        max_capacity: String(payload.max_capacity),
+        capacity_unit: payload.capacity_unit || 'kg',
+        verification_scale_interval_e: String(payload.verification_scale_interval_e),
+        scale_interval_unit: payload.scale_interval_unit || 'g',
+        specifications: JSON.stringify(payload.specifications || {}),
+        is_active: true,
+      },
+    });
+
+    await writeAudit(actor, 'ADMIN_REGISTER_MODEL', 'instrument_models', model.model_id, {
+      model_approval_number: payload.model_approval_number,
+      model_name: payload.model_name,
+    });
+
+    return model;
+  }
+
+  // --- DUAL-CONTROL / MAKER-CHECKER WORKFLOW ---
+  async createApprovalRequest(actor: AdminActor, payload: {
+    tenant_id?: string;
+    entity_type: 'USER_PROVISION' | 'GATC_REGISTRATION' | 'MODEL_APPROVAL' | 'STANDARD_REGISTER';
+    title: string;
+    payload: Record<string, unknown>;
+  }) {
+    const tenantId = payload.tenant_id || actor.tenantId || 'tenant-delhi-central';
+
+    const req = await prisma.approvalRequest.create({
+      data: {
+        tenant_id: tenantId,
+        entity_type: payload.entity_type,
+        title: payload.title,
+        payload: JSON.stringify(payload.payload),
+        status: 'PENDING',
+        requester_id: actor.userId,
+        requester_name: actor.userName || actor.userId,
+      },
+    });
+
+    await writeAudit(actor, 'MAKER_SUBMIT_APPROVAL', 'approval_requests', req.request_id, {
+      entity_type: payload.entity_type,
+      title: payload.title,
+    });
+
+    return req;
+  }
+
+  async listApprovals(status?: string) {
+    const where: Record<string, unknown> = {};
+    if (status && status !== 'ALL') {
+      where.status = status;
+    }
+    return prisma.approvalRequest.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+    });
+  }
+
+  async reviewApproval(actor: AdminActor, requestId: string, action: 'APPROVE' | 'REJECT', notes?: string) {
+    const req = await prisma.approvalRequest.findUnique({ where: { request_id: requestId } });
+    if (!req) {
+      throw new NotFoundError(`Approval request '${requestId}' not found.`);
+    }
+    if (req.status !== 'PENDING') {
+      throw new ValidationError(`Approval request has already been ${req.status.toLowerCase()}.`);
+    }
+
+    let appliedResult: any = null;
+
+    if (action === 'APPROVE') {
+      const data = JSON.parse(req.payload);
+      switch (req.entity_type) {
+        case 'USER_PROVISION':
+          appliedResult = await this.provisionUser(actor, data);
+          break;
+        case 'GATC_REGISTRATION':
+          appliedResult = await this.registerGATC(actor, data);
+          break;
+        case 'MODEL_APPROVAL':
+          appliedResult = await this.registerModelApproval(actor, data);
+          break;
+        default:
+          appliedResult = { message: 'Approved and applied' };
+      }
+    }
+
+    const updated = await prisma.approvalRequest.update({
+      where: { request_id: requestId },
+      data: {
+        status: action === 'APPROVE' ? 'APPROVED' : 'REJECTED',
+        reviewer_id: actor.userId,
+        reviewer_name: actor.userName || actor.userId,
+        review_notes: notes || (action === 'APPROVE' ? 'Approved by Controller' : 'Rejected by Controller'),
+        reviewed_at: new Date(),
+      },
+    });
+
+    await writeAudit(actor, `CHECKER_${action}`, 'approval_requests', requestId, {
+      action,
+      notes,
+      appliedResult,
+    });
+
+    return { approval: updated, appliedResult };
+  }
+
+  async listJurisdictions(tenantId = 'tenant-delhi-central') {
+    return prisma.jurisdiction.findMany({
+      where: { tenant_id: tenantId },
+      orderBy: { code: 'asc' },
+    });
+  }
+
+  async listUsers(tenantId = 'tenant-delhi-central') {
+    return prisma.user.findMany({
+      where: { tenant_id: tenantId },
+      include: { lmo_profile: true },
+      orderBy: { created_at: 'desc' },
+    });
+  }
+
+  async listGATCCentres(tenantId = 'tenant-delhi-central') {
+    return prisma.gatcProfile.findMany({
+      where: { tenant_id: tenantId },
+      include: { facility: true },
+      orderBy: { created_at: 'desc' },
+    });
   }
 
   async listAuditLogs(
     actor: AdminActor,
-    o: {
-      page?: number; pageSize?: number; actorId?: string; entityType?: string;
-      action?: string; from?: string; to?: string; correlationId?: string;
+    filter: {
+      page?: number;
+      pageSize?: number;
+      actorId?: string;
+      action?: string;
+      entityType?: string;
+      correlationId?: string;
+      from?: string;
+      to?: string;
     }
-  ): Promise<PaginatedResult<any>> {
-    const safePage = Math.max(1, o.page || 1);
-    const safeSize = Math.min(100, Math.max(1, o.pageSize || 50));
+  ): Promise<any> {
+    const page = filter.page || 1;
+    const pageSize = Math.min(Math.max(filter.pageSize || 50, 1), 100);
     const where: Record<string, unknown> = {};
-    if (o.actorId) where.actor_id = o.actorId;
-    if (o.entityType) where.entity_type = o.entityType;
-    if (o.action) where.action = o.action;
-    if (o.correlationId) where.correlation_id = o.correlationId;
-    if (o.from || o.to) {
-      const recordedAt: Record<string, unknown> = {};
-      if (o.from) recordedAt.gte = new Date(o.from);
-      if (o.to) recordedAt.lte = new Date(o.to);
-      where.recorded_at = recordedAt;
+
+    if (filter.actorId) where.actor_id = filter.actorId;
+    if (filter.action) where.action = filter.action;
+    if (filter.entityType) where.entity_type = filter.entityType;
+    if (filter.correlationId) where.correlation_id = filter.correlationId;
+
+    if (filter.from || filter.to) {
+      const ts: Record<string, Date> = {};
+      if (filter.from) ts.gte = new Date(filter.from);
+      if (filter.to) ts.lte = new Date(filter.to);
+      where.recorded_at = ts;
     }
-    const [total, raw] = await Promise.all([
+
+    const skip = (page - 1) * pageSize;
+    const [total, items] = await Promise.all([
       prisma.auditLog.count({ where }),
       prisma.auditLog.findMany({
-        where, skip: (safePage - 1) * safeSize, take: safeSize, orderBy: { recorded_at: 'desc' },
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { recorded_at: 'desc' },
       }),
     ]);
+
+    const totalPages = Math.ceil(total / pageSize) || 1;
     return {
-      items: sanitize(raw) as any[],
-      total, page: safePage, page_size: safeSize,
-      total_pages: Math.max(1, Math.ceil(total / safeSize)),
+      items,
+      total,
+      page,
+      page_size: pageSize,
+      pageSize,
+      total_pages: totalPages,
+      totalPages,
     };
   }
 
-  async overview(actor: AdminActor): Promise<Record<string, unknown>> {
-    const whereTenant = actor.role === 'ADMIN' ? {} : { tenant_id: actor.tenantId };
+  async overview(actor: AdminActor): Promise<any> {
+    const whereTenant = actor.tenantId ? { tenant_id: actor.tenantId } : {};
 
     const [
-      tenantCount, jurisdictionCount, stakeholderCount, facilityCount, userCount, instrumentModelCount,
-      instrumentCount, applicationCount, sessionCount, certificateCount, standardCount,
+      tenantCount, jurisdictionCount, stakeholderCount, facilityCount,
+      userCount, instrumentModelCount, instrumentCount, applicationCount,
+      sessionCount, certificateCount, standardCount,
       observationCount, stampCount, feeCount, auditCount, delegationCount,
-      procedureCount, legalSourceCount,
+      procedureCount, legalSourceCount, approvalCount,
       appByStatus, certByStatus, sessionByStatus, standardByStatus, instrumentByStatus, paymentByStatus,
     ] = await Promise.all([
       prisma.tenant.count(), prisma.jurisdiction.count({ where: whereTenant }),
@@ -362,7 +701,7 @@ export class AdminService {
       prisma.testObservation.count(), prisma.physicalStampAction.count({ where: whereTenant }),
       prisma.feeAssessment.count({ where: whereTenant }), prisma.auditLog.count(),
       prisma.delegation.count({ where: whereTenant }), prisma.procedurePack.count(),
-      prisma.legalSourceRecord.count(),
+      prisma.legalSourceRecord.count(), prisma.approvalRequest.count({ where: whereTenant }),
       prisma.verificationApplication.groupBy({ by: ['current_status'], _count: { _all: true }, where: whereTenant }),
       prisma.certificate.groupBy({ by: ['certificate_status'], _count: { _all: true }, where: whereTenant }),
       prisma.verificationSession.groupBy({ by: ['status'], _count: { _all: true }, where: whereTenant }),
@@ -383,6 +722,7 @@ export class AdminService {
         procedure_packs: procedureCount, legal_sources: legalSourceCount,
         test_observations: observationCount, stamp_actions: stampCount,
         fee_assessments: feeCount, audit_logs: auditCount, delegations: delegationCount,
+        approval_requests: approvalCount,
       },
       applications_by_status: appByStatus.map((r) => ({ status: r.current_status, count: r._count._all })),
       certificates_by_status: certByStatus.map((r) => ({ status: r.certificate_status, count: r._count._all })),

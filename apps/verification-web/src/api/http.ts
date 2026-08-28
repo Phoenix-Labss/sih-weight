@@ -283,3 +283,56 @@ export const httpEvidenceService: IEvidenceService = {
     });
   },
 };
+
+export const httpAdminService = {
+  async provisionUser(payload: any): Promise<any> {
+    return request('/admin/users/provision', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async registerGATC(payload: any): Promise<any> {
+    return request('/admin/gatc/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async registerModel(payload: any): Promise<any> {
+    return request('/admin/models/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async submitApproval(payload: any): Promise<any> {
+    return request('/admin/approvals/submit', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async listApprovals(status?: string): Promise<any> {
+    const q = status ? `?status=${encodeURIComponent(status)}` : '';
+    return request(`/admin/approvals${q}`);
+  },
+  async reviewApproval(requestId: string, action: 'APPROVE' | 'REJECT', notes?: string): Promise<any> {
+    return request(`/admin/approvals/${requestId}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ action, notes }),
+    });
+  },
+  async listJurisdictions(): Promise<any> {
+    return request('/admin/jurisdictions');
+  },
+  async listUsers(): Promise<any> {
+    return request('/admin/users');
+  },
+  async listGATCCentres(): Promise<any> {
+    return request('/admin/gatc');
+  },
+  async listAuditLogs(page = 1, pageSize = 50): Promise<any> {
+    return request(`/admin/audit-logs?page=${page}&page_size=${pageSize}`);
+  },
+  async getOverview(): Promise<any> {
+    return request('/admin/overview');
+  },
+};
+

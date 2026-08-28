@@ -1113,6 +1113,290 @@ export class MockDatabase {
       evidence_category: payload.evidence_category || 'SEAL_PHOTO',
     };
   }
+
+  // Admin & Governance Methods
+  private approvals: any[] = [
+    {
+      request_id: 'REQ-2026-001',
+      tenant_id: 'tenant-delhi-central',
+      entity_type: 'GATC_REGISTRATION',
+      title: 'Accreditation of North-West Metrology Testing Lab',
+      payload: JSON.stringify({
+        facility_name: 'North-West Delhi Regional Calibration Facility',
+        approval_order_number: 'GATC/DL/2026/044',
+        address_line: 'Plot 12, Sector 8, Rohini',
+        district: 'North West Delhi',
+        pincode: '110085',
+        max_capacity_kg: 30000,
+        approved_classes: ['Class II', 'Class III'],
+      }),
+      status: 'PENDING',
+      requester_id: 'adm-system-01',
+      requester_name: 'Admin Desk',
+      created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+      updated_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+    },
+    {
+      request_id: 'REQ-2026-002',
+      tenant_id: 'tenant-delhi-central',
+      entity_type: 'MODEL_APPROVAL',
+      title: 'Model Approval for Phoenix PX-500 Jewellery Scale',
+      payload: JSON.stringify({
+        category: 'WEIGHING',
+        subtype: 'NON_AUTOMATIC',
+        manufacturer_name: 'Phoenix Metrology Systems Pvt Ltd',
+        model_name: 'Phoenix High-Precision Jewellery Balance Model PX-500',
+        model_approval_number: 'IND/09/2026/552',
+        accuracy_class: 'CLASS_II',
+        min_capacity: '0.02',
+        max_capacity: '500.00',
+        capacity_unit: 'g',
+        verification_scale_interval_e: '0.01',
+        scale_interval_unit: 'g',
+      }),
+      status: 'PENDING',
+      requester_id: 'adm-system-01',
+      requester_name: 'Admin Desk',
+      created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+      updated_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+    },
+  ];
+
+  public provisionUser(payload: any): any {
+    const newUser = {
+      user_id: `usr-${Date.now().toString().slice(-6)}`,
+      tenant_id: payload.tenant_id || 'tenant-delhi-central',
+      full_name: payload.full_name,
+      email: payload.email,
+      role: payload.role,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      lmo_profile: {
+        designation: payload.designation || 'Legal Metrology Officer',
+        posting_order_number: payload.posting_order_number || `GOV-ORD-${Date.now().toString().slice(-6)}`,
+        jurisdiction_id: payload.jurisdiction_id || 'jur-dl-01',
+        digital_signature_cert_id: payload.digital_signature_cert_id || `HSM-DL-${Math.floor(10 + Math.random() * 90)}`,
+      },
+    };
+    return newUser;
+  }
+
+  public registerGATC(payload: any): any {
+    return {
+      gatc_id: `gatc-${Date.now().toString().slice(-6)}`,
+      facility_id: `fac-${Date.now().toString().slice(-6)}`,
+      approval_order_number: payload.approval_order_number,
+      approved_scope: JSON.stringify({
+        max_capacity_kg: payload.max_capacity_kg,
+        approved_classes: payload.approved_classes,
+      }),
+      valid_from: payload.valid_from || new Date().toISOString(),
+      valid_to: payload.valid_to || new Date(Date.now() + 3 * 365 * 24 * 3600 * 1000).toISOString(),
+      status: 'ACTIVE',
+      created_at: new Date().toISOString(),
+      facility: {
+        facility_name: payload.facility_name,
+        address_line: payload.address_line,
+        district: payload.district,
+        pincode: payload.pincode,
+      },
+    };
+  }
+
+  public registerModel(payload: any): any {
+    const newModel = {
+      model_id: `model-${Date.now().toString().slice(-6)}`,
+      category: payload.category || 'WEIGHING',
+      subtype: payload.subtype || 'NON_AUTOMATIC',
+      manufacturer_name: payload.manufacturer_name,
+      model_name: payload.model_name,
+      model_approval_number: payload.model_approval_number,
+      accuracy_class: payload.accuracy_class,
+      min_capacity: Number(payload.min_capacity),
+      max_capacity: Number(payload.max_capacity),
+      capacity_unit: payload.capacity_unit || 'kg',
+      verification_scale_interval_e: Number(payload.verification_scale_interval_e),
+      scale_interval_unit: payload.scale_interval_unit || 'g',
+      specifications: payload.specifications || {},
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    this.models.unshift(newModel);
+    save('models', this.models);
+    return newModel;
+  }
+
+  public submitApproval(payload: any): any {
+    const req = {
+      request_id: `REQ-${Date.now().toString().slice(-6)}`,
+      tenant_id: payload.tenant_id || 'tenant-delhi-central',
+      entity_type: payload.entity_type,
+      title: payload.title,
+      payload: JSON.stringify(payload.payload),
+      status: 'PENDING',
+      requester_id: 'adm-system-01',
+      requester_name: 'Admin System',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    this.approvals.unshift(req);
+    return req;
+  }
+
+  public listApprovals(status?: string): any[] {
+    if (status && status !== 'ALL') {
+      return this.approvals.filter((a) => a.status === status);
+    }
+    return this.approvals;
+  }
+
+  public reviewApproval(requestId: string, action: 'APPROVE' | 'REJECT', notes?: string): any {
+    const item = this.approvals.find((a) => a.request_id === requestId);
+    if (!item) throw new Error(`Approval request '${requestId}' not found`);
+    item.status = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+    item.reviewer_id = 'ctrl-delhi-01';
+    item.reviewer_name = 'Dr. Vikramaditya Sharma (Controller)';
+    item.review_notes = notes || (action === 'APPROVE' ? 'Approved by Controller' : 'Rejected by Controller');
+    item.reviewed_at = new Date().toISOString();
+
+    let appliedResult: any = null;
+    if (action === 'APPROVE') {
+      const data = JSON.parse(item.payload);
+      if (item.entity_type === 'MODEL_APPROVAL') {
+        appliedResult = this.registerModel(data);
+      } else if (item.entity_type === 'GATC_REGISTRATION') {
+        appliedResult = this.registerGATC(data);
+      } else if (item.entity_type === 'USER_PROVISION') {
+        appliedResult = this.provisionUser(data);
+      }
+    }
+    return { approval: item, appliedResult };
+  }
+
+  public getJurisdictions(): any[] {
+    return [
+      { jurisdiction_id: 'jur-dl-01', tenant_id: 'tenant-delhi-central', name: 'Central Delhi Metrology Division', code: 'DL-CENTRAL', level: 'DISTRICT' },
+      { jurisdiction_id: 'jur-dl-02', tenant_id: 'tenant-delhi-central', name: 'North Delhi Metrology Division', code: 'DL-NORTH', level: 'DISTRICT' },
+      { jurisdiction_id: 'jur-dl-03', tenant_id: 'tenant-delhi-central', name: 'South Delhi Metrology Division', code: 'DL-SOUTH', level: 'DISTRICT' },
+      { jurisdiction_id: 'jur-dl-04', tenant_id: 'tenant-delhi-central', name: 'East Delhi Metrology Division', code: 'DL-EAST', level: 'DISTRICT' },
+      { jurisdiction_id: 'jur-dl-05', tenant_id: 'tenant-delhi-central', name: 'West Delhi Metrology Division', code: 'DL-WEST', level: 'DISTRICT' },
+    ];
+  }
+
+  public getUsers(): any[] {
+    return [
+      {
+        user_id: 'usr-lmo-01',
+        tenant_id: 'tenant-delhi-central',
+        full_name: 'Rajesh Kumar Sharma',
+        email: 'lmo.delhi@gov.in',
+        role: 'LMO',
+        is_active: true,
+        created_at: '2026-01-15T09:00:00Z',
+        lmo_profile: {
+          designation: 'Legal Metrology Officer (Inspector)',
+          posting_order_number: 'DL/LM/POST/2026/041',
+          jurisdiction_id: 'jur-dl-01',
+          digital_signature_cert_id: 'HSM-DL-01',
+        },
+      },
+      {
+        user_id: 'usr-gatc-01',
+        tenant_id: 'tenant-delhi-central',
+        full_name: 'Dr. Priya Nair',
+        email: 'gatc.delhi@gov.in',
+        role: 'GATC_VERIFIER',
+        is_active: true,
+        created_at: '2026-02-01T10:00:00Z',
+        lmo_profile: {
+          designation: 'Chief Metrology Technical Assessor',
+          posting_order_number: 'GATC/APEX/2024/014',
+          jurisdiction_id: 'jur-dl-01',
+          digital_signature_cert_id: 'HSM-GATC-01',
+        },
+      },
+      {
+        user_id: 'usr-sup-01',
+        tenant_id: 'tenant-delhi-central',
+        full_name: 'Anil Sengupta',
+        email: 'supervisor.delhi@gov.in',
+        role: 'SUPERVISOR',
+        is_active: true,
+        created_at: '2026-01-10T08:30:00Z',
+        lmo_profile: {
+          designation: 'Senior Metrology Supervisor & Audit Lead',
+          posting_order_number: 'DL/LM/SUP/2025/102',
+          jurisdiction_id: 'jur-dl-01',
+          digital_signature_cert_id: 'HSM-SUP-01',
+        },
+      },
+    ];
+  }
+
+  public getGATCCentres(): any[] {
+    return [
+      {
+        gatc_id: 'GATC-APEX-01',
+        facility_id: 'FAC-GATC-01',
+        approval_order_number: 'GATC/MH/2024/014',
+        approved_scope: JSON.stringify({
+          max_capacity_kg: 50000,
+          approved_classes: ['Class II', 'Class III'],
+        }),
+        valid_from: '2024-04-01T00:00:00Z',
+        valid_to: '2027-03-31T23:59:59Z',
+        status: 'ACTIVE',
+        created_at: '2024-04-01T00:00:00Z',
+        facility: {
+          facility_name: 'Apex Metrology Calibration & Verification Lab',
+          address_line: 'Plot 45, Okhla Industrial Area Phase-III',
+          district: 'South Delhi',
+          pincode: '110020',
+        },
+      },
+    ];
+  }
+
+  public getAuditLogs(page = 1, pageSize = 50): any {
+    const items = [
+      {
+        audit_id: 'AUD-001',
+        tenant_id: 'tenant-delhi-central',
+        actor_id: 'ctrl-delhi-01',
+        actor_role: 'CONTROLLER',
+        action: 'MAKER_CHECKER_APPROVE',
+        entity_type: 'MODEL_APPROVAL',
+        entity_id: 'IND/09/2026/552',
+        correlation_id: 'corr-1787942800-abc1',
+        recorded_at: new Date().toISOString(),
+      },
+      {
+        audit_id: 'AUD-002',
+        tenant_id: 'tenant-delhi-central',
+        actor_id: 'adm-system-01',
+        actor_role: 'ADMIN',
+        action: 'ADMIN_PROVISION_USER',
+        entity_type: 'USER',
+        entity_id: 'lmo.delhi@gov.in',
+        correlation_id: 'corr-1787942700-def2',
+        recorded_at: new Date(Date.now() - 1800000).toISOString(),
+      },
+    ];
+    return { items, total: items.length, page, pageSize, totalPages: 1 };
+  }
+
+  public getOverview(): any {
+    return {
+      totals: {
+        users: 14,
+        jurisdictions: 5,
+        gatc_centres: 3,
+        instrument_models: this.models.length,
+        approval_requests: this.approvals.length,
+      },
+    };
+  }
 }
 
 export const mockDb = new MockDatabase();

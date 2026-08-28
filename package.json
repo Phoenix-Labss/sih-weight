@@ -9,9 +9,10 @@
     "dev": "node run.js",
     "backend": "cd backend && npm run dev",
     "frontend": "cd apps/verification-web && npm run dev",
+    "admin": "cd apps/admin-portal && npm run dev",
     "test": "cd backend && npm test",
     "test:coverage": "cd backend && npm run test:coverage",
-    "build": "cd apps/verification-web && npm run build",
+    "build": "cd apps/verification-web && npm run build && cd ../admin-portal && npm run build",
     "db:push": "cd backend && npx prisma db push",
     "db:generate": "cd backend && npx prisma generate",
     "db:seed": "cd backend && npm run prisma:seed"

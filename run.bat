@@ -1,15 +1,17 @@
 @echo off
-title National Legal Metrology Platform (PostgreSQL + Backend + Frontend)
+title National Legal Metrology Platform (PostgreSQL + Backend + Web Portal + Admin Portal)
 cd /d "%~dp0"
 
 echo ======================================================================
 echo   National Legal Metrology Verification Platform
 echo   Ministry of Consumer Affairs, Food & Public Distribution
 echo ======================================================================
-echo   [1/3] Checking PostgreSQL Database Service (Port 5432)...
+echo   [1/4] Checking PostgreSQL Database Service (Port 5432)...
 powershell -Command "$svc = Get-Service -Name *postgres* -ErrorAction SilentlyContinue; if ($svc -and $svc.Status -ne 'Running') { Write-Host '[POSTGRES] Starting PostgreSQL service...' -ForegroundColor Yellow; Start-Service -Name $svc.Name -ErrorAction SilentlyContinue }"
 
-echo   [2/3] Initializing Unified Runner (Backend Port 8000, Frontend Port 5173)...
+echo   [2/4] Starting Fastify Backend Server on Port 8000...
+echo   [3/4] Starting Verification Web Portal on Port 5173...
+echo   [4/4] Starting Admin Control Plane on Port 5174...
 echo ======================================================================
 echo.
 

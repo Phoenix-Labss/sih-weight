@@ -81,7 +81,8 @@ export const OfficerWorkspace: React.FC = () => {
   );
 
   const activeSession = workSessions.find((s) => s.session_id === selectedSessionId) || workSessions[0];
-  const activeSessionInst = instruments.find((i) => i.instrument_id === activeSession?.instrument_id);
+  const activeSessionApp = applications.find((a) => a.application_id === activeSession?.application_id);
+  const activeSessionInst = instruments.find((i) => i.instrument_id === (activeSession?.instrument_id || activeSessionApp?.instrument_id));
 
   const handleSelectSessionForTesting = async (appId: string) => {
     let matchedSession = sessions.find((s) => s.application_id === appId && s.status !== 'FINALIZED');
@@ -206,13 +207,22 @@ export const OfficerWorkspace: React.FC = () => {
               <select
                 value={selectedSessionId}
                 onChange={(e) => setSelectedSessionId(e.target.value)}
-                className="text-xs font-mono font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full sm:w-auto"
+                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full sm:min-w-[420px]"
               >
-                {workSessions.map((s) => (
-                  <option key={s.session_id} value={s.session_id}>
-                    {s.session_id} — {s.status} (App: {s.application_id})
-                  </option>
-                ))}
+                {workSessions.map((s) => {
+                  const app = applications.find((a) => a.application_id === s.application_id);
+                  const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
+                  const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
+                  const model = inst?.model?.model_name || 'Weighing Instrument';
+                  const sn = inst?.serial_number || 'N/A';
+                  const status = s.status.replace(/_/g, ' ');
+                  const outcome = s.outcome ? ` • ${s.outcome.replace(/_/g, ' ')}` : '';
+                  return (
+                    <option key={s.session_id} value={s.session_id}>
+                      {appNum} — {model} (SN: {sn}) [{status}{outcome}]
+                    </option>
+                  );
+                })}
               </select>
               <button
                 onClick={async () => {
@@ -245,6 +255,7 @@ export const OfficerWorkspace: React.FC = () => {
             <TestObservationGrid
               session={activeSession}
               instrument={activeSessionInst}
+              application={activeSessionApp}
               certificate={certificates.find((c) => c.session_id === activeSession.session_id)}
               onSessionUpdated={(updated) => {
                 setSessions((prev) => prev.map((s) => (s.session_id === updated.session_id ? updated : s)));

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VerificationSession, ObservationItemInput, StepType } from '../../types/session';
+import { Application } from '../../types/application';
 import { Instrument } from '../../types/instrument';
 import { NAWITestStepForm } from './NAWITestStepForm';
 import { StampRecordForm } from './StampRecordForm';
@@ -32,6 +33,7 @@ import { StatusBadge } from '../common/StatusBadge';
 interface TestObservationGridProps {
   session: VerificationSession;
   instrument?: Instrument | null;
+  application?: Application | null;
   certificate?: Certificate | null;
   onSessionUpdated: (session: VerificationSession) => void;
   onCertificateIssued?: (cert: Certificate) => void;
@@ -46,6 +48,7 @@ const defaultStandardWeights = [
 export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   session,
   instrument,
+  application,
   certificate,
   onSessionUpdated,
   onCertificateIssued,
@@ -235,13 +238,18 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-extrabold text-base text-gov-navy">{session.session_id}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-extrabold text-base text-gov-navy">
+                {application?.application_number || 'Verification Worksheet'}
+              </span>
+              <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
+                {session.session_id.length > 18 ? `SESS-${session.session_id.slice(0, 8)}` : session.session_id}
+              </span>
               <StatusBadge status={session.status} size="sm" />
               {session.outcome && <StatusBadge status={session.outcome} size="sm" />}
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Procedure: <span className="font-mono font-semibold text-slate-700">{session.procedure_pack_id}</span> | Scheduled: {session.scheduled_date} | Verifier: {session.verifier_id}
+            <p className="text-xs text-slate-600 mt-1">
+              Instrument: <strong className="text-slate-900 font-bold">{instrument?.model?.model_name || 'NAWI Scale'}</strong> (SN: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'N/A'}</span>) | Procedure: <span className="font-mono font-semibold text-slate-700">{session.procedure_pack_id}</span> | Scheduled: {session.scheduled_date} | Verifier: {session.verifier_id}
             </p>
           </div>
 

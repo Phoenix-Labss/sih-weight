@@ -79,6 +79,11 @@ export const OfficerWorkspace: React.FC = () => {
     (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
   );
 
+  // Pending Scrutiny applications (action required: scrutiny, query response, or scheduling)
+  const pendingScrutinyApps = applications.filter(
+    (a) => a.current_status !== 'COMPLETED' && a.current_status !== 'REJECTED'
+  );
+
   // Strictly only show active workload sessions in the testing execution tab. Completed sessions are removed and live in Master Ledger
   const activeSession = activeWorkSessions.find((s) => s.session_id === selectedSessionId) || activeWorkSessions[0] || null;
   const activeSessionApp = activeSession ? applications.find((a) => a.application_id === activeSession.application_id) : null;
@@ -154,7 +159,7 @@ export const OfficerWorkspace: React.FC = () => {
           }`}
         >
           <FileCheck2 className="w-4 h-4 text-amber-400" />
-          <span>Application Scrutiny & Scheduling Queue ({applications.length})</span>
+          <span>Application Scrutiny & Scheduling Queue ({pendingScrutinyApps.length} Pending)</span>
         </button>
 
         <button
@@ -290,7 +295,7 @@ export const OfficerWorkspace: React.FC = () => {
                   className="px-4 py-2 rounded-lg bg-gov-navy text-white text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                 >
                   <FileCheck2 className="w-4 h-4 text-amber-400" />
-                  <span>Review Scrutiny Queue ({applications.length})</span>
+                  <span>Review Scrutiny Queue ({pendingScrutinyApps.length} Pending)</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('ledger')}

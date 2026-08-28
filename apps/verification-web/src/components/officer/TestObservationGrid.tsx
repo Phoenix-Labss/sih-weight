@@ -511,11 +511,27 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           </div>
 
           {/* Card 4: Environmental conditions */}
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 flex flex-col justify-between">
+          <div
+            className={`p-3.5 rounded-xl border space-y-2 flex flex-col justify-between transition-colors ${
+              tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
+                ? 'bg-slate-50 border-slate-200'
+                : 'bg-rose-50/50 border-rose-300 ring-1 ring-rose-200'
+            }`}
+          >
             <div className="space-y-1.5">
               <div className="font-bold text-slate-800 flex items-center justify-between">
                 <span>Environmental State</span>
-                <span className="text-blue-600 font-semibold text-[10px] uppercase">Compliant</span>
+                {tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0 ? (
+                  <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-[10px] uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                    Compliant
+                  </span>
+                ) : (
+                  <span className="text-rose-700 bg-rose-100 border border-rose-300 font-bold text-[10px] uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <AlertTriangle className="w-2.5 h-2.5 text-rose-600" />
+                    Non-Compliant
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
@@ -529,7 +545,11 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     disabled={isFinalized}
                     value={tempCelsius}
                     onChange={(e) => setTempCelsius(Number(e.target.value))}
-                    className="w-full font-mono font-bold bg-white text-slate-900 border rounded px-1.5 py-1 text-xs"
+                    className={`w-full font-mono font-bold border rounded px-1.5 py-1 text-xs transition-colors ${
+                      tempCelsius >= 20.0 && tempCelsius <= 28.0
+                        ? 'bg-white text-slate-900 border-slate-300'
+                        : 'bg-rose-50 text-rose-900 border-rose-400 ring-1 ring-rose-300 font-black'
+                    }`}
                   />
                 </div>
                 <div>
@@ -543,13 +563,34 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     disabled={isFinalized}
                     value={humidityPercent}
                     onChange={(e) => setHumidityPercent(Number(e.target.value))}
-                    className="w-full font-mono font-bold bg-white text-slate-900 border rounded px-1.5 py-1 text-xs"
+                    className={`w-full font-mono font-bold border rounded px-1.5 py-1 text-xs transition-colors ${
+                      humidityPercent >= 45.0 && humidityPercent <= 65.0
+                        ? 'bg-white text-slate-900 border-slate-300'
+                        : 'bg-rose-50 text-rose-900 border-rose-400 ring-1 ring-rose-300 font-black'
+                    }`}
                   />
                 </div>
               </div>
             </div>
-            <div className="text-[10px] text-slate-400 text-right">
-              Range: 20–28°C / 45–65% RH
+            <div className="flex items-center justify-between text-[10px]">
+              <span
+                className={
+                  tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
+                    ? 'text-slate-400'
+                    : 'text-rose-600 font-semibold'
+                }
+              >
+                {tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
+                  ? 'Within statutory limits'
+                  : !(tempCelsius >= 20.0 && tempCelsius <= 28.0) && !(humidityPercent >= 45.0 && humidityPercent <= 65.0)
+                  ? 'Temp & RH out of range'
+                  : !(tempCelsius >= 20.0 && tempCelsius <= 28.0)
+                  ? 'Temp out of range'
+                  : 'RH out of range'}
+              </span>
+              <span className="text-slate-400 font-mono">
+                Range: 20–28°C / 45–65% RH
+              </span>
             </div>
           </div>
         </div>

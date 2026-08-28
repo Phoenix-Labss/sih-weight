@@ -134,29 +134,47 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
           </div>
 
           {/* Card 3: Environmental Controls */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Environmental Controls
-            </span>
-            <div className="flex items-center gap-2 pt-1">
-              <Thermometer className="w-4 h-4 text-rose-500 shrink-0" />
-              <div>
-                <span className="text-slate-500 text-[10px] block">Temperature:</span>
-                <span className="font-mono font-bold text-slate-900 text-sm">
-                  {session.environmental_temp_celsius || 24.5}°C
-                </span>
+          {(() => {
+            const temp = Number(session.environmental_temp_celsius) || 24.5;
+            const rh = Number(session.environmental_humidity_percent) || 55.0;
+            const isEnvPass = temp >= 20.0 && temp <= 28.0 && rh >= 45.0 && rh <= 65.0;
+            return (
+              <div className={`border rounded-xl p-3.5 space-y-1.5 ${isEnvPass ? 'bg-slate-50 border-slate-200' : 'bg-rose-50/50 border-rose-300'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Environmental Controls
+                  </span>
+                  {isEnvPass ? (
+                    <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
+                      Pass
+                    </span>
+                  ) : (
+                    <span className="text-rose-700 bg-rose-100 border border-rose-300 font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
+                      Out of Range
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Thermometer className="w-4 h-4 text-rose-500 shrink-0" />
+                  <div>
+                    <span className="text-slate-500 text-[10px] block">Temperature:</span>
+                    <span className={`font-mono font-bold text-sm ${temp >= 20.0 && temp <= 28.0 ? 'text-slate-900' : 'text-rose-700'}`}>
+                      {temp}°C {temp >= 20.0 && temp <= 28.0 ? '' : '(Limit: 20–28°C)'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Droplets className="w-4 h-4 text-blue-500 shrink-0" />
+                  <div>
+                    <span className="text-slate-500 text-[10px] block">Relative Humidity:</span>
+                    <span className={`font-mono font-bold text-sm ${rh >= 45.0 && rh <= 65.0 ? 'text-slate-900' : 'text-rose-700'}`}>
+                      {rh}% RH {rh >= 45.0 && rh <= 65.0 ? '' : '(Limit: 45–65%)'}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2 pt-1">
-              <Droplets className="w-4 h-4 text-blue-500 shrink-0" />
-              <div>
-                <span className="text-slate-500 text-[10px] block">Relative Humidity:</span>
-                <span className="font-mono font-bold text-slate-900 text-sm">
-                  {session.environmental_humidity_percent || 55.0}% RH
-                </span>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Card 4: Reference Standards & Wire Seal */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">

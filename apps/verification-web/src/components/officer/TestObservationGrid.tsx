@@ -10,6 +10,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../api/client';
 import { Certificate } from '../../types/certificate';
 import { CertificateModal } from '../trader/CertificateModal';
+import { PhysicalSerialMatchModal } from './PhysicalSerialMatchModal';
 import {
   Scale,
   ShieldCheck,
@@ -65,6 +66,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   const [humidityPercent, setHumidityPercent] = useState<number>(Number(session?.environmental_humidity_percent) || 55.0);
 
   // Modals
+  const [isPhysicalMatchModalOpen, setIsPhysicalMatchModalOpen] = useState(false);
   const [isStampModalOpen, setIsStampModalOpen] = useState(false);
   const [isDispositionModalOpen, setIsDispositionModalOpen] = useState(false);
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
@@ -123,19 +125,21 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
     });
   };
 
-  const handleConfirmIdentity = async () => {
-    if (!session) {
-      notify('error', 'Session Error', 'No active verification session loaded.');
-      return;
-    }
+  const handleConfirmPhysicalMatch = async (physicalSerial: string) => {
+    if (!session) return;
     try {
       const updated = await api.verification.confirmIdentity(user.tenantId, session.session_id, true);
       setSerialVerified(true);
-      notify('success', 'Identity Confirmed', 'Instrument serial and specifications verified on-site against registry.');
+      notify(
+        'success',
+        'Physical Match Confirmed',
+        `Physical serial '${physicalSerial}' verified against registered specifications. You can now click 'Start Test Execution'.`
+      );
       onSessionUpdated(updated);
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Unknown error';
       notify('error', 'Physical Serial Check Failed', `Reason: ${errMsg}`);
+      throw err;
     }
   };
 
@@ -144,18 +148,15 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       notify('error', 'Session Error', 'No active verification session loaded. Please select an application from the scrutiny queue.');
       return;
     }
-    try {
-      if (session.status === 'PLANNED' && !serialVerified) {
-        try {
-          await api.verification.confirmIdentity(user.tenantId, session.session_id, true);
-          setSerialVerified(true);
-        } catch (identErr) {
-          console.warn('Physical serial match notice:', identErr);
-        }
-      }
 
+    if (!serialVerified || session.status === 'PLANNED') {
+      notify('warning', 'Physical Verification Required', 'Please inspect the instrument physical serial plate and confirm the matchup before starting test execution.');
+      setIsPhysicalMatchModalOpen(true);
+      return;
+    }
+
+    try {
       const updated = await api.verification.startSession(user.tenantId, session.session_id);
-      setSerialVerified(true);
       notify('success', 'Session In Progress', 'Procedure lock engaged. Record measurement readings on the NAWI worksheet below.');
       onSessionUpdated(updated);
     } catch (err) {
@@ -311,13 +312,23 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             <p className="text-slate-600 text-[11px]">
               Serial: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'DL-2024-8842'}</span> | Class: {accuracyClass}
             </p>
-            {!serialVerified && (
+            {!serialVerified ? (
               <button
-                onClick={handleConfirmIdentity}
-                className="w-full py-1.5 rounded bg-gov-navy text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors"
+                type="button"
+                onClick={() => setIsPhysicalMatchModalOpen(true)}
+                className="w-full py-1.5 rounded bg-gov-navy text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
               >
-                Confirm Physical Serial Match
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                <span>Inspect &amp; Match Physical Serial</span>
               </button>
+            ) : (
+              <div className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 flex items-center justify-between font-semibold">
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Physical Stamping Inspected</span>
+                </span>
+                <span className="text-[9px] font-mono bg-emerald-100/70 text-emerald-800 px-1 rounded">MATCHED</span>
+              </div>
             )}
           </div>
 
@@ -503,6 +514,14 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         onClose={() => setIsCertViewOpen(false)}
         certificate={certificate || null}
         instrument={instrument || null}
+      />
+
+      <PhysicalSerialMatchModal
+        isOpen={isPhysicalMatchModalOpen}
+        onClose={() => setIsPhysicalMatchModalOpen(false)}
+        instrument={instrument}
+        session={session}
+        onConfirmMatch={handleConfirmPhysicalMatch}
       />
     </div>
   );

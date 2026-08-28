@@ -474,8 +474,8 @@ export class MockDatabase {
       throw new Error(`Verification session '${sessionId}' was not found in the database. Please ensure the application has been scheduled.`);
     }
 
-    if (session.status === 'PLANNED') {
-      session.status = 'IDENTITY_CONFIRMED';
+    if (session.status !== 'IDENTITY_CONFIRMED') {
+      throw new Error("Physical Serial Check Required: You must inspect the physical instrument nameplate and confirm the serial match before starting test execution.");
     }
 
     session.status = 'IN_PROGRESS';

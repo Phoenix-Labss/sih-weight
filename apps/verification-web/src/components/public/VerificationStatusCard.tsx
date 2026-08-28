@@ -100,15 +100,45 @@ export const VerificationStatusCard: React.FC<VerificationStatusCardProps> = ({
       </div>
 
       {/* Date Milestones Grid */}
-      <div className="grid grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs text-xs">
         <div>
           <span className="text-slate-500 block text-[11px]">Verification / Issuance Date:</span>
           <span className="font-bold text-slate-800 text-sm">{formatDate(verificationDate)}</span>
         </div>
         <div>
-          <span className="text-slate-500 block text-[11px]">Next Re-Verification Due Date:</span>
-          <span className={`font-bold text-sm ${isExpired ? 'text-rose-700' : 'text-emerald-700'}`}>
-            {formatDate(validUntil)}
+          <span className="text-slate-500 block text-[11px]">
+            {isExpired
+              ? 'Statutory Expiry (Overdue):'
+              : isRevoked
+              ? 'Certificate Validity:'
+              : isSuspended
+              ? 'Suspension Status:'
+              : isSuperseded
+              ? 'Superseded Status:'
+              : 'Next Re-Verification Due Date:'}
+          </span>
+          <span
+            className={`font-bold text-sm ${
+              isExpired
+                ? 'text-rose-700'
+                : isRevoked
+                ? 'text-rose-800 line-through'
+                : isSuspended
+                ? 'text-amber-800'
+                : isSuperseded
+                ? 'text-blue-800'
+                : 'text-emerald-700'
+            }`}
+          >
+            {isRevoked
+              ? 'Cancelled / Revoked (Void)'
+              : isSuspended
+              ? 'Suspended (Inspection Pending)'
+              : isSuperseded
+              ? 'Superseded by Newer Verification'
+              : isExpired
+              ? `${formatDate(validUntil)} (Overdue)`
+              : formatDate(validUntil)}
           </span>
         </div>
       </div>

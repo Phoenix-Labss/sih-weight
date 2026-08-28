@@ -4,7 +4,23 @@ import { Certificate } from '../../types/certificate';
 import { Instrument } from '../../types/instrument';
 import { formatDate, formatDateTime, maskSerialNumber, truncateHash } from '../../utils/formatters';
 import { generateDeterministicMatrix } from '../../utils/qrGenerator';
-import { ShieldCheck, Download, Printer, CheckCircle2, Lock, QrCode, Award, FileCheck, Building2, Scale } from 'lucide-react';
+import {
+  ShieldCheck,
+  Download,
+  Printer,
+  CheckCircle2,
+  Lock,
+  QrCode,
+  Award,
+  FileCheck,
+  Building2,
+  Scale,
+  AlertTriangle,
+  XCircle,
+  ShieldAlert,
+  RefreshCw,
+  Clock,
+} from 'lucide-react';
 
 interface CertificateModalProps {
   isOpen: boolean;
@@ -35,6 +51,93 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   const handleDownloadPdf = () => {
     window.print();
   };
+
+  const status = certificate.certificate_status;
+
+  const getStatusBadge = () => {
+    switch (status) {
+      case 'ISSUED':
+        return {
+          label: 'ISSUED / ACTIVE',
+          badgeClass: 'text-emerald-900 bg-emerald-100 border-emerald-300 ring-1 ring-emerald-400/30',
+          icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />,
+        };
+      case 'EXPIRED':
+        return {
+          label: 'EXPIRED (OVERDUE)',
+          badgeClass: 'text-orange-950 bg-orange-100 border-orange-300 ring-1 ring-orange-400/40',
+          icon: <AlertTriangle className="w-3.5 h-3.5 text-orange-700 shrink-0" />,
+        };
+      case 'SUSPENDED':
+        return {
+          label: 'SUSPENDED',
+          badgeClass: 'text-amber-950 bg-amber-100 border-amber-300 ring-1 ring-amber-400/40',
+          icon: <ShieldAlert className="w-3.5 h-3.5 text-amber-700 shrink-0" />,
+        };
+      case 'REVOKED':
+        return {
+          label: 'REVOKED / CANCELLED',
+          badgeClass: 'text-rose-950 bg-rose-100 border-rose-300 ring-1 ring-rose-400/40',
+          icon: <XCircle className="w-3.5 h-3.5 text-rose-700 shrink-0" />,
+        };
+      case 'SUPERSEDED':
+        return {
+          label: 'SUPERSEDED',
+          badgeClass: 'text-blue-950 bg-blue-100 border-blue-300 ring-1 ring-blue-400/40',
+          icon: <RefreshCw className="w-3.5 h-3.5 text-blue-700 shrink-0" />,
+        };
+      default:
+        return {
+          label: (status as string)?.replace(/_/g, ' ') || 'PENDING',
+          badgeClass: 'text-slate-800 bg-slate-100 border-slate-300',
+          icon: <Clock className="w-3.5 h-3.5 text-slate-600 shrink-0" />,
+        };
+    }
+  };
+
+  const getDueInfo = () => {
+    switch (status) {
+      case 'ISSUED':
+        return {
+          title: 'Next Reverification Due',
+          value: formatDate(certificate.valid_until),
+          pillClass: 'font-bold text-emerald-800 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block',
+        };
+      case 'EXPIRED':
+        return {
+          title: 'Statutory Expiry (Overdue)',
+          value: `${formatDate(certificate.valid_until)} (Expired)`,
+          pillClass: 'font-bold text-rose-800 text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block',
+        };
+      case 'SUSPENDED':
+        return {
+          title: 'Reverification Status',
+          value: 'Suspended (Inspection Pending)',
+          pillClass: 'font-bold text-amber-900 text-xs bg-amber-50 px-2 py-0.5 rounded border border-amber-300 inline-block',
+        };
+      case 'REVOKED':
+        return {
+          title: 'Certificate Validity',
+          value: 'Null & Void (Revoked by Dept)',
+          pillClass: 'font-bold text-rose-900 text-xs bg-rose-100 px-2 py-0.5 rounded border border-rose-300 inline-block line-through',
+        };
+      case 'SUPERSEDED':
+        return {
+          title: 'Replaced Status',
+          value: 'Superseded by Newer Verification',
+          pillClass: 'font-bold text-blue-900 text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block',
+        };
+      default:
+        return {
+          title: 'Next Reverification Due',
+          value: formatDate(certificate.valid_until) || 'Pending Authorization',
+          pillClass: 'font-bold text-slate-700 text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-300 inline-block',
+        };
+    }
+  };
+
+  const statusBadge = getStatusBadge();
+  const dueInfo = getDueInfo();
 
   return (
     <Modal
@@ -121,6 +224,30 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                   <p className="text-[10px] text-slate-500 mt-1 font-medium">
                     [Issued under Section 24 of The Legal Metrology Act, 2009 (1 of 2010) & Rule 14, Schedule IX of The Legal Metrology General Rules, 2011]
                   </p>
+
+                  {/* Non-Active Certificate Warning Banner */}
+                  {status !== 'ISSUED' && (
+                    <div className={`mt-2.5 p-2 rounded-lg border text-[11px] flex items-center justify-center gap-2 font-bold ${
+                      status === 'EXPIRED'
+                        ? 'bg-orange-50 text-orange-950 border-orange-300'
+                        : status === 'REVOKED'
+                        ? 'bg-rose-50 text-rose-950 border-rose-300'
+                        : status === 'SUSPENDED'
+                        ? 'bg-amber-50 text-amber-950 border-amber-300'
+                        : 'bg-blue-50 text-blue-950 border-blue-300'
+                    }`}>
+                      {statusBadge.icon}
+                      <span>
+                        {status === 'EXPIRED'
+                          ? 'ATTENTION: This certificate is EXPIRED. Commercial use of this instrument is prohibited under Section 24.'
+                          : status === 'REVOKED'
+                          ? 'WARNING: This certificate has been REVOKED. Commercial use is prohibited.'
+                          : status === 'SUSPENDED'
+                          ? 'NOTICE: This certificate is SUSPENDED pending departmental inspection.'
+                          : 'NOTICE: This certificate has been SUPERSEDED by a newer verification certificate.'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -143,9 +270,9 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         Statutory Status
                       </span>
-                      <span className="inline-flex items-center gap-1 font-bold text-xs text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-300">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span>{certificate.certificate_status}</span>
+                      <span className={`inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-md border ${statusBadge.badgeClass}`}>
+                        {statusBadge.icon}
+                        <span>{statusBadge.label}</span>
                       </span>
                     </div>
 
@@ -160,10 +287,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                        Next Reverification Due
+                        {dueInfo.title}
                       </span>
-                      <span className="font-bold text-emerald-800 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
-                        {formatDate(certificate.valid_until)}
+                      <span className={dueInfo.pillClass}>
+                        {dueInfo.value}
                       </span>
                     </div>
                   </div>

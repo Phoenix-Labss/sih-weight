@@ -309,11 +309,13 @@ export class MockDatabase {
   } {
     const totalFleetSize = 10;
     const standardSlotWindows = [
-      { slot_id: '09:00-11:00', start_time: '09:00', end_time: '11:00' },
-      { slot_id: '11:00-13:00', start_time: '11:00', end_time: '13:00' },
-      { slot_id: '13:00-15:00', start_time: '13:00', end_time: '15:00' },
-      { slot_id: '15:00-17:00', start_time: '15:00', end_time: '17:00' },
-      { slot_id: '17:00-19:00', start_time: '17:00', end_time: '19:00' },
+      { slot_id: '09:00-10:30', start_time: '09:00', end_time: '10:30' },
+      { slot_id: '10:30-12:00', start_time: '10:30', end_time: '12:00' },
+      // 12:00 - 13:00 is Official Lunch & Recess (no bookings)
+      { slot_id: '13:00-14:30', start_time: '13:00', end_time: '14:30' },
+      { slot_id: '14:30-16:00', start_time: '14:30', end_time: '16:00' },
+      { slot_id: '16:00-17:30', start_time: '16:00', end_time: '17:30' },
+      { slot_id: '17:30-19:00', start_time: '17:30', end_time: '19:00' },
     ];
 
     const bookedCounts: Record<string, number> = {};

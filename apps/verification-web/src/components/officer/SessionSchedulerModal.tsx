@@ -30,7 +30,7 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
     return d.toISOString().split('T')[0];
   });
 
-  const [selectedSlot, setSelectedSlot] = useState<string>('09:00-11:00');
+  const [selectedSlot, setSelectedSlot] = useState<string>('09:00-10:30');
   const [assignedOfficer, setAssignedOfficer] = useState<string>('lmo-officer-01');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlotCounts, setBookedSlotCounts] = useState<Record<string, number>>({});

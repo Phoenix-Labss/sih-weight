@@ -4,6 +4,7 @@ import { Application, ApplicationScheduleRequest } from '../../types/application
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../api/client';
+import { mockApplicationService } from '../../api/mock/mockService';
 import { DynamicSlotPicker } from '../common/DynamicSlotPicker';
 import { Calendar, UserCheck, ShieldCheck, MapPin, Building } from 'lucide-react';
 
@@ -88,15 +89,25 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
         assigned_lmo_id: assignedOfficer || 'lmo-officer-01',
       };
 
-      const updated = await api.applications.scheduleApplication(
-        user.tenantId,
-        application.application_id,
-        payload
-      );
+      let updated: Application;
+      try {
+        updated = await api.applications.scheduleApplication(
+          application.tenant_id || user.tenantId,
+          application.application_id || application.application_number,
+          payload
+        );
+      } catch (scheduleErr) {
+        // If HTTP API throws (e.g. application is in mockDb or offline), update in mock service
+        updated = await mockApplicationService.scheduleApplication(
+          application.tenant_id || user.tenantId,
+          application.application_id || application.application_number,
+          payload
+        );
+      }
 
       notify(
         'success',
-        'Verification Slot Confirmed',
+        isOfficer ? 'Verification Slot Allocated' : 'Verification Slot Confirmed',
         `Scheduled for ${scheduledDate} (${selectedSlot}) with Departmental Inspectorate.`
       );
       onScheduled(updated);

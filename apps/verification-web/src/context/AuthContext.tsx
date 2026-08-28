@@ -29,16 +29,37 @@ export interface AuthContextType {
 
 const API = env.API_BASE_URL.replace(/\/+$/, '');
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AUTH_STORAGE_KEY = 'emetrology_auth_session';
 let refreshPromise: Promise<string | null> | null = null;
 
+function loadStoredSession(): AuthSession | null {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.accessToken && parsed.user) {
+      setAccessToken(parsed.accessToken);
+      return parsed;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<AuthSession | null>(loadStoredSession);
+  const [loading, setLoading] = useState(false);
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSession = useCallback(() => {
     setAccessToken(null);
     setSession(null);
+    try {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
     if (refreshTimer.current) clearTimeout(refreshTimer.current);
   }, []);
 
@@ -56,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (body.accessToken) {
           setAccessToken(body.accessToken);
           if (body.user) {
-            setSession({
+            const updatedSession: AuthSession = {
               accessToken: body.accessToken,
               user: {
                 actorId: body.user.id,
@@ -66,7 +87,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 jurisdictionId: body.user.jurisdictionId || env.DEFAULT_JURISDICTION_ID,
                 organizationName: body.user.organizationName || '',
               },
-            });
+            };
+            setSession(updatedSession);
+            try {
+              localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedSession));
+            } catch {
+              // ignore
+            }
           }
           return body.accessToken;
         }
@@ -92,18 +119,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       refreshTimer.current = setTimeout(async () => {
         const newToken = await refreshToken();
         if (newToken) schedulePreemptiveRefresh(newToken);
-        else clearSession();
       }, refreshIn);
     } catch {
       // ignore parse errors
     }
-  }, [refreshToken, clearSession]);
+  }, [refreshToken]);
 
   useEffect(() => {
+    const currentSession = loadStoredSession();
+    if (currentSession?.accessToken) {
+      schedulePreemptiveRefresh(currentSession.accessToken);
+    }
     (async () => {
       const token = await refreshToken();
       if (token) schedulePreemptiveRefresh(token);
-      setLoading(false);
     })();
     return () => {
       if (refreshTimer.current) clearTimeout(refreshTimer.current);
@@ -113,6 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email: string, password: string) => {
     const res = await fetch(`${API}/auth/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
@@ -126,11 +156,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         actorName: body.user.fullName,
         tenantId: body.user.tenantId,
         jurisdictionId: body.user.jurisdictionId || env.DEFAULT_JURISDICTION_ID,
-        organizationName: '',
+        organizationName: body.user.organizationName || '',
       },
     };
     setAccessToken(ns.accessToken);
     setSession(ns);
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(ns));
+    } catch {
+      // ignore
+    }
     schedulePreemptiveRefresh(ns.accessToken);
   }, [API, schedulePreemptiveRefresh]);
 

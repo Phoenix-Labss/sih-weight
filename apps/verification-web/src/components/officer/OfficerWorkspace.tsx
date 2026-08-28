@@ -73,8 +73,10 @@ export const OfficerWorkspace: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // All sessions remain selectable so officers can inspect observations, certificates, and physical seals anytime
-  const workSessions = sessions;
+  // Active testing workload: sessions that still need officer testing. Completed/certified sessions move to Ledger
+  const workSessions = sessions.filter(
+    (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
+  );
 
   const activeSession = workSessions.find((s) => s.session_id === selectedSessionId) || workSessions[0];
   const activeSessionApp = applications.find((a) => a.application_id === activeSession?.application_id);
@@ -260,7 +262,9 @@ export const OfficerWorkspace: React.FC = () => {
               onCertificateIssued={(cert) => {
                 setCertificates((prev) => [cert, ...prev.filter((c) => c.certificate_id !== cert.certificate_id)]);
                 loadData();
+                setActiveTab('ledger');
               }}
+              onNavigateToLedger={() => setActiveTab('ledger')}
             />
           ) : (
             <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500 text-xs">
@@ -311,15 +315,27 @@ export const OfficerWorkspace: React.FC = () => {
                         <StatusBadge status={cert.certificate_status} size="sm" />
                       </td>
                       <td className="py-3 px-3 text-right font-sans">
-                        <button
-                          onClick={() => {
-                            setSelectedCertForView(cert);
-                            setIsCertModalOpen(true);
-                          }}
-                          className="px-2.5 py-1 rounded bg-blue-50 text-gov-blue hover:bg-blue-100 font-semibold"
-                        >
-                          View Certificate
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedSessionId(cert.session_id);
+                              setActiveTab('testing');
+                            }}
+                            className="px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                            title="Inspect complete NAWI observation worksheet and test readings"
+                          >
+                            Worksheet
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedCertForView(cert);
+                              setIsCertModalOpen(true);
+                            }}
+                            className="px-2.5 py-1 rounded bg-blue-50 text-gov-blue hover:bg-blue-100 font-semibold cursor-pointer"
+                          >
+                            View Certificate
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

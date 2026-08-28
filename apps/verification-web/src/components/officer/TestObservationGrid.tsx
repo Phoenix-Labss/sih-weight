@@ -37,6 +37,7 @@ interface TestObservationGridProps {
   certificate?: Certificate | null;
   onSessionUpdated: (session: VerificationSession) => void;
   onCertificateIssued?: (cert: Certificate) => void;
+  onNavigateToLedger?: () => void;
 }
 
 const defaultStandardWeights = [
@@ -52,6 +53,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   certificate,
   onSessionUpdated,
   onCertificateIssued,
+  onNavigateToLedger,
 }) => {
   const { user } = useAuth();
   const { notify } = useNotification();
@@ -331,6 +333,29 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             )}
           </div>
         </div>
+
+        {/* Verification & Certification Complete Banner */}
+        {isFinalized && certificate && (
+          <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <div>
+                <strong className="text-emerald-950 font-bold text-sm">Verification &amp; Digital Certification Complete</strong>
+                <p className="text-emerald-800 text-[11px] mt-0.5">
+                  Statutory certificate <span className="font-mono font-bold text-emerald-950">{certificate.certificate_number}</span> is published &amp; physical seals are recorded. This completed verification is archived in the Master Ledger.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigateToLedger?.()}
+              className="px-4 py-2 rounded-lg bg-gov-navy hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-xs cursor-pointer transition-colors"
+            >
+              <Award className="w-4 h-4 text-amber-300" />
+              <span>Go to Issued Ledger &rarr;</span>
+            </button>
+          </div>
+        )}
 
         {/* Pre-Inspection & Post-Inspection Verifications: 4 Grid Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">

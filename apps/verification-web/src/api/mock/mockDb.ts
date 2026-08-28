@@ -475,6 +475,12 @@ export class MockDatabase {
     const app = this.getApplication(session.application_id);
     if (app && req.outcome === 'VERIFICATION_PASSED_PENDING_AUTHORIZATION') {
       app.current_status = 'COMPLETED';
+      if (app.fee_assessment && app.fee_assessment.payment_status !== 'PAYMENT_RECONCILED') {
+        app.fee_assessment.payment_status = 'PAYMENT_RECONCILED';
+        app.fee_assessment.treasury_challan_number = app.fee_assessment.treasury_challan_number || `CHL-DL-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+        app.fee_assessment.receipt_number = app.fee_assessment.receipt_number || `RCPT-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+        app.fee_assessment.paid_at = app.fee_assessment.paid_at || new Date().toISOString();
+      }
       save('applications', this.applications);
     } else if (app && req.outcome === 'VERIFICATION_FAILED') {
       app.current_status = 'REJECTED';
@@ -584,6 +590,19 @@ export class MockDatabase {
       inst.latest_certificate_id = newCert.certificate_id;
       inst.verification_due_date = newCert.valid_until;
       save('instruments', this.instruments);
+    }
+
+    // Ensure parent application is COMPLETED and fee is marked reconciled
+    const app = this.getApplication(session.application_id);
+    if (app) {
+      app.current_status = 'COMPLETED';
+      if (app.fee_assessment && app.fee_assessment.payment_status !== 'PAYMENT_RECONCILED') {
+        app.fee_assessment.payment_status = 'PAYMENT_RECONCILED';
+        app.fee_assessment.treasury_challan_number = app.fee_assessment.treasury_challan_number || `CHL-DL-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+        app.fee_assessment.receipt_number = app.fee_assessment.receipt_number || `RCPT-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+        app.fee_assessment.paid_at = app.fee_assessment.paid_at || new Date().toISOString();
+      }
+      save('applications', this.applications);
     }
 
     // Add to public verify projection

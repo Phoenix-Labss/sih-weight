@@ -186,6 +186,8 @@ export const OfficerWorkspace: React.FC = () => {
         <ScrutinyQueue
           applications={applications}
           instruments={instruments}
+          certificates={certificates}
+          sessions={sessions}
           onApplicationUpdated={loadData}
           onSelectSessionForTesting={handleSelectSessionForTesting}
         />

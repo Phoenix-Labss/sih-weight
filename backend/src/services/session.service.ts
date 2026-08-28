@@ -412,6 +412,23 @@ export class SessionService {
     const appOutcome =
       input.outcome === 'VERIFICATION_PASSED_PENDING_AUTHORIZATION' ? 'COMPLETED' : 'REJECTED';
 
+    const parentApp = await prisma.verificationApplication.findUnique({
+      where: { application_id: session.application_id },
+      include: { fee_assessment: true },
+    });
+
+    if (appOutcome === 'COMPLETED' && parentApp?.fee_assessment && parentApp.fee_assessment.payment_status !== 'PAYMENT_RECONCILED') {
+      await prisma.feeAssessment.update({
+        where: { fee_assessment_id: parentApp.fee_assessment.fee_assessment_id },
+        data: {
+          payment_status: 'PAYMENT_RECONCILED',
+          receipt_number: `RCPT-2026-${Math.floor(100000 + Math.random() * 900000)}`,
+          treasury_challan_number: `CHL-DL-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+          paid_at: new Date(),
+        },
+      });
+    }
+
     await prisma.verificationApplication.update({
       where: { application_id: session.application_id },
       data: { current_status: appOutcome as any },

@@ -9,6 +9,7 @@ import { ScrutinyActionModal } from './ScrutinyActionModal';
 import { SessionSchedulerModal } from './SessionSchedulerModal';
 import { CertificateModal } from '../trader/CertificateModal';
 import { ReceiptViewer } from '../trader/ReceiptViewer';
+import { WorksheetModal } from './WorksheetModal';
 import {
   Search,
   CheckCircle2,
@@ -71,6 +72,24 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
   const [isSchedulerModalOpen, setIsSchedulerModalOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+
+  // Dedicated Worksheet Inspection Modal State
+  const [selectedWorksheetSession, setSelectedWorksheetSession] = useState<VerificationSession | null>(null);
+  const [selectedWorksheetCert, setSelectedWorksheetCert] = useState<Certificate | null>(null);
+  const [selectedWorksheetApp, setSelectedWorksheetApp] = useState<Application | null>(null);
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState(false);
+
+  const handleOpenWorksheet = (app: Application) => {
+    let sess = sessions.find((s) => s.application_id === app.application_id);
+    if (!sess) {
+      sess = sessions.find((s) => s.instrument_id === app.instrument_id);
+    }
+    const cert = certificates.find((c) => c.session_id === sess?.session_id || c.instrument_id === app.instrument_id);
+    setSelectedWorksheetSession(sess || null);
+    setSelectedWorksheetCert(cert || null);
+    setSelectedWorksheetApp(app);
+    setIsWorksheetModalOpen(true);
+  };
 
   // Tab Count Calculations
   const activeApps = useMemo(
@@ -681,16 +700,14 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                                 <span>Receipt</span>
                               </button>
 
-                              {onSelectSessionForTesting && (
-                                <button
-                                  onClick={() => onSelectSessionForTesting(app.application_id)}
-                                  className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold inline-flex items-center gap-1 transition-colors border border-slate-300 cursor-pointer"
-                                  title="Inspect NAWI Worksheet &amp; Error Data"
-                                >
-                                  <Scale className="w-3 h-3 text-slate-600" />
-                                  <span>Test Log</span>
-                                </button>
-                              )}
+                              <button
+                                onClick={() => handleOpenWorksheet(app)}
+                                className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold inline-flex items-center gap-1 transition-colors border border-slate-300 cursor-pointer"
+                                title="Inspect NAWI Observation Worksheet & Error Data"
+                              >
+                                <Scale className="w-3.5 h-3.5 text-slate-600" />
+                                <span>Worksheet</span>
+                              </button>
                             </>
                           )}
 
@@ -780,6 +797,20 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
         isOpen={isReceiptModalOpen}
         onClose={() => setIsReceiptModalOpen(false)}
         application={selectedAppForReceipt}
+      />
+
+      <WorksheetModal
+        isOpen={isWorksheetModalOpen}
+        onClose={() => setIsWorksheetModalOpen(false)}
+        session={selectedWorksheetSession}
+        instrument={selectedWorksheetApp ? instruments.find((i) => i.instrument_id === selectedWorksheetApp.instrument_id) : null}
+        application={selectedWorksheetApp}
+        certificate={selectedWorksheetCert}
+        onViewCertificate={(cert) => {
+          setSelectedCertForView(cert);
+          setSelectedInstrumentForCert(instruments.find((i) => i.instrument_id === cert.instrument_id) || null);
+          setIsCertModalOpen(true);
+        }}
       />
     </div>
   );

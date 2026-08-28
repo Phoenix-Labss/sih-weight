@@ -98,6 +98,16 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     timestamp: new Date().toISOString(),
   }));
 
+  // System Reset Endpoint (Cleans all transactions & reseeds 21 approved models)
+  app.post('/api/v1/system/reset-database', async (_request, reply) => {
+    const { seedDatabase } = await import('./db/seed.js');
+    await seedDatabase();
+    return reply.send({
+      status: 'SUCCESS',
+      message: 'Database reset to clean state with 21 statutory Indian models.',
+      timestamp: new Date().toISOString(),
+    });
+  });
   // 7. Register REST API Routes under /api/v1 prefix
   await app.register(
     async (v1) => {

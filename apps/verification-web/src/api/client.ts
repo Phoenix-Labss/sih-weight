@@ -187,10 +187,19 @@ export const api = {
   publicVerify: createProxy(mockPublicVerifyService, httpPublicVerifyService),
   evidence: createProxy(mockEvidenceService, httpEvidenceService),
   system: {
-    resetAllData: () => {
+    resetAllData: async () => {
+      try {
+        await fetch(`${env.API_BASE_URL.replace('/api/v1', '')}/api/v1/system/reset-database`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } catch {
+        // Ignore backend unreachable in purely offline mode
+      }
       mockDb.resetToDefaults();
       try {
         localStorage.clear();
+        sessionStorage.clear();
       } catch {
         // ignore
       }

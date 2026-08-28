@@ -93,116 +93,80 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
             }}
             className="w-full text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gov-blue"
           >
-            {/* Category Groups */}
-            <optgroup label="🛒 Commercial, Grocery & Retail Scales (Class III)">
-              {models
-                .filter((m) => m.subtype === 'COUNTER_SCALE_ELECTRONIC' || m.subtype === 'PRICE_COMPUTING_SCALE' || m.subtype === 'TABLETOP_SCALE_ELECTRONIC')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="💎 Precious Jewelry & Bullion Balances (Class II High Accuracy)">
-              {models
-                .filter((m) => m.subtype === 'BULLION_BALANCE_HIGH_PRECISION' || m.subtype === 'JEWELRY_CARAT_BALANCE' || m.subtype === 'PRECISION_LABORATORY_BALANCE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🔬 Special Accuracy Analytical Balances (Class I)">
-              {models
-                .filter((m) => m.accuracy_class === 'CLASS_I')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🌾 APMC Mandi, Wholesale & Platform Scales (Class III)">
-              {models
-                .filter((m) => m.subtype === 'INDUSTRIAL_PLATFORM_SCALE' || m.subtype === 'HEAVY_DUTY_PLATFORM_SCALE' || m.subtype === 'AGRICULTURAL_MANDI_SCALE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🥛 Dairy Automated Milk Collection Units (AMCU)">
-              {models
-                .filter((m) => m.subtype === 'AUTOMATED_MILK_COLLECTION_SCALE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🏗️ Heavy Crane & Hanging Scales">
-              {models
-                .filter((m) => m.subtype === 'WIRELESS_CRANE_SCALE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🚛 Highway Truck & Heavy Industrial Weighbridges (Class IIII)">
-              {models
-                .filter((m) => m.subtype === 'HIGHWAY_TRUCK_WEIGHBRIDGE' || m.subtype === 'HEAVY_INDUSTRIAL_WEIGHBRIDGE' || m.accuracy_class === 'CLASS_IIII')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="📦 Automatic Gravimetric Catchweighers & Bagging (AWI)">
-              {models
-                .filter((m) => m.category === 'AWI')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="🏥 Medical & Healthcare Scales">
-              {models
-                .filter((m) => m.subtype === 'MEDICAL_PERSON_SCALE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="⛽ Motor Fuel & Petroleum Flow Meters (OIML R117)">
-              {models
-                .filter((m) => m.category === 'FLOW_METER')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
-
-            <optgroup label="📏 Linear & Dimensional Measures">
-              {models
-                .filter((m) => m.category === 'LINEAR_MEASURE')
-                .map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}]
-                  </option>
-                ))}
-            </optgroup>
+            {/* Render Category Groups (Only render non-empty groups) */}
+            {[
+              {
+                label: '🛒 Commercial, Grocery & Retail Scales (Class III)',
+                filter: (m: InstrumentModel) =>
+                  m.subtype === 'COUNTER_SCALE_ELECTRONIC' ||
+                  m.subtype === 'PRICE_COMPUTING_SCALE' ||
+                  m.subtype === 'TABLETOP_SCALE_ELECTRONIC' ||
+                  m.subtype === 'COUNTER_MACHINE_ELECTRONIC',
+              },
+              {
+                label: '💎 Precious Jewelry & Bullion Balances (Class II High Accuracy)',
+                filter: (m: InstrumentModel) =>
+                  m.subtype === 'BULLION_BALANCE_HIGH_PRECISION' ||
+                  m.subtype === 'JEWELRY_CARAT_BALANCE' ||
+                  m.subtype === 'PRECISION_LABORATORY_BALANCE' ||
+                  (m.accuracy_class === 'CLASS_II' && m.category === 'NAWI'),
+              },
+              {
+                label: '🔬 Special Accuracy Analytical Balances (Class I)',
+                filter: (m: InstrumentModel) => m.accuracy_class === 'CLASS_I',
+              },
+              {
+                label: '🌾 APMC Mandi, Wholesale & Platform Scales (Class III)',
+                filter: (m: InstrumentModel) =>
+                  m.subtype === 'INDUSTRIAL_PLATFORM_SCALE' ||
+                  m.subtype === 'HEAVY_DUTY_PLATFORM_SCALE' ||
+                  m.subtype === 'AGRICULTURAL_MANDI_SCALE',
+              },
+              {
+                label: '🥛 Dairy Automated Milk Collection Units (AMCU)',
+                filter: (m: InstrumentModel) => m.subtype === 'AUTOMATED_MILK_COLLECTION_SCALE',
+              },
+              {
+                label: '🏗️ Heavy Crane & Hanging Scales',
+                filter: (m: InstrumentModel) => m.subtype === 'WIRELESS_CRANE_SCALE',
+              },
+              {
+                label: '🚛 Highway Truck & Heavy Industrial Weighbridges (Class IIII)',
+                filter: (m: InstrumentModel) =>
+                  m.subtype === 'HIGHWAY_TRUCK_WEIGHBRIDGE' ||
+                  m.subtype === 'HEAVY_INDUSTRIAL_WEIGHBRIDGE' ||
+                  m.accuracy_class === 'CLASS_IIII' ||
+                  m.subtype === 'WEIGHBRIDGE_ELECTRONIC',
+              },
+              {
+                label: '📦 Automatic Gravimetric Catchweighers & Bagging (AWI)',
+                filter: (m: InstrumentModel) => m.category === 'AWI',
+              },
+              {
+                label: '🏥 Medical & Healthcare Scales',
+                filter: (m: InstrumentModel) => m.subtype === 'MEDICAL_PERSON_SCALE',
+              },
+              {
+                label: '⛽ Motor Fuel & Petroleum Flow Meters (OIML R117)',
+                filter: (m: InstrumentModel) => m.category === 'FLOW_METER',
+              },
+              {
+                label: '📏 Linear & Dimensional Measures',
+                filter: (m: InstrumentModel) => m.category === 'LINEAR_MEASURE',
+              },
+            ].map((cat) => {
+              const matched = models.filter(cat.filter);
+              if (matched.length === 0) return null;
+              return (
+                <optgroup key={cat.label} label={cat.label}>
+                  {matched.map((m) => (
+                    <option key={m.model_id} value={m.model_id}>
+                      {m.model_name} [{m.model_approval_number} — Max {m.max_capacity} {m.capacity_unit}, e={m.verification_scale_interval_e} {m.scale_interval_unit}]
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })}
           </select>
         </div>
 

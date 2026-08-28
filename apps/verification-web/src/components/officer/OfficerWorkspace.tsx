@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Application } from '../../types/application';
 import { Instrument } from '../../types/instrument';
 import { VerificationSession } from '../../types/session';
 import { Certificate } from '../../types/certificate';
 import { PhysicalStamp } from '../../types/stamp';
 import { api } from '../../api/client';
+import { mockDb } from '../../api/mock/mockService';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { useApiMode } from '../../context/ApiModeContext';
@@ -13,19 +14,14 @@ import { TestObservationGrid } from './TestObservationGrid';
 import { CertificateModal } from '../trader/CertificateModal';
 import { WorksheetModal } from './WorksheetModal';
 import { StatusBadge } from '../common/StatusBadge';
-import { formatDate, formatDateTime, maskSerialNumber, truncateHash } from '../../utils/formatters';
+import { truncateHash } from '../../utils/formatters';
 import {
   ShieldCheck,
-  CheckCircle2,
   FileCheck2,
   Calendar,
   Scale,
   Award,
-  Stamp,
-  Building2,
   Lock,
-  Layers,
-  Plus,
 } from 'lucide-react';
 
 export const OfficerWorkspace: React.FC = () => {
@@ -38,7 +34,7 @@ export const OfficerWorkspace: React.FC = () => {
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [sessions, setSessions] = useState<VerificationSession[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [stamps, setStamps] = useState<PhysicalStamp[]>([]);
+  const [, setStamps] = useState<PhysicalStamp[]>([]);
 
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
   const [selectedCertForView, setSelectedCertForView] = useState<Certificate | null>(null);
@@ -79,6 +75,11 @@ export const OfficerWorkspace: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Departmental LMO Certificates strictly (excludes third-party GATC test reports)
+  const lmoCertificates = certificates.filter(
+    (c) => c.issuer_type !== 'GATC' && !c.certificate_number.startsWith('GATC-')
+  );
 
   // Active testing workload: strictly sessions that still require officer testing actions (uncompleted)
   const activeWorkSessions = sessions.filter(
@@ -138,7 +139,7 @@ export const OfficerWorkspace: React.FC = () => {
               <ShieldCheck className="w-6 h-6 text-emerald-400" />
               <h2 className="text-xl font-bold tracking-tight">Legal Metrology Officer Enforcement Console</h2>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                LMO / GATC AUTHORITY
+                LMO STATUTORY AUTHORITY
               </span>
             </div>
             <p className="text-xs text-slate-300">
@@ -159,19 +160,19 @@ export const OfficerWorkspace: React.FC = () => {
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
         <button
           onClick={() => setActiveTab('scrutiny')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'scrutiny'
               ? 'bg-gov-navy text-white shadow-xs'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <FileCheck2 className="w-4 h-4 text-amber-400" />
-          <span>Application Scrutiny & Scheduling Queue ({pendingScrutinyApps.length} Pending)</span>
+          <span>Application Scrutiny &amp; Scheduling Queue ({pendingScrutinyApps.length} Pending)</span>
         </button>
 
         <button
           onClick={() => setActiveTab('testing')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'testing'
               ? 'bg-emerald-700 text-white shadow-xs'
               : 'text-slate-600 hover:bg-slate-100'
@@ -183,14 +184,14 @@ export const OfficerWorkspace: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('ledger')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'ledger'
               ? 'bg-indigo-700 text-white shadow-xs'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Award className="w-4 h-4 text-indigo-300" />
-          <span>Issued Certificates & Physical Stamps Ledger ({certificates.length})</span>
+          <span>Issued Departmental Certificates Ledger ({lmoCertificates.length})</span>
         </button>
       </div>
 
@@ -211,16 +212,16 @@ export const OfficerWorkspace: React.FC = () => {
         <div className="space-y-4">
           {/* Session Picker Bar (Strictly Active Workload) */}
           <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 shrink-0">
               <Calendar className="w-4 h-4 text-gov-blue" />
               <span>Active Testing Queue:</span>
             </div>
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <div className="flex-1 w-full">
               <select
                 value={activeSession?.session_id || ''}
                 onChange={(e) => setSelectedSessionId(e.target.value)}
                 disabled={activeWorkSessions.length === 0}
-                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full sm:min-w-[440px] disabled:bg-slate-50 disabled:text-slate-400"
+                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full disabled:bg-slate-50 disabled:text-slate-400"
               >
                 {activeWorkSessions.length > 0 ? (
                   activeWorkSessions.map((s) => {
@@ -241,29 +242,6 @@ export const OfficerWorkspace: React.FC = () => {
                   <option value="">No pending verification sessions — Active queue clear</option>
                 )}
               </select>
-              <button
-                onClick={async () => {
-                  try {
-                    const app = applications[0];
-                    const inst = instruments[0];
-                    if (!app || !inst) return;
-                    const newSess = await api.verification.createSession(user.tenantId, {
-                      application_id: app.application_id,
-                      instrument_id: inst.instrument_id,
-                      scheduled_date: new Date().toISOString().split('T')[0],
-                    });
-                    await loadData();
-                    setSelectedSessionId(newSess.session_id);
-                    notify('success', 'New Session Created', `Fresh verification session ${newSess.session_id} in PLANNED state is ready.`);
-                  } catch (e) {
-                    notify('error', 'Creation Failed', e instanceof Error ? e.message : 'Unknown error');
-                  }
-                }}
-                className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 border border-slate-300 transition-colors whitespace-nowrap cursor-pointer"
-                title="Create an ad-hoc field verification session"
-              >
-                + New Session
-              </button>
             </div>
           </div>
 
@@ -294,14 +272,30 @@ export const OfficerWorkspace: React.FC = () => {
         <div className="space-y-6">
           {/* Issued Certificates Ledger */}
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm text-gov-navy uppercase tracking-wider">
-                  Statutory Digital Certificates Master Ledger
+                  Departmental Statutory Verification Certificates Master Ledger
                 </h3>
               </div>
-              <span className="text-xs font-mono text-slate-500">{certificates.length} Total Records</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-slate-500">{lmoCertificates.length} Total Records</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Clear all demo certificates and reset database back to baseline state?')) {
+                      mockDb.resetDatabase();
+                      loadData();
+                      notify('success', 'Database Reset', 'All demo certificates cleared and state restored to baseline.');
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold border border-rose-200 transition-colors cursor-pointer"
+                  title="Clear all generated mock certificates and reset database"
+                >
+                  Clear All Data / Reset
+                </button>
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -317,76 +311,54 @@ export const OfficerWorkspace: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono">
-                  {certificates.map((cert) => (
-                    <tr key={cert.certificate_id} className="hover:bg-slate-50">
-                      <td className="py-3 px-3 font-bold text-slate-900">{cert.certificate_number}</td>
-                      <td className="py-3 px-3 font-sans text-slate-700">
-                        {cert.issue_date} to <strong className="text-slate-900">{cert.valid_until}</strong>
-                      </td>
-                      <td className="py-3 px-3 text-gov-blue">{cert.public_verification_token}</td>
-                      <td className="py-3 px-3 text-slate-500">{truncateHash(cert.certificate_bytes_sha256, 16)}</td>
-                      <td className="py-3 px-3 font-sans">
-                        <StatusBadge status={cert.certificate_status} size="sm" />
-                      </td>
-                      <td className="py-3 px-3 text-right font-sans">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => {
-                              const matchedSess = sessions.find((s) => s.session_id === cert.session_id);
-                              setSelectedWorksheetSession(matchedSess || null);
-                              setSelectedWorksheetCert(cert);
-                              setIsWorksheetModalOpen(true);
-                            }}
-                            className="px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
-                            title="Inspect complete NAWI observation worksheet and test readings"
-                          >
-                            Worksheet
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedCertForView(cert);
-                              setIsCertModalOpen(true);
-                            }}
-                            className="px-2.5 py-1 rounded bg-blue-50 text-gov-blue hover:bg-blue-100 font-semibold cursor-pointer"
-                          >
-                            View Certificate
-                          </button>
-                        </div>
+                  {lmoCertificates.length > 0 ? (
+                    lmoCertificates.map((cert) => (
+                      <tr key={cert.certificate_id} className="hover:bg-slate-50">
+                        <td className="py-3 px-3 font-bold text-slate-900">{cert.certificate_number}</td>
+                        <td className="py-3 px-3 font-sans text-slate-700">
+                          {cert.issue_date} to <strong className="text-slate-900">{cert.valid_until}</strong>
+                        </td>
+                        <td className="py-3 px-3 text-gov-blue">{cert.public_verification_token}</td>
+                        <td className="py-3 px-3 text-slate-500">{truncateHash(cert.certificate_bytes_sha256, 16)}</td>
+                        <td className="py-3 px-3 font-sans">
+                          <StatusBadge status={cert.certificate_status} size="sm" />
+                        </td>
+                        <td className="py-3 px-3 text-right font-sans">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => {
+                                const matchedSess = sessions.find((s) => s.session_id === cert.session_id);
+                                setSelectedWorksheetSession(matchedSess || null);
+                                setSelectedWorksheetCert(cert);
+                                setIsWorksheetModalOpen(true);
+                              }}
+                              className="px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                              title="Inspect complete NAWI observation worksheet and test readings"
+                            >
+                              Worksheet
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedCertForView(cert);
+                                setIsCertModalOpen(true);
+                              }}
+                              className="px-2.5 py-1 rounded bg-blue-50 text-gov-blue hover:bg-blue-100 font-semibold cursor-pointer"
+                            >
+                              View Certificate
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-slate-500 font-sans text-xs">
+                        No issued certificates in Master Ledger yet. Execute verification testing in the Live Testing console to issue statutory certificates.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          {/* Decoupled Physical Seal Ledger */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div className="flex items-center gap-2">
-                <Stamp className="w-5 h-5 text-amber-600" />
-                <h3 className="font-bold text-sm text-gov-navy uppercase tracking-wider">
-                  Decoupled Physical Wire Seal & Hologram Ledger
-                </h3>
-              </div>
-              <span className="text-xs text-slate-500 font-sans">Strictly decoupled per AGENTS.md §3.2</span>
-            </div>
-
-            <div className="text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <span className="text-slate-500 block">Active Lead Seal:</span>
-                  <span className="font-mono font-bold text-slate-900">DL-SEAL-2026-0042</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block">Position:</span>
-                  <span className="font-semibold text-slate-800">CALIBRATION_PORT_MAIN</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block">Affixed Timestamp:</span>
-                  <span className="font-semibold text-slate-800">23 Aug 2026, 11:05 AM</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

@@ -138,13 +138,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
   const statusBadge = getStatusBadge();
   const dueInfo = getDueInfo();
+  const isGatc = certificate.issuer_type === 'GATC' || certificate.certificate_number.startsWith('GATC-');
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Official Legal Metrology Verification Certificate"
-      subtitle={`Certificate: ${certificate.certificate_number} • Form Schedule IX`}
+      title={isGatc ? "Government Approved Test Centre (GATC) Test Certificate" : "Official Legal Metrology Verification Certificate"}
+      subtitle={`Certificate: ${certificate.certificate_number} • ${isGatc ? 'Form Schedule IX (GATC) • GATC Rules, 2013' : 'Form Schedule IX • General Rules, 2011'}`}
       maxWidth="4xl"
     >
       <div className="space-y-6">
@@ -210,19 +211,25 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     MINISTRY OF CONSUMER AFFAIRS, FOOD & PUBLIC DISTRIBUTION
                   </h5>
                   <h2 className="text-lg sm:text-xl font-extrabold text-gov-navy uppercase tracking-tight font-serif pt-0.5">
-                    Department of Legal Metrology
+                    {isGatc ? (certificate.gatc_facility_name || 'Apex Metrology Calibration Lab Pvt Ltd') : 'Department of Legal Metrology'}
                   </h2>
                   <p className="text-xs font-semibold text-amber-800 tracking-wide">
-                    Government of NCT of Delhi • Central Delhi Enforcement Zone
+                    {isGatc
+                      ? `Government Approved Test Centre • Approval Order: ${certificate.gatc_approval_order || 'GATC/MH/2024/014'} under Section 19`
+                      : 'Government of NCT of Delhi • Central Delhi Enforcement Zone'}
                   </p>
                 </div>
 
                 <div className="pt-2">
-                  <div className="inline-block bg-slate-900 text-amber-400 font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs">
-                    CERTIFICATE OF VERIFICATION OF WEIGHTS & MEASURES
+                  <div className={`inline-block font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs ${
+                    isGatc ? 'bg-indigo-900 text-indigo-200' : 'bg-slate-900 text-amber-400'
+                  }`}>
+                    {isGatc ? 'GATC VERIFICATION TEST REPORT & CERTIFICATE' : 'CERTIFICATE OF VERIFICATION OF WEIGHTS & MEASURES'}
                   </div>
                   <p className="text-[10px] text-slate-500 mt-1 font-medium">
-                    [Issued under Section 24 of The Legal Metrology Act, 2009 (1 of 2010) & Rule 14, Schedule IX of The Legal Metrology General Rules, 2011]
+                    {isGatc
+                      ? '[Issued under Section 19 of The Legal Metrology Act, 2009 & Rule 13, Schedule II of Legal Metrology (GATC) Rules, 2013]'
+                      : '[Issued under Section 24 of The Legal Metrology Act, 2009 (1 of 2010) & Rule 14, Schedule IX of The Legal Metrology General Rules, 2011]'}
                   </p>
 
                   {/* Non-Active Certificate Warning Banner */}
@@ -436,24 +443,26 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                   <div>
                     <div className="flex items-center gap-1 text-emerald-800 font-bold text-xs mb-0.5">
                       <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Digitally Approved & Signed</span>
+                      <span>{isGatc ? 'GATC Approved & Signed' : 'Digitally Approved & Signed'}</span>
                     </div>
                     <span className="font-bold text-slate-900 text-xs block truncate">
-                      Shri Arvind Sharma
+                      {certificate.verifier_name || (isGatc ? 'Dr. Priya Nair' : 'Shri Arvind Sharma')}
                     </span>
                     <span className="text-[10px] text-slate-600 block truncate">
-                      Legal Metrology Officer (Central Delhi Zone)
+                      {certificate.verifier_designation || (isGatc ? 'Approved GATC Verifier (Apex Calibration Lab)' : 'Legal Metrology Officer (Central Delhi Zone)')}
                     </span>
                   </div>
                   <p className="text-[9px] font-mono text-slate-500 pt-1 border-t border-emerald-200/60 truncate" title={certificate.digital_signature_reference || 'DSC-GOV-IN-DL-LMO-2026-9921'}>
-                    DSC: {truncateHash(certificate.digital_signature_reference || 'DSC-GOV-IN-DL-LMO-2026-9921', 26)}
+                    DSC: {truncateHash(certificate.digital_signature_reference || (isGatc ? 'DSC-GATC-IN-DL-2026-0042' : 'DSC-GOV-IN-DL-LMO-2026-9921'), 26)}
                   </p>
                 </div>
               </div>
 
               {/* Official Statutory Footnote */}
               <div className="text-[10px] text-center text-slate-500 pt-1.5 border-t border-slate-100 font-medium">
-                This digital certificate is generated and issued under Section 24 of The Legal Metrology Act, 2009. The physical instrument bears the statutory stamp and seal as prescribed in Schedule VIII of The General Rules, 2011.
+                {isGatc
+                  ? 'This statutory test report and digital verification certificate is generated and issued under Section 19 of The Legal Metrology Act, 2009 & GATC Rules, 2013.'
+                  : 'This digital certificate is generated and issued under Section 24 of The Legal Metrology Act, 2009. The physical instrument bears the statutory stamp and seal as prescribed in Schedule VIII of The General Rules, 2011.'}
               </div>
             </div>
           </div>

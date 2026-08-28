@@ -33,7 +33,7 @@ import {
   StatutoryObservationItem,
 } from '../../utils/nawiCalculations';
 
-const STORAGE_PREFIX = 'emetrology_clean_v1_';
+const STORAGE_PREFIX = 'emetrology_clean_v5_';
 
 function loadOrInit<T>(key: string, initial: T): T {
   try {
@@ -72,6 +72,35 @@ export class MockDatabase {
     this.stamps = loadOrInit('stamps', mockStamps);
     this.certificates = loadOrInit('certificates', mockCertificates);
     this.publicMap = loadOrInit('publicMap', mockPublicVerifyMap);
+  }
+
+  public resetToDefaults(): void {
+    this.resetDatabase();
+  }
+
+  public resetDatabase(): void {
+    try {
+      const keys = ['models', 'instruments', 'applications', 'sessions', 'stamps', 'certificates', 'publicMap'];
+      ['emetrology_clean_v1_', 'emetrology_clean_v2_', 'emetrology_clean_v3_', 'emetrology_clean_v4_', 'emetrology_clean_v5_'].forEach((pref) => {
+        keys.forEach((k) => {
+          localStorage.removeItem(pref + k);
+        });
+      });
+    } catch {}
+    this.models = JSON.parse(JSON.stringify(mockModels));
+    this.instruments = JSON.parse(JSON.stringify(mockInstruments));
+    this.applications = JSON.parse(JSON.stringify(mockApplications));
+    this.sessions = JSON.parse(JSON.stringify(mockSessions));
+    this.stamps = JSON.parse(JSON.stringify(mockStamps));
+    this.certificates = JSON.parse(JSON.stringify(mockCertificates));
+    this.publicMap = JSON.parse(JSON.stringify(mockPublicVerifyMap));
+    save('models', this.models);
+    save('instruments', this.instruments);
+    save('applications', this.applications);
+    save('sessions', this.sessions);
+    save('stamps', this.stamps);
+    save('certificates', this.certificates);
+    save('publicMap', this.publicMap);
   }
 
   // --- Instruments ---
@@ -839,10 +868,13 @@ export class MockDatabase {
     validUntil.setDate(validUntil.getDate() - 1);
 
     const token = `TOK-CERT-${Date.now().toString().slice(-6)}`;
-    const certNum = `CERT-2026-DL-${Math.floor(10000 + Math.random() * 90000)}`;
+    const isGatc = req.issuer_type === 'GATC' || session.verifier_id === 'gatc-verifier-01';
+    const certNum = isGatc
+      ? `GATC-REP-2026-DL-${Math.floor(10000 + Math.random() * 90000)}`
+      : `CERT-2026-DL-${Math.floor(10000 + Math.random() * 90000)}`;
 
     const newCert: Certificate = {
-      certificate_id: `CERT-${Date.now().toString().slice(-4)}`,
+      certificate_id: isGatc ? `GATC-${Date.now().toString().slice(-4)}` : `CERT-${Date.now().toString().slice(-4)}`,
       certificate_number: certNum,
       public_verification_token: token,
       tenant_id: tenantId,
@@ -851,12 +883,22 @@ export class MockDatabase {
       owner_id: inst?.owner_id || 'usr-trader-01',
       procedure_pack_id: session.procedure_pack_id,
       verifier_id: session.verifier_id,
-      signer_id: 'lmo-officer-01',
+      signer_id: isGatc ? 'gatc-verifier-01' : 'lmo-officer-01',
+      issuer_type: isGatc ? 'GATC' : 'DEPARTMENTAL_LMO',
+      issuer_authority_name: isGatc
+        ? 'Apex Metrology Calibration Lab Pvt Ltd (GATC)'
+        : 'Department of Legal Metrology, Government of NCT of Delhi',
+      verifier_name: isGatc ? (req.verifier_name || 'Dr. Priya Nair') : (req.verifier_name || 'Shri Arvind Sharma'),
+      verifier_designation: isGatc ? (req.verifier_designation || 'Approved GATC Verifier') : (req.verifier_designation || 'Legal Metrology Officer'),
+      gatc_approval_order: isGatc ? (req.gatc_approval_order || 'GATC/MH/2024/014') : undefined,
+      gatc_facility_name: isGatc ? (req.gatc_facility_name || 'Apex Metrology Calibration Lab Pvt Ltd') : undefined,
       issue_date: issueDate.toISOString().split('T')[0],
       valid_until: validUntil.toISOString().split('T')[0],
       certificate_status: 'ISSUED',
       certificate_bytes_sha256: 'a1b2c3d4e5f6789012345678abcdef0123456789abcdef0123456789abcdef01',
-      digital_signature_reference: `SIG-ED25519-DL-2026-LMO-${Math.floor(10000 + Math.random() * 90000)}`,
+      digital_signature_reference: isGatc
+        ? `SIG-ED25519-DL-2026-GATC-${Math.floor(10000 + Math.random() * 90000)}`
+        : `SIG-ED25519-DL-2026-LMO-${Math.floor(10000 + Math.random() * 90000)}`,
       signature_timestamp: new Date().toISOString(),
       qr_code_payload: `http://localhost:5173/#/verify/${token}`,
       status_events: [
@@ -865,8 +907,8 @@ export class MockDatabase {
           certificate_id: certNum,
           previous_status: 'DRAFT',
           new_status: 'ISSUED',
-          actor_id: 'lmo-officer-01',
-          reason: req.signer_notes || 'Statutory verification completed with full compliance.',
+          actor_id: isGatc ? 'gatc-verifier-01' : 'lmo-officer-01',
+          reason: req.signer_notes || (isGatc ? 'GATC statutory verification testing completed with full compliance.' : 'Statutory verification completed with full compliance.'),
           event_timestamp: new Date().toISOString(),
         },
       ],

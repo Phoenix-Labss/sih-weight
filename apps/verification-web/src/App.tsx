@@ -23,9 +23,9 @@ const ROLE_TABS: Record<string, TabId[]> = {
   OWNER: ['trader', 'public'],
   APPLICANT: ['trader', 'public'],
   LMO: ['officer', 'public'],
-  GATC_VERIFIER: ['officer', 'public'],
-  SUPERVISOR: ['supervisor', 'public'],
-  CONTROLLER: ['supervisor', 'public'],
+  GATC_VERIFIER: ['gatc', 'public'],
+  SUPERVISOR: ['supervisor', 'gatc', 'public'],
+  CONTROLLER: ['supervisor', 'gatc', 'public'],
   ADMIN: ['trader', 'officer', 'supervisor', 'gatc', 'migration', 'public'],
 };
 
@@ -34,11 +34,24 @@ function allowedTabs(role: RoleType): TabId[] {
 }
 
 function defaultTab(role: RoleType): TabId {
-  const tabs = allowedTabs(role);
-  if (tabs.includes('trader')) return 'trader';
-  if (tabs.includes('officer')) return 'officer';
-  if (tabs.includes('supervisor')) return 'supervisor';
-  return 'public';
+  switch (role) {
+    case 'GATC_VERIFIER':
+      return 'gatc';
+    case 'LMO':
+      return 'officer';
+    case 'SUPERVISOR':
+    case 'CONTROLLER':
+      return 'supervisor';
+    case 'OWNER':
+    case 'APPLICANT':
+      return 'trader';
+    case 'ADMIN':
+      return 'officer';
+    default: {
+      const tabs = allowedTabs(role);
+      return tabs[0] || 'public';
+    }
+  }
 }
 
 const AppContent: React.FC = () => {

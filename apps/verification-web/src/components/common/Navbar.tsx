@@ -16,7 +16,7 @@ const TAB_LABELS: Record<TabId, string> = {
   trader: 'Trader Portal',
   officer: 'Officer Workspace',
   supervisor: 'Supervisor / SLA',
-  gatc: 'GATC Centers',
+  gatc: 'GATC Testing Center',
   migration: 'Legacy Migration',
   public: 'Public QR Verify',
 };

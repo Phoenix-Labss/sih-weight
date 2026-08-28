@@ -41,7 +41,7 @@ export const certificateRoutes: FastifyPluginAsync = async (fastify) => {
     };
   }>(
     '/tenants/:tenantId/certificates/issue',
-    { preHandler: [tenantGuard, requireRoles('LMO', 'SUPERVISOR', 'CONTROLLER', 'ADMIN')] },
+    { preHandler: [tenantGuard, requireRoles('LMO', 'GATC_VERIFIER', 'SUPERVISOR', 'CONTROLLER', 'ADMIN')] },
     async (request, reply) => {
       const { tenantId } = request.params;
       const issued = await certificateService.issueCertificate(

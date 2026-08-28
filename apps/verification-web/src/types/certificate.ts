@@ -12,6 +12,11 @@ export interface CertificateIssueRequest {
   session_id: string;
   validity_months?: number;
   signer_notes?: string;
+  issuer_type?: 'DEPARTMENTAL_LMO' | 'GATC';
+  verifier_name?: string;
+  verifier_designation?: string;
+  gatc_approval_order?: string;
+  gatc_facility_name?: string;
 }
 
 export interface CertificateStatusUpdateRequest {
@@ -43,6 +48,12 @@ export interface Certificate {
   procedure_pack_id: string;
   verifier_id: string;
   signer_id?: string;
+  issuer_type?: 'DEPARTMENTAL_LMO' | 'GATC';
+  issuer_authority_name?: string;
+  verifier_name?: string;
+  verifier_designation?: string;
+  gatc_approval_order?: string;
+  gatc_facility_name?: string;
   issue_date: string;
   valid_until: string;
   certificate_status: CertificateStatus;

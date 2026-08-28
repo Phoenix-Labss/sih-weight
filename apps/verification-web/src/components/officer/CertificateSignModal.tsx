@@ -86,17 +86,23 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
       // Simulate HSM signature delay
       await new Promise((resolve) => setTimeout(resolve, 600));
 
+      const isGatc = user.actorRole === 'GATC_VERIFIER';
       const payload: CertificateIssueRequest = {
         session_id: session.session_id,
         validity_months: validityMonths,
         signer_notes: signerNotes.trim() || undefined,
+        issuer_type: isGatc ? 'GATC' : 'DEPARTMENTAL_LMO',
+        verifier_name: user.actorName,
+        verifier_designation: isGatc ? 'Approved GATC Verifier' : 'Legal Metrology Officer',
+        gatc_approval_order: isGatc ? 'GATC/MH/2024/014' : undefined,
+        gatc_facility_name: isGatc ? 'Apex Metrology Calibration Lab Pvt Ltd' : undefined,
       };
 
       const cert = await api.certificates.issueCertificate(user.tenantId, payload);
       setIssuedCert(cert);
       notify(
         'success',
-        'Digital Certificate Issued & Cryptographically Signed',
+        isGatc ? 'GATC Test Report & Digital Certificate Issued' : 'Digital Certificate Issued & Cryptographically Signed',
         `Certificate Number: ${cert.certificate_number} | QR Token: ${cert.public_verification_token}`
       );
     } catch (err) {
@@ -114,12 +120,14 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
     onNavigateToLedger?.();
   };
 
+  const isGatcUser = user.actorRole === 'GATC_VERIFIER';
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Authorize & Cryptographically Sign Certificate"
-      subtitle={`Session: ${session.session_id} | Statutory Digital Issuance`}
+      title={isGatcUser ? "Authorize & Sign GATC Verification Test Report" : "Authorize & Cryptographically Sign Certificate"}
+      subtitle={`Session: ${session.session_id} | ${isGatcUser ? 'GATC Rules, 2013 Digital Issuance' : 'Statutory Digital Issuance'}`}
       maxWidth="xl"
     >
       {!issuedCert ? (
@@ -128,10 +136,10 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs text-emerald-950 space-y-1.5">
             <div className="flex items-center gap-2 font-bold text-emerald-900 text-sm">
               <ShieldCheck className="w-5 h-5 text-emerald-700" />
-              <span>Statutory Verification Complete</span>
+              <span>{isGatcUser ? 'GATC Verification Testing Complete' : 'Statutory Verification Complete'}</span>
             </div>
             <p className="leading-relaxed text-[11px]">
-              The verification session passed all deterministic test steps. Ready to generate canonical SHA-256 digest and execute digital signing under the authority of <strong className="font-semibold">{user.actorName}</strong>.
+              The verification session passed all deterministic test steps. Ready to generate canonical SHA-256 digest and execute digital signing under the authority of <strong className="font-semibold">{user.actorName}</strong> ({isGatcUser ? 'Approved GATC Verifier' : 'Legal Metrology Officer'}).
             </p>
           </div>
 

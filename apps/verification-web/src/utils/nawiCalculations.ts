@@ -216,3 +216,210 @@ export function evaluateRepeatabilityTest(
     passed: spread <= mpe + 0.0000001,
   };
 }
+
+export interface NAWIInstrumentSpec {
+  accuracy_class?: 'CLASS_I' | 'CLASS_II' | 'CLASS_III' | 'CLASS_IIII' | string;
+  verification_scale_interval_e?: number | string;
+  max_capacity?: number | string;
+  min_capacity?: number | string;
+  unit_of_measure?: string;
+}
+
+export interface StatutoryObservationItem {
+  step_type: 'ZERO_TEST' | 'INCREASING_LOAD' | 'DECREASING_LOAD' | 'ECCENTRICITY' | 'REPEATABILITY' | 'TARE_TEST';
+  step_sequence: number;
+  nominal_load: number;
+  load_unit?: string;
+  raw_indication_reading: number;
+  reading_unit?: string;
+  normalized_indication?: number;
+  repetition_index?: number;
+  eccentricity_position?: string;
+  delta_L?: number;
+}
+
+/**
+ * Generates statutory NAWI test points dynamically tailored to the exact
+ * Accuracy Class (Class I, II, III, IIII), capacity, and scale interval (e)
+ * as mandated by Schedule VII of Legal Metrology (General) Rules, 2011.
+ */
+export function generateStatutoryNAWITestSteps(spec?: NAWIInstrumentSpec | null): StatutoryObservationItem[] {
+  const accuracyClass = (spec?.accuracy_class as any) || 'CLASS_III';
+  const e = Number(spec?.verification_scale_interval_e) || 0.005;
+  const maxCap = Number(spec?.max_capacity) || 30.0;
+  const minCap = Number(spec?.min_capacity) || (
+    accuracyClass === 'CLASS_I' ? 100 * e :
+    accuracyClass === 'CLASS_II' ? 50 * e :
+    accuracyClass === 'CLASS_III' ? 20 * e : 10 * e
+  );
+  const unit = spec?.unit_of_measure || 'kg';
+
+  const decimals = e.toString().includes('.') ? Math.min(e.toString().split('.')[1].length + 1, 6) : 4;
+  const roundE = (val: number) => {
+    if (e <= 0) return Number(val.toFixed(decimals));
+    const factor = Math.round(val / e);
+    return Number((factor * e).toFixed(decimals));
+  };
+
+  const deltaL = Number((0.5 * e).toFixed(decimals));
+
+  // Determine stepped transition points in terms of scale interval e
+  let step1Load: number;
+  let step2Load: number;
+
+  if (accuracyClass === 'CLASS_I') {
+    step1Load = Math.min(roundE(50000 * e), roundE(maxCap * 0.25));
+    step2Load = Math.min(roundE(200000 * e), roundE(maxCap * 0.5));
+  } else if (accuracyClass === 'CLASS_II') {
+    step1Load = Math.min(roundE(5000 * e), roundE(maxCap * 0.25));
+    step2Load = Math.min(roundE(20000 * e), roundE(maxCap * 0.5));
+  } else if (accuracyClass === 'CLASS_IIII') {
+    step1Load = Math.min(roundE(50 * e), roundE(maxCap * 0.25));
+    step2Load = Math.min(roundE(200 * e), roundE(maxCap * 0.5));
+  } else {
+    // CLASS_III
+    step1Load = Math.min(roundE(500 * e), roundE(maxCap * 0.25));
+    step2Load = Math.min(roundE(2000 * e), roundE(maxCap * 0.5));
+  }
+
+  // Ensure strictly ordered positive stepped loads: minCap < step1Load < step2Load < maxCap
+  if (step1Load <= minCap) step1Load = roundE(minCap + (maxCap - minCap) * 0.25);
+  if (step2Load <= step1Load) step2Load = roundE(minCap + (maxCap - minCap) * 0.6);
+  if (step2Load >= maxCap) step2Load = roundE(maxCap * 0.75);
+
+  const eccLoad = roundE(maxCap / 3);
+  const repLoad = roundE(maxCap * 0.8);
+
+  return [
+    // 1. Zero test
+    {
+      step_type: 'ZERO_TEST',
+      step_sequence: 1,
+      nominal_load: 0.0,
+      raw_indication_reading: 0.0,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    // 2. Increasing loads (Min, Step 1 Transition, Step 2 Transition, Max)
+    {
+      step_type: 'INCREASING_LOAD',
+      step_sequence: 2,
+      nominal_load: roundE(minCap),
+      raw_indication_reading: roundE(minCap),
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'INCREASING_LOAD',
+      step_sequence: 3,
+      nominal_load: step1Load,
+      raw_indication_reading: step1Load,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'INCREASING_LOAD',
+      step_sequence: 4,
+      nominal_load: step2Load,
+      raw_indication_reading: step2Load,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'INCREASING_LOAD',
+      step_sequence: 5,
+      nominal_load: roundE(maxCap),
+      raw_indication_reading: roundE(maxCap),
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    // 3. Eccentricity 5 positions (1/3 Max)
+    {
+      step_type: 'ECCENTRICITY',
+      step_sequence: 6,
+      nominal_load: eccLoad,
+      raw_indication_reading: eccLoad,
+      eccentricity_position: 'CENTER',
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'ECCENTRICITY',
+      step_sequence: 7,
+      nominal_load: eccLoad,
+      raw_indication_reading: eccLoad,
+      eccentricity_position: 'FRONT_LEFT',
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'ECCENTRICITY',
+      step_sequence: 8,
+      nominal_load: eccLoad,
+      raw_indication_reading: eccLoad,
+      eccentricity_position: 'BACK_LEFT',
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'ECCENTRICITY',
+      step_sequence: 9,
+      nominal_load: eccLoad,
+      raw_indication_reading: eccLoad,
+      eccentricity_position: 'BACK_RIGHT',
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'ECCENTRICITY',
+      step_sequence: 10,
+      nominal_load: eccLoad,
+      raw_indication_reading: eccLoad,
+      eccentricity_position: 'FRONT_RIGHT',
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    // 4. Repeatability (3 consecutive applications at ~0.8 Max)
+    {
+      step_type: 'REPEATABILITY',
+      step_sequence: 11,
+      nominal_load: repLoad,
+      raw_indication_reading: repLoad,
+      repetition_index: 1,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'REPEATABILITY',
+      step_sequence: 12,
+      nominal_load: repLoad,
+      raw_indication_reading: repLoad,
+      repetition_index: 2,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+    {
+      step_type: 'REPEATABILITY',
+      step_sequence: 13,
+      nominal_load: repLoad,
+      raw_indication_reading: repLoad,
+      repetition_index: 3,
+      load_unit: unit,
+      reading_unit: unit,
+      delta_L: deltaL,
+    },
+  ];
+}
+

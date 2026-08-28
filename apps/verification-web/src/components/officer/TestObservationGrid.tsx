@@ -13,6 +13,7 @@ import { Certificate } from '../../types/certificate';
 import { CertificateModal } from '../trader/CertificateModal';
 import { PhysicalSerialMatchModal } from './PhysicalSerialMatchModal';
 import { PhysicalStamp } from '../../types/stamp';
+import { generateStatutoryNAWITestSteps } from '../../utils/nawiCalculations';
 import {
   Scale,
   ShieldCheck,
@@ -104,7 +105,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
   const [isCertViewOpen, setIsCertViewOpen] = useState(false);
 
-  // Observation items state initialized with default statutory points
+  // Observation items state initialized with statutory points tailored to the specific machine class
   const [observations, setObservations] = useState<ObservationItemInput[]>(() => {
     if (session && session.observations && session.observations.length > 0) {
       return session.observations.map((o) => ({
@@ -117,33 +118,14 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         normalized_indication: o.normalized_indication ? Number(o.normalized_indication) : undefined,
         repetition_index: o.repetition_index ? Number(o.repetition_index) : undefined,
         eccentricity_position: o.eccentricity_position,
-        delta_L: Number((0.5 * scaleIntervalE).toFixed(4)),
+        delta_L: o.delta_L !== undefined ? Number(o.delta_L) : Number((0.5 * scaleIntervalE).toFixed(4)),
       }));
     }
 
-    // Default NAWI Class III procedure test steps
-    return [
-      // 1. Zero load
-      { step_type: 'ZERO_TEST', step_sequence: 1, nominal_load: 0.0, raw_indication_reading: 0.0, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      // 2. Increasing load steps
-      { step_type: 'INCREASING_LOAD', step_sequence: 2, nominal_load: minCap, raw_indication_reading: minCap, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'INCREASING_LOAD', step_sequence: 3, nominal_load: Number((500 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((500 * scaleIntervalE + 0.001).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'INCREASING_LOAD', step_sequence: 4, nominal_load: Number((2000 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((2000 * scaleIntervalE + 0.002).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'INCREASING_LOAD', step_sequence: 5, nominal_load: maxCap, raw_indication_reading: Number((maxCap + 0.004).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      // 3. Eccentricity (1/3 Max = 10 kg) 5 positions
-      { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.003).toFixed(3)), eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      // 4. Repeatability (3 runs at 15 kg)
-      { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 1, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.002).toFixed(3)), repetition_index: 2, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 3, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-    ];
+    return generateStatutoryNAWITestSteps(instrument?.model);
   });
 
-  // Re-synchronize state whenever session prop changes (switching between sessions)
+  // Re-synchronize state whenever session or instrument model changes
   useEffect(() => {
     if (!session) return;
     setSerialVerified(session.status !== 'PLANNED');
@@ -162,27 +144,15 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           normalized_indication: o.normalized_indication ? Number(o.normalized_indication) : undefined,
           repetition_index: o.repetition_index ? Number(o.repetition_index) : undefined,
           eccentricity_position: o.eccentricity_position,
-          delta_L: Number((0.5 * scaleIntervalE).toFixed(4)),
+          delta_L: o.delta_L !== undefined ? Number(o.delta_L) : Number((0.5 * scaleIntervalE).toFixed(4)),
         }))
       );
     } else {
-      setObservations([
-        { step_type: 'ZERO_TEST', step_sequence: 1, nominal_load: 0.0, raw_indication_reading: 0.0, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'INCREASING_LOAD', step_sequence: 2, nominal_load: minCap, raw_indication_reading: minCap, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'INCREASING_LOAD', step_sequence: 3, nominal_load: Number((500 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((500 * scaleIntervalE + 0.001).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'INCREASING_LOAD', step_sequence: 4, nominal_load: Number((2000 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((2000 * scaleIntervalE + 0.002).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'INCREASING_LOAD', step_sequence: 5, nominal_load: maxCap, raw_indication_reading: Number((maxCap + 0.004).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.003).toFixed(3)), eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 1, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.002).toFixed(3)), repetition_index: 2, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-        { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 3, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      ]);
+      // Auto-generate exact statutory test steps matching the machine's accuracy class and interval
+      const autoSteps = generateStatutoryNAWITestSteps(instrument?.model);
+      setObservations(autoSteps);
     }
-  }, [session?.session_id, session?.status, session?.observations, scaleIntervalE, minCap, maxCap]);
+  }, [session?.session_id, session?.status, session?.observations, instrument?.model, scaleIntervalE]);
 
   const [isSubmittingObservations, setIsSubmittingObservations] = useState(false);
 
@@ -573,17 +543,48 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           <div className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-gov-blue" />
             <div>
-              <h3 className="text-sm font-bold text-slate-800">
-                Guided NAWI Test Procedure Execution (Class III / IIII)
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                Stepped MPE calculation: 0 &lt; m ≤ 500: ±1.0e; 500 &lt; m ≤ 2000: ±2.0e; 2000 &lt; m ≤ 10000: ±3.0e
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-sm font-bold text-slate-800">
+                  Guided NAWI Test Procedure Execution
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                  {accuracyClass === 'CLASS_I'
+                    ? 'Class I (Special Accuracy — Analytical/Micro)'
+                    : accuracyClass === 'CLASS_II'
+                    ? 'Class II (High Accuracy — Gold / Jewellery / Carat)'
+                    : accuracyClass === 'CLASS_IIII'
+                    ? 'Class IIII (Ordinary Accuracy — Industrial)'
+                    : 'Class III (Medium Accuracy — Commercial Trade)'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                {accuracyClass === 'CLASS_I'
+                  ? 'Stepped MPE: 0 < m ≤ 50,000e: ±1.0e; 50,000e < m ≤ 200,000e: ±2.0e; m > 200,000e: ±3.0e'
+                  : accuracyClass === 'CLASS_II'
+                  ? 'Stepped MPE: 0 < m ≤ 5,000e: ±1.0e; 5,000e < m ≤ 20,000e: ±2.0e; m > 20,000e: ±3.0e'
+                  : accuracyClass === 'CLASS_IIII'
+                  ? 'Stepped MPE: 0 < m ≤ 50e: ±1.0e; 50e < m ≤ 200e: ±2.0e; m > 200e: ±3.0e'
+                  : 'Stepped MPE: 0 < m ≤ 500e: ±1.0e; 500e < m ≤ 2,000e: ±2.0e; m > 2,000e: ±3.0e'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs flex-wrap">
             <span className="text-slate-500">Interval (e): <strong className="font-mono text-slate-900">{scaleIntervalE} kg</strong></span>
+            {!isFinalized && (
+              <button
+                type="button"
+                onClick={() => {
+                  const autoSteps = generateStatutoryNAWITestSteps(instrument?.model);
+                  setObservations(autoSteps);
+                  notify('info', 'Test Steps Auto-Aligned', `Procedure points auto-calculated for ${accuracyClass} (${scaleIntervalE} kg scale interval).`);
+                }}
+                className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] border border-slate-300 transition-colors cursor-pointer"
+                title="Reset or auto-align test points with the loaded machine specifications"
+              >
+                Auto-Align Steps
+              </button>
+            )}
           </div>
         </div>
 

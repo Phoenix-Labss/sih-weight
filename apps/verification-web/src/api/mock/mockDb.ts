@@ -602,6 +602,19 @@ export class MockDatabase {
 
   public recordStamp(tenantId: string, sessionId: string, req: PhysicalStampRecordRequest): PhysicalStamp {
     const session = this.getSession(sessionId);
+    const sealNum = (req.seal_identification_number || '').trim();
+    // Prevent duplicate stamp entries for the same seal number in the same session
+    const existing = this.stamps.find(
+      (s) => s.session_id === sessionId && s.seal_identification_number.trim().toLowerCase() === sealNum.toLowerCase()
+    );
+    if (existing) {
+      existing.seal_position = req.seal_position || existing.seal_position;
+      existing.photo_evidence_hash = req.photo_evidence_hash || existing.photo_evidence_hash;
+      existing.notes = req.notes || existing.notes;
+      save('stamps', this.stamps);
+      return existing;
+    }
+
     const newStamp: PhysicalStamp = {
       stamp_action_id: `STAMP-${Date.now().toString().slice(-4)}`,
       tenant_id: tenantId,
@@ -610,7 +623,7 @@ export class MockDatabase {
       verifier_id: 'lmo-officer-01',
       action_type: req.action_type || 'SEAL_APPLIED',
       seal_type: req.seal_type || 'LEAD_WIRE_SEAL',
-      seal_identification_number: req.seal_identification_number,
+      seal_identification_number: sealNum,
       seal_position: req.seal_position,
       photo_evidence_hash: req.photo_evidence_hash || '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
       action_timestamp: new Date().toISOString(),

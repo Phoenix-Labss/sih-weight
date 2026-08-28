@@ -78,7 +78,16 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
     if (!session) return;
     try {
       const stamps = await api.stamps.listSessionStamps(user.tenantId, session.session_id);
-      setRecordedStamps(stamps || []);
+      const uniqueStamps: PhysicalStamp[] = [];
+      const seen = new Set<string>();
+      for (const s of stamps || []) {
+        const id = (s.seal_identification_number || '').trim().toLowerCase();
+        if (id && !seen.has(id)) {
+          seen.add(id);
+          uniqueStamps.push(s);
+        }
+      }
+      setRecordedStamps(uniqueStamps);
     } catch {
       // ignore
     }
@@ -291,7 +300,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 <Stamp className={`w-4 h-4 ${recordedStamps.length > 0 ? 'text-amber-400' : 'text-white'}`} />
                 <span>
                   {recordedStamps.length > 0
-                    ? `Seal: ${recordedStamps[0].seal_identification_number} (${recordedStamps.length})`
+                    ? `Seal: ${recordedStamps[0].seal_identification_number}${recordedStamps.length > 1 ? ` (${recordedStamps.length})` : ''}`
                     : 'Affix Physical Seal'}
                 </span>
               </button>
@@ -441,7 +450,13 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               }`}
             >
               <Stamp className="w-3.5 h-3.5" />
-              <span>{recordedStamps.length > 0 ? `Manage Seals (${recordedStamps.length})` : 'Affix Physical Seal'}</span>
+              <span>
+                {recordedStamps.length > 0
+                  ? recordedStamps.length > 1
+                    ? `Manage Seals (${recordedStamps.length})`
+                    : 'Manage Seal'
+                  : 'Affix Physical Seal'}
+              </span>
             </button>
           </div>
 

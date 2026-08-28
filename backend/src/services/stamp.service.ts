@@ -43,6 +43,19 @@ export class StampService {
     }
 
     const instrumentId = input.instrument_id || session.instrument_id;
+    const cleanSealNumber = input.seal_identification_number.trim();
+
+    // Check for existing seal to prevent duplicate recording
+    const existingSeal = await prisma.physicalStampAction.findFirst({
+      where: {
+        tenant_id: tenantId,
+        session_id: sessionId,
+        seal_identification_number: cleanSealNumber,
+      },
+    });
+    if (existingSeal) {
+      return this.formatStamp(existingSeal);
+    }
 
     const created = await prisma.physicalStampAction.create({
       data: {

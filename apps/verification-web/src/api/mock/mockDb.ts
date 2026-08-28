@@ -477,18 +477,25 @@ export class MockDatabase {
   }
 
   public getSession(id: string): VerificationSession | undefined {
+    if (!id) return undefined;
     let sess = this.sessions.find(
       (s) =>
         s.session_id === id ||
         s.session_id.toLowerCase() === id.toLowerCase() ||
-        s.application_id === id
+        s.application_id === id ||
+        s.application_id.toLowerCase() === id.toLowerCase() ||
+        s.instrument_id === id
     );
 
     if (!sess) {
-      // Fallback: If id matches an existing application, auto-create or find planned session
-      const app = this.getApplication(id);
+      // Fallback 1: match application by application_id, application_number, or instrument_id
+      const app = this.applications.find(
+        (a) => a.application_id === id || a.application_number === id || a.instrument_id === id
+      );
       if (app) {
-        sess = this.sessions.find((s) => s.instrument_id === app.instrument_id);
+        sess = this.sessions.find(
+          (s) => s.application_id === app.application_id || s.instrument_id === app.instrument_id
+        );
         if (!sess) {
           sess = this.createSession(app.tenant_id, {
             application_id: app.application_id,
@@ -497,6 +504,50 @@ export class MockDatabase {
           });
         }
       }
+    }
+
+    if (!sess) {
+      // Fallback 2: match instrument by instrument_id or serial_number
+      const inst = this.instruments.find((i) => i.instrument_id === id || i.serial_number === id);
+      if (inst) {
+        sess = this.sessions.find((s) => s.instrument_id === inst.instrument_id);
+        if (!sess) {
+          sess = this.createSession(inst.tenant_id, {
+            application_id: `APP-${Date.now().toString().slice(-4)}`,
+            instrument_id: inst.instrument_id,
+            scheduled_date: new Date().toISOString().split('T')[0],
+          });
+        }
+      }
+    }
+
+    if (!sess && id.startsWith('SESS-')) {
+      // Fallback 3: create on-demand session for requested session ID
+      sess = {
+        session_id: id,
+        tenant_id: 'tenant-delhi-01',
+        application_id: `APP-${id}`,
+        instrument_id: this.instruments[0]?.instrument_id || 'INST-001',
+        procedure_pack_id: 'IND-LM-NAWI-CLASS-III-IIII-2026.1',
+        procedure_pack_checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        verifier_id: 'lmo-officer-01',
+        verifier_role: 'LEGAL_METROLOGY_OFFICER',
+        scheduled_date: new Date().toISOString().split('T')[0],
+        status: 'IN_PROGRESS',
+        reference_standards: [
+          {
+            standard_id: 'STD-MASS-CLASS-F2-001',
+            snapshot_calibration_certificate: 'CAL-NPL-2025-F2-089',
+            snapshot_valid_until: '2027-05-15T00:00:00Z',
+            verified_suitable: true,
+          },
+        ],
+        observations: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      this.sessions.unshift(sess);
+      save('sessions', this.sessions);
     }
 
     if (sess && (sess.status === 'FINALIZED' || sess.status === 'SUBMITTED' || this.certificates.some((c) => c.session_id === sess.session_id))) {
@@ -584,8 +635,37 @@ export class MockDatabase {
     temp?: number,
     humidity?: number
   ): VerificationSession {
-    const session = this.getSession(sessionId);
-    if (!session) throw new Error('Session not found');
+    let session = this.getSession(sessionId);
+    if (!session) {
+      session = this.sessions.find(
+        (s) =>
+          s.session_id === sessionId ||
+          s.session_id.toLowerCase() === sessionId.toLowerCase() ||
+          s.application_id === sessionId ||
+          s.instrument_id === sessionId
+      );
+    }
+
+    if (!session) {
+      session = {
+        session_id: sessionId,
+        tenant_id: 'tenant-delhi-01',
+        application_id: `APP-${sessionId}`,
+        instrument_id: this.instruments[0]?.instrument_id || 'INST-001',
+        procedure_pack_id: 'IND-LM-NAWI-CLASS-III-IIII-2026.1',
+        procedure_pack_checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        verifier_id: 'lmo-officer-01',
+        verifier_role: 'LEGAL_METROLOGY_OFFICER',
+        scheduled_date: new Date().toISOString().split('T')[0],
+        status: 'IN_PROGRESS',
+        reference_standards: [],
+        observations: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      this.sessions.unshift(session);
+      save('sessions', this.sessions);
+    }
 
     const inst = this.getInstrument(session.instrument_id);
     const scaleInterval = inst?.model?.verification_scale_interval_e || 0.005;

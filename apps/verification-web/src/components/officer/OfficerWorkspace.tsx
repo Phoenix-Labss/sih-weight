@@ -11,6 +11,7 @@ import { useApiMode } from '../../context/ApiModeContext';
 import { ScrutinyQueue } from './ScrutinyQueue';
 import { TestObservationGrid } from './TestObservationGrid';
 import { CertificateModal } from '../trader/CertificateModal';
+import { WorksheetModal } from './WorksheetModal';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDate, formatDateTime, maskSerialNumber, truncateHash } from '../../utils/formatters';
 import {
@@ -43,6 +44,11 @@ export const OfficerWorkspace: React.FC = () => {
   const [selectedCertForView, setSelectedCertForView] = useState<Certificate | null>(null);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
 
+  // Dedicated Worksheet Inspection Modal State
+  const [selectedWorksheetSession, setSelectedWorksheetSession] = useState<VerificationSession | null>(null);
+  const [selectedWorksheetCert, setSelectedWorksheetCert] = useState<Certificate | null>(null);
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState(false);
+
   const loadData = useCallback(async () => {
     try {
       const [appRes, instRes, sessRes, certRes] = await Promise.all([
@@ -74,7 +80,7 @@ export const OfficerWorkspace: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Active testing workload: sessions that still require officer testing actions (uncompleted)
+  // Active testing workload: strictly sessions that still require officer testing actions (uncompleted)
   const activeWorkSessions = sessions.filter(
     (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
   );
@@ -84,12 +90,8 @@ export const OfficerWorkspace: React.FC = () => {
     (a) => a.current_status !== 'COMPLETED' && a.current_status !== 'REJECTED'
   );
 
-  // Selected session to view in the NAWI testing tab (can be active work session or completed session for read-only worksheet inspection)
-  const activeSession =
-    sessions.find((s) => s.session_id === selectedSessionId) ||
-    activeWorkSessions[0] ||
-    sessions[0] ||
-    null;
+  // Active workload session strictly for the live testing console
+  const activeSession = activeWorkSessions.find((s) => s.session_id === selectedSessionId) || activeWorkSessions[0] || null;
   const activeSessionApp = activeSession ? applications.find((a) => a.application_id === activeSession.application_id) : null;
   const activeSessionInst = activeSession ? instruments.find((i) => i.instrument_id === (activeSession.instrument_id || activeSessionApp?.instrument_id)) : null;
   const activeSessionCert = activeSession ? certificates.find((c) => c.session_id === activeSession.session_id) : null;
@@ -204,65 +206,39 @@ export const OfficerWorkspace: React.FC = () => {
         />
       )}
 
-      {/* Tab 2: Guided NAWI Testing Execution */}
+      {/* Tab 2: Guided NAWI Testing Execution (Active Workload Only) */}
       {activeTab === 'testing' && (
         <div className="space-y-4">
-          {/* Session Picker Bar */}
+          {/* Session Picker Bar (Strictly Active Workload) */}
           <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
               <Calendar className="w-4 h-4 text-gov-blue" />
-              <span>Select Verification Session / Worksheet:</span>
+              <span>Active Testing Queue:</span>
             </div>
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <select
                 value={activeSession?.session_id || ''}
                 onChange={(e) => setSelectedSessionId(e.target.value)}
-                disabled={sessions.length === 0}
+                disabled={activeWorkSessions.length === 0}
                 className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue w-full sm:min-w-[440px] disabled:bg-slate-50 disabled:text-slate-400"
               >
-                {sessions.length > 0 ? (
-                  <>
-                    {activeWorkSessions.length > 0 && (
-                      <optgroup label="📋 Active Verification Workload (Action Required)">
-                        {activeWorkSessions.map((s) => {
-                          const app = applications.find((a) => a.application_id === s.application_id);
-                          const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
-                          const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
-                          const model = inst?.model?.model_name || 'Weighing Instrument';
-                          const sn = inst?.serial_number || 'N/A';
-                          const status = s.status.replace(/_/g, ' ');
-                          const outcome = s.outcome ? ` • ${s.outcome.replace(/_/g, ' ')}` : '';
-                          return (
-                            <option key={s.session_id} value={s.session_id}>
-                              {appNum} — {model} (SN: {sn}) [{status}{outcome}]
-                            </option>
-                          );
-                        })}
-                      </optgroup>
-                    )}
-                    {sessions.some((s) => s.status === 'FINALIZED' || certificates.some((c) => c.session_id === s.session_id)) && (
-                      <optgroup label="📜 Completed & Certified Worksheets (Immutable Audit Records)">
-                        {sessions
-                          .filter((s) => s.status === 'FINALIZED' || certificates.some((c) => c.session_id === s.session_id))
-                          .map((s) => {
-                            const app = applications.find((a) => a.application_id === s.application_id);
-                            const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
-                            const cert = certificates.find((c) => c.session_id === s.session_id);
-                            const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
-                            const model = inst?.model?.model_name || 'Weighing Instrument';
-                            const sn = inst?.serial_number || 'N/A';
-                            const certNum = cert ? ` • Cert #${cert.certificate_number}` : '';
-                            return (
-                              <option key={s.session_id} value={s.session_id}>
-                                {appNum} — {model} (SN: {sn}) [FINALIZED & CERTIFIED{certNum}]
-                              </option>
-                            );
-                          })}
-                      </optgroup>
-                    )}
-                  </>
+                {activeWorkSessions.length > 0 ? (
+                  activeWorkSessions.map((s) => {
+                    const app = applications.find((a) => a.application_id === s.application_id);
+                    const inst = instruments.find((i) => i.instrument_id === (s.instrument_id || app?.instrument_id));
+                    const appNum = app?.application_number || `App #${s.application_id.slice(0, 8)}`;
+                    const model = inst?.model?.model_name || 'Weighing Instrument';
+                    const sn = inst?.serial_number || 'N/A';
+                    const status = s.status.replace(/_/g, ' ');
+                    const outcome = s.outcome ? ` • ${s.outcome.replace(/_/g, ' ')}` : '';
+                    return (
+                      <option key={s.session_id} value={s.session_id}>
+                        {appNum} — {model} (SN: {sn}) [{status}{outcome}]
+                      </option>
+                    );
+                  })
                 ) : (
-                  <option value="">No verification sessions available</option>
+                  <option value="">No pending verification sessions — Active queue clear</option>
                 )}
               </select>
               <button
@@ -302,41 +278,21 @@ export const OfficerWorkspace: React.FC = () => {
               onNavigateToLedger={() => setActiveTab('ledger')}
             />
           ) : (
-            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-2xs text-center space-y-4 max-w-2xl mx-auto my-6">
-              <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-base font-bold text-slate-800">All Scheduled Verification Sessions Completed</h4>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  There are no pending verification sessions in your active inspection queue. All previously completed sessions have had their certificates minted in the Master Ledger.
-                </p>
-              </div>
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                <button
-                  onClick={() => setActiveTab('scrutiny')}
-                  className="px-4 py-2 rounded-lg bg-gov-navy text-white text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-                >
-                  <FileCheck2 className="w-4 h-4 text-amber-400" />
-                  <span>Review Scrutiny Queue ({pendingScrutinyApps.length} Pending)</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('ledger')}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-                >
-                  <Award className="w-4 h-4 text-indigo-200" />
-                  <span>Open Master Ledger ({certificates.length})</span>
-                </button>
-              </div>
+            <div className="bg-white p-12 rounded-xl border border-slate-200 text-center space-y-3">
+              <Scale className="w-12 h-12 text-slate-300 mx-auto" />
+              <h3 className="font-bold text-slate-700 text-sm">No Pending Verification Workload</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                All scheduled applications have been completed and certified. Allocate new inspection slots in Scrutiny or inspect immutable observation records in the Master Ledger.
+              </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Tab 3: Issued Certificates & Stamps Ledger */}
+      {/* Tab 3: Master Ledger */}
       {activeTab === 'ledger' && (
         <div className="space-y-6">
-          {/* Digital Certificates Section */}
+          {/* Issued Certificates Ledger */}
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between border-b pb-3">
               <div className="flex items-center gap-2">
@@ -376,8 +332,10 @@ export const OfficerWorkspace: React.FC = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => {
-                              setSelectedSessionId(cert.session_id);
-                              setActiveTab('testing');
+                              const matchedSess = sessions.find((s) => s.session_id === cert.session_id);
+                              setSelectedWorksheetSession(matchedSess || null);
+                              setSelectedWorksheetCert(cert);
+                              setIsWorksheetModalOpen(true);
                             }}
                             className="px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
                             title="Inspect complete NAWI observation worksheet and test readings"
@@ -440,6 +398,20 @@ export const OfficerWorkspace: React.FC = () => {
         onClose={() => setIsCertModalOpen(false)}
         certificate={selectedCertForView}
         instrument={instruments.find((i) => i.instrument_id === selectedCertForView?.instrument_id)}
+      />
+
+      {/* Dedicated NAWI Worksheet Inspection Modal */}
+      <WorksheetModal
+        isOpen={isWorksheetModalOpen}
+        onClose={() => setIsWorksheetModalOpen(false)}
+        session={selectedWorksheetSession}
+        instrument={selectedWorksheetSession ? instruments.find((i) => i.instrument_id === selectedWorksheetSession.instrument_id) : null}
+        application={selectedWorksheetSession ? applications.find((a) => a.application_id === selectedWorksheetSession.application_id) : null}
+        certificate={selectedWorksheetCert}
+        onViewCertificate={(cert) => {
+          setSelectedCertForView(cert);
+          setIsCertModalOpen(true);
+        }}
       />
     </div>
   );

@@ -48,6 +48,7 @@ export interface Observation {
   is_within_mpe: bool_or_boolean;
   repetition_index: number;
   eccentricity_position?: string;
+  delta_L?: number;
   calculation_trace: Record<string, unknown>;
   is_immutable: boolean;
   recorded_at?: string;

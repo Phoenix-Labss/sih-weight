@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /**
- * Unified Node.js Runner for Legal Metrology Platform.
- * Launches Fastify TypeScript Backend (port 8000), Verification Web Portal (port 5173),
- * and optionally the Admin Portal (port 5174).
+ * Unified Runner for National Legal Metrology Verification Platform.
+ * Ensures PostgreSQL is running, then launches:
+ *  - Fastify TypeScript Backend (port 8000)
+ *  - Verification Web Portal (port 5173) [Includes Admin & Governance, Trader, LMO, GATC, Supervisor, Migration, QR Verify]
  */
 
 import { spawn, execSync } from 'child_process';
 import path from 'path';
+import net from 'net';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,9 +17,6 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = __dirname;
 const BACKEND_DIR = path.join(ROOT_DIR, 'backend');
 const FRONTEND_DIR = path.join(ROOT_DIR, 'apps', 'verification-web');
-const ADMIN_DIR = path.join(ROOT_DIR, 'apps', 'admin-portal');
-
-const includeAdmin = process.argv.includes('--admin');
 
 const colors = {
   cyan: '\x1b[36m',
@@ -25,11 +24,57 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   magenta: '\x1b[35m',
+  blue: '\x1b[34m',
   reset: '\x1b[0m',
   bold: '\x1b[1m',
 };
 
 const processes = [];
+
+function checkPostgresPort(port = 5432) {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    socket.setTimeout(1500);
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on('error', () => {
+      resolve(false);
+    });
+    socket.connect(port, '127.0.0.1');
+  });
+}
+
+async function ensurePostgres() {
+  console.log(`${colors.cyan}[POSTGRES] Checking PostgreSQL Database on port 5432...${colors.reset}`);
+  let isRunning = await checkPostgresPort(5432);
+
+  if (!isRunning && process.platform === 'win32') {
+    console.log(`${colors.yellow}[POSTGRES] PostgreSQL port 5432 is not responding. Starting Windows PostgreSQL service...${colors.reset}`);
+    try {
+      execSync('powershell -Command "Get-Service -Name *postgres* -ErrorAction SilentlyContinue | Start-Service -ErrorAction SilentlyContinue"', { stdio: 'ignore' });
+      // Wait up to 5 seconds for PostgreSQL to accept connections
+      for (let i = 0; i < 10; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+        isRunning = await checkPostgresPort(5432);
+        if (isRunning) break;
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
+  if (isRunning) {
+    console.log(`${colors.green}[POSTGRES] ✓ PostgreSQL is active and accepting connections on localhost:5432 (emetrology_db)${colors.reset}`);
+  } else {
+    console.log(`${colors.yellow}[POSTGRES] ⚠ Warning: Could not connect to PostgreSQL on port 5432. The backend may attempt automatic connection retry.${colors.reset}`);
+  }
+}
 
 function freePort(port) {
   try {
@@ -112,35 +157,34 @@ function cleanup() {
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
 
-console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}`);
-console.log(`${colors.bold}${colors.green}  National Legal Metrology Verification & Digital Certification Platform${colors.reset}`);
-console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}`);
-console.log(`  Backend API:          ${colors.bold}http://localhost:8000${colors.reset} (Fastify + Prisma)`);
-console.log(`  Verification Portal:  ${colors.bold}http://localhost:5173${colors.reset} (Trader / Officer / Supervisor / Public)`);
-if (includeAdmin) {
-  console.log(`  Admin Control Plane:  ${colors.bold}http://localhost:5174${colors.reset} (System Administrator)`);
-}
-console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}\n`);
+async function main() {
+  console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}`);
+  console.log(`${colors.bold}${colors.green}  National Legal Metrology Verification & Digital Certification Platform${colors.reset}`);
+  console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}`);
+  console.log(`  Database:             ${colors.bold}localhost:5432${colors.reset} (PostgreSQL 18 - emetrology_db)`);
+  console.log(`  Backend API:          ${colors.bold}http://localhost:8000${colors.reset} (Fastify + Prisma ORM)`);
+  console.log(`  Main Web Portal:      ${colors.bold}http://localhost:5173${colors.reset} (Admin, Trader, LMO, GATC, SLA, QR)`);
+  console.log(`${colors.bold}${colors.cyan}======================================================================${colors.reset}\n`);
 
-// Free ports
-freePort(8000);
-freePort(5173);
-if (includeAdmin) freePort(5174);
+  // 1. Ensure PostgreSQL is active
+  await ensurePostgres();
 
-// 1. Start Backend API
-console.log(`${colors.cyan}[RUNNER] Starting Fastify TypeScript Backend on port 8000...${colors.reset}`);
-startProcess('BACKEND', 'npm', ['run', 'dev'], BACKEND_DIR, colors.cyan);
+  // 2. Free any stale port allocations
+  freePort(8000);
+  freePort(5173);
 
-// 2. Start Frontend Web Portal
-setTimeout(() => {
-  console.log(`${colors.green}[RUNNER] Starting Verification Web Portal on port 5173...${colors.reset}`);
-  startProcess('WEB-PORTAL', 'npm', ['run', 'dev'], FRONTEND_DIR, colors.green);
-}, 1500);
+  // 3. Start Backend Fastify API
+  console.log(`\n${colors.cyan}[RUNNER] Launching Fastify Backend Server on port 8000...${colors.reset}`);
+  startProcess('BACKEND', 'npm', ['run', 'dev'], BACKEND_DIR, colors.cyan);
 
-// 3. Start Admin Portal (if requested)
-if (includeAdmin) {
+  // 4. Start Frontend Web Portal
   setTimeout(() => {
-    console.log(`${colors.magenta}[RUNNER] Starting Admin Control Plane on port 5174...${colors.reset}`);
-    startProcess('ADMIN-PORTAL', 'npm', ['run', 'dev'], ADMIN_DIR, colors.magenta);
-  }, 2000);
+    console.log(`${colors.green}[RUNNER] Launching Verification Web Portal on port 5173...${colors.reset}`);
+    startProcess('WEB-PORTAL', 'npm', ['run', 'dev'], FRONTEND_DIR, colors.green);
+  }, 1800);
 }
+
+main().catch((err) => {
+  console.error('[RUNNER] Fatal startup error:', err);
+  process.exit(1);
+});

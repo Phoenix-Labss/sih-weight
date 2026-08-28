@@ -1,0 +1,19 @@
+{
+  "name": "emetrology-platform",
+  "version": "1.0.0",
+  "description": "National Legal Metrology Digital Verification, Stamping and Certification Platform",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node run.js",
+    "dev": "node run.js",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd apps/verification-web && npm run dev",
+    "test": "cd backend && npm test",
+    "test:coverage": "cd backend && npm run test:coverage",
+    "build": "cd apps/verification-web && npm run build",
+    "db:push": "cd backend && npx prisma db push",
+    "db:generate": "cd backend && npx prisma generate",
+    "db:seed": "cd backend && npm run prisma:seed"
+  }
+}

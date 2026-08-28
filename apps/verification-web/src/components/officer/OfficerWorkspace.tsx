@@ -73,12 +73,8 @@ export const OfficerWorkspace: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Sessions that still need officer work in the testing tab. A FINALIZED
-  // session with an issued certificate is complete - it lives in the
-  // Certificates & Stamps Ledger tab, not in the active work queue.
-  const workSessions = sessions.filter(
-    (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
-  );
+  // All sessions remain selectable so officers can inspect observations, certificates, and physical seals anytime
+  const workSessions = sessions;
 
   const activeSession = workSessions.find((s) => s.session_id === selectedSessionId) || workSessions[0];
   const activeSessionApp = applications.find((a) => a.application_id === activeSession?.application_id);
@@ -264,7 +260,6 @@ export const OfficerWorkspace: React.FC = () => {
               onCertificateIssued={(cert) => {
                 setCertificates((prev) => [cert, ...prev.filter((c) => c.certificate_id !== cert.certificate_id)]);
                 loadData();
-                setActiveTab('ledger');
               }}
             />
           ) : (

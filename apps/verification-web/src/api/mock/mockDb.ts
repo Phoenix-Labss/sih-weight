@@ -29,7 +29,7 @@ import {
 } from './mockFixtures';
 import { evaluateNAWIObservation } from '../../utils/nawiCalculations';
 
-const STORAGE_PREFIX = 'emetrology_mock_';
+const STORAGE_PREFIX = 'emetrology_clean_v1_';
 
 function loadOrInit<T>(key: string, initial: T): T {
   try {
@@ -805,13 +805,14 @@ export class MockDatabase {
 
   public resetToDefaults(): void {
     try {
-      localStorage.removeItem(STORAGE_PREFIX + 'models');
-      localStorage.removeItem(STORAGE_PREFIX + 'instruments');
-      localStorage.removeItem(STORAGE_PREFIX + 'applications');
-      localStorage.removeItem(STORAGE_PREFIX + 'sessions');
-      localStorage.removeItem(STORAGE_PREFIX + 'stamps');
-      localStorage.removeItem(STORAGE_PREFIX + 'certificates');
-      localStorage.removeItem(STORAGE_PREFIX + 'publicMap');
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('emetrology_') || k.startsWith('mock_'))) {
+          keysToRemove.push(k);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
     } catch {
       // Ignore
     }

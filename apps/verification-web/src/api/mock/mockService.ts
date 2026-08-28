@@ -179,3 +179,5 @@ export const mockEvidenceService: IEvidenceService = {
     return mockDb.verifyAndIngestEvidence(tenantId, payload);
   },
 };
+
+export { mockDb };

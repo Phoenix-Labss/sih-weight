@@ -72,44 +72,9 @@ export const mockModels: InstrumentModel[] = [
   },
 ];
 
-export const mockInstruments: Instrument[] = [
-  {
-    instrument_id: 'inst-dl-001',
-    public_instrument_token: 'INST_TOKEN_DL_001',
-    tenant_id: 'tenant-delhi-central',
-    jurisdiction_id: 'jur-dl-01',
-    model_id: 'MOD-NAWI-01',
-    owner_id: 'usr-trader-01',
-    facility_id: 'fac-retail-01',
-    serial_number: 'SN-2026-DL-9941',
-    year_of_manufacture: 2024,
-    intended_use: 'Retail Supermarket Counter Trade Weighing',
-    installation_location_notes: 'Main Checkout Counter 1, Chandni Chowk, Delhi',
-    current_status: 'UNVERIFIED',
-    verification_due_date: '2026-09-30',
-    model: mockModels[0],
-    components: [],
-    created_at: '2026-08-24T10:00:00Z',
-  },
-];
+export const mockInstruments: Instrument[] = [];
 
-export const mockApplications: Application[] = [
-  {
-    application_id: 'app-dl-2026-00142',
-    application_number: 'APP-2026-DL-00142',
-    tenant_id: 'tenant-delhi-central',
-    jurisdiction_id: 'jur-dl-01',
-    instrument_id: 'inst-dl-001',
-    applicant_id: 'usr-trader-01',
-    application_type: 'INITIAL_VERIFICATION',
-    service_mode: 'ON_SITE',
-    preferred_verification_date: '2026-08-28',
-    current_status: 'DRAFT',
-    applicant_declaration_accepted: true,
-    version: 1,
-    created_at: '2026-08-24T10:00:00Z',
-  },
-];
+export const mockApplications: Application[] = [];
 
 export const mockSessions: VerificationSession[] = [];
 

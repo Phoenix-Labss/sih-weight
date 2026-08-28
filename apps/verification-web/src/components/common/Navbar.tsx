@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Scale, ShieldCheck, QrCode, UserCheck, Building2, LogOut, Menu, X } from 'lucide-react';
+import { Scale, ShieldCheck, QrCode, UserCheck, Building2, LogOut, Menu, X, RotateCcw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../i18n';
 import { TabId } from '../../App';
+import { api } from '../../api/client';
 
 interface NavbarProps {
   activeTab: TabId;
@@ -92,8 +93,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, allowed
             <span className="text-slate-400">{user?.actorName}</span>
           </div>
           <button
+            onClick={() => {
+              if (window.confirm('Reset all demo & verification data back to a completely clean slate?')) {
+                api.system.resetAllData();
+              }
+            }}
+            className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors border border-slate-700 cursor-pointer"
+            title="Wipe mock database and reset to clean state"
+          >
+            <RotateCcw className="h-3.5 w-3.5 text-amber-400" />
+            <span>Reset Data</span>
+          </button>
+          <button
             onClick={onLogout}
-            className="inline-flex items-center gap-1 rounded-lg bg-red-700/80 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-red-600 transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg bg-red-700/80 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-red-600 transition-colors cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">{t.logoutButton}</span>

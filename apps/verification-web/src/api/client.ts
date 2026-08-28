@@ -27,6 +27,7 @@ import {
   mockStampService,
   mockVerificationService,
   mockEvidenceService,
+  mockDb,
 } from './mock/mockService';
 import {
   httpApplicationService,
@@ -185,4 +186,15 @@ export const api = {
   certificates: createProxy(mockCertificateService, httpCertificateService),
   publicVerify: createProxy(mockPublicVerifyService, httpPublicVerifyService),
   evidence: createProxy(mockEvidenceService, httpEvidenceService),
+  system: {
+    resetAllData: () => {
+      mockDb.resetToDefaults();
+      try {
+        localStorage.clear();
+      } catch {
+        // ignore
+      }
+      window.location.reload();
+    },
+  },
 };

@@ -85,8 +85,23 @@ export const TraderDashboard: React.FC = () => {
   // screen; the issued certificate remains available below in the quick table.
   const visibleApplications = applications.filter((a) => a.current_status !== 'COMPLETED');
   const pendingFees = applications
-    .filter((a) => a.fee_assessment && a.fee_assessment.payment_status === 'PAYMENT_PENDING')
-    .reduce((sum, a) => sum + (a.fee_assessment?.total_assessed_amount || 0), 0);
+    .filter(
+      (a) =>
+        (a.fee_assessment && a.fee_assessment.payment_status === 'PAYMENT_PENDING') ||
+        a.current_status === 'FEE_PENDING' ||
+        a.current_status === 'ACCEPTED' ||
+        a.current_status === 'PAYMENT_PROCESSING'
+    )
+    .filter(
+      (a) =>
+        a.current_status !== 'FEE_PAID' &&
+        a.current_status !== 'PAYMENT_RECONCILED' &&
+        a.current_status !== 'SCHEDULED' &&
+        a.current_status !== 'VERIFICATION_IN_PROGRESS' &&
+        a.current_status !== 'COMPLETED' &&
+        a.current_status !== 'REJECTED'
+    )
+    .reduce((sum, a) => sum + (a.fee_assessment?.total_assessed_amount || 800), 0);
   const dueInstruments = instruments.filter(
     (i) => i.current_status === 'VERIFICATION_DUE' || i.current_status === 'OVERDUE'
   ).length;

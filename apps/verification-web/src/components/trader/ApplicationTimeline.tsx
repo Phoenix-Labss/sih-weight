@@ -120,15 +120,13 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           application.fee_assessment.payment_status === 'SUCCESS')
     );
 
-  // Statutory fee payment is only possible after the officer has scrutinized
-  // and assessed the fee (ACCEPTED/FEE_PENDING). A lingering PAYMENT_PENDING
-  // assessment on an earlier-stage application must not surface Pay actions.
+  // Statutory fee payment is possible once the application is in FEE_PENDING,
+  // ACCEPTED, or PAYMENT_PROCESSING state.
   const isFeePending =
     !isPaid &&
     (currentStatus === 'FEE_PENDING' ||
       currentStatus === 'ACCEPTED' ||
-      currentStatus === 'PAYMENT_PROCESSING') &&
-    Boolean(application.fee_assessment);
+      currentStatus === 'PAYMENT_PROCESSING');
 
   // Scrutiny, scheduling, and testing are officer actions; guide officers
   // directly there. Consumers (OWNER/APPLICANT) cannot access the Officer
@@ -244,11 +242,24 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       )}
 
       {isFeePending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />
-            <span className="font-bold">Statutory Fee Assessed:</span> Statutory fee of <span className="font-bold text-slate-900">{formatCurrency(application.fee_assessment?.total_assessed_amount || 750)}</span> is pending payment. Use the <span className="font-bold text-slate-900">Pay Fees</span> button above to complete the treasury transaction.
+            <div>
+              <span className="font-bold">Statutory Fee Assessed:</span> Statutory fee of{' '}
+              <span className="font-bold text-slate-900">
+                {formatCurrency(application.fee_assessment?.total_assessed_amount || 800)}
+              </span>{' '}
+              is pending payment. Complete the treasury transaction to proceed to scheduling.
+            </div>
           </div>
+          <button
+            onClick={() => onOpenPaymentModal(application)}
+            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-xs transition-colors shrink-0 flex items-center gap-1.5 self-end sm:self-auto cursor-pointer"
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            <span>Pay Fees ({formatCurrency(application.fee_assessment?.total_assessed_amount || 800)})</span>
+          </button>
         </div>
       )}
 

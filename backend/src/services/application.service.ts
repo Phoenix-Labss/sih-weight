@@ -276,6 +276,22 @@ export class ApplicationService {
           where: { fee_assessment_id: app.fee_assessment_id },
           data: { payment_status: 'PAYMENT_PENDING' },
         });
+      } else {
+        const newFee = await prisma.feeAssessment.create({
+          data: {
+            tenant_id: tenantId,
+            base_verification_fee: 750.0,
+            user_charge: 50.0,
+            late_fee: 0.0,
+            total_assessed_amount: 800.0,
+            policy_version: 'POL-FEES-2026.1',
+            payment_status: 'PAYMENT_PENDING',
+          },
+        });
+        await prisma.verificationApplication.update({
+          where: { application_id: app.application_id },
+          data: { fee_assessment_id: newFee.fee_assessment_id },
+        });
       }
     } else if (input.action === 'QUERY') {
       activeQuery = input.query_text || input.notes || 'Additional clarification required for submitted specifications';
@@ -449,6 +465,26 @@ export class ApplicationService {
           payment_gateway_ref: gatewayRef,
           paid_at: new Date(),
         },
+      });
+    } else {
+      const newFee = await prisma.feeAssessment.create({
+        data: {
+          tenant_id: tenantId,
+          base_verification_fee: 750.0,
+          user_charge: 50.0,
+          late_fee: 0.0,
+          total_assessed_amount: 800.0,
+          policy_version: 'POL-FEES-2026.1',
+          payment_status: 'PAYMENT_RECONCILED',
+          receipt_number: receiptNum,
+          treasury_challan_number: challanNum,
+          payment_gateway_ref: gatewayRef,
+          paid_at: new Date(),
+        },
+      });
+      await prisma.verificationApplication.update({
+        where: { application_id: app.application_id },
+        data: { fee_assessment_id: newFee.fee_assessment_id },
       });
     }
 

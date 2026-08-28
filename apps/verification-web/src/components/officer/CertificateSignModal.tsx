@@ -13,6 +13,7 @@ interface CertificateSignModalProps {
   onClose: () => void;
   session: VerificationSession | null;
   onCertificateIssued: (cert: Certificate) => void;
+  onNavigateToLedger?: () => void;
 }
 
 export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
@@ -20,6 +21,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
   onClose,
   session,
   onCertificateIssued,
+  onNavigateToLedger,
 }) => {
   const { user } = useAuth();
   const { notify } = useNotification();
@@ -109,6 +111,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
       onCertificateIssued(issuedCert);
     }
     onClose();
+    onNavigateToLedger?.();
   };
 
   return (

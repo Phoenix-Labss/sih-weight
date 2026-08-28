@@ -63,13 +63,13 @@ export const OfficerWorkspace: React.FC = () => {
       setSessions(sessRes.items);
       setCertificates(certRes.items);
 
-      if (sessRes.items.length > 0 && !selectedSessionId) {
-        const firstWorkSession = sessRes.items.find(
+      // Automatically advance selectedSessionId away from completed & certified sessions
+      const isSelectedSessionCertified = certRes.items.some((c) => c.session_id === selectedSessionId);
+      if (!selectedSessionId || isSelectedSessionCertified) {
+        const remainingWorkSession = sessRes.items.find(
           (s) => !(s.status === 'FINALIZED' && certRes.items.some((c) => c.session_id === s.session_id))
         );
-        if (firstWorkSession) {
-          setSelectedSessionId(firstWorkSession.session_id);
-        }
+        setSelectedSessionId(remainingWorkSession ? remainingWorkSession.session_id : '');
       }
     } catch (err) {
       console.error('Failed to load officer data:', err);

@@ -835,6 +835,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           onCertificateIssued?.(cert);
           onSessionUpdated({ ...session, status: 'FINALIZED' });
         }}
+        onNavigateToLedger={onNavigateToLedger}
       />
 
       <CertificateModal

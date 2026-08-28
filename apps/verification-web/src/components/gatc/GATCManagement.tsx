@@ -8,6 +8,7 @@ import { mockDb } from '../../api/mock/mockService';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { useApiMode } from '../../context/ApiModeContext';
+import { ScrutinyQueue } from '../officer/ScrutinyQueue';
 import { TestObservationGrid } from '../officer/TestObservationGrid';
 import { CertificateModal } from '../trader/CertificateModal';
 import { WorksheetModal } from '../officer/WorksheetModal';
@@ -21,6 +22,7 @@ import {
   Lock,
   Calendar,
   CheckCircle2,
+  FileCheck2,
   Microscope,
   Layers,
 } from 'lucide-react';
@@ -107,7 +109,7 @@ export const GATCManagement: React.FC = () => {
   const { user } = useAuth();
   const { notify } = useNotification();
   const { mode, version: apiVersion } = useApiMode();
-  const [activeTab, setActiveTab] = useState<'testing' | 'standards' | 'ledger'>('testing');
+  const [activeTab, setActiveTab] = useState<'intake' | 'testing' | 'standards' | 'ledger'>('intake');
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [instruments, setInstruments] = useState<Instrument[]>([]);
@@ -159,6 +161,11 @@ export const GATCManagement: React.FC = () => {
     (c) => c.issuer_type === 'GATC' || c.certificate_number.startsWith('GATC-')
   );
 
+  // Pending Scrutiny / Intake applications (action required: scrutiny, scope check, deficiency query, or scheduling)
+  const pendingIntakeApps = applications.filter(
+    (a) => a.current_status !== 'COMPLETED' && a.current_status !== 'REJECTED'
+  );
+
   // Active testing workload: sessions available for GATC testing
   const activeWorkSessions = sessions.filter(
     (s) => !(s.status === 'FINALIZED' && certificates.some((c) => c.session_id === s.session_id))
@@ -169,6 +176,38 @@ export const GATCManagement: React.FC = () => {
   const activeSessionInst = activeSession ? instruments.find((i) => i.instrument_id === (activeSession.instrument_id || activeSessionApp?.instrument_id)) : null;
   const activeSessionCert = activeSession ? certificates.find((c) => c.session_id === activeSession.session_id) : null;
 
+  const handleSelectSessionForTesting = async (appId: string) => {
+    let matchedSession = sessions.find((s) => s.application_id === appId && s.status !== 'FINALIZED');
+    if (!matchedSession) {
+      matchedSession = sessions.find((s) => s.application_id === appId);
+    }
+    if (!matchedSession) {
+      const app = applications.find((a) => a.application_id === appId);
+      if (app) {
+        matchedSession = sessions.find((s) => s.instrument_id === app.instrument_id && s.status !== 'FINALIZED');
+        if (!matchedSession) {
+          try {
+            matchedSession = await api.verification.createSession(user.tenantId, {
+              application_id: app.application_id,
+              instrument_id: app.instrument_id,
+              scheduled_date: new Date().toISOString().split('T')[0],
+            });
+            await loadData();
+          } catch (e) {
+            console.error('Failed to auto-create session for GATC testing:', e);
+          }
+        }
+      }
+    }
+
+    if (matchedSession) {
+      setSelectedSessionId(matchedSession.session_id);
+    } else if (activeWorkSessions.length > 0) {
+      setSelectedSessionId(activeWorkSessions[0].session_id);
+    }
+    setActiveTab('testing');
+  };
+
   return (
     <div className="space-y-6">
       {/* GATC Verified Header Card */}
@@ -177,7 +216,7 @@ export const GATCManagement: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
               <Microscope className="w-6 h-6 text-indigo-400" />
-              <h2 className="text-xl font-bold tracking-tight">Government Approved Test Centre (GATC) Portal</h2>
+              <h2 className="text-xl font-bold tracking-tight">Government Approved Test Centre (GATC) Console</h2>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 GATC RULES, 2013 ACCREDITED
               </span>
@@ -196,8 +235,20 @@ export const GATCManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      {/* Tab Navigation (Matching LMO Structure + GATC Standards Registry) */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 flex-wrap">
+        <button
+          onClick={() => setActiveTab('intake')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+            activeTab === 'intake'
+              ? 'bg-gov-navy text-white shadow-xs'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <FileCheck2 className="w-4 h-4 text-amber-400" />
+          <span>Application Intake &amp; Lab Scheduling Queue ({pendingIntakeApps.length} Pending)</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('testing')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
@@ -207,19 +258,19 @@ export const GATCManagement: React.FC = () => {
           }`}
         >
           <Scale className="w-4 h-4 text-indigo-300" />
-          <span>GATC Verification Testing Console ({activeWorkSessions.length} Active Workload)</span>
+          <span>Guided NAWI Testing Session Execution ({activeWorkSessions.length} Active Workload)</span>
         </button>
 
         <button
           onClick={() => setActiveTab('standards')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'standards'
-              ? 'bg-gov-navy text-white shadow-xs'
+              ? 'bg-slate-800 text-white shadow-xs'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Building2 className="w-4 h-4 text-amber-400" />
-          <span>GATC Accreditation &amp; Working Standards ({mockWorkingStandards.length})</span>
+          <span>Accreditation Scope &amp; Working Standards ({mockWorkingStandards.length})</span>
         </button>
 
         <button
@@ -231,11 +282,23 @@ export const GATCManagement: React.FC = () => {
           }`}
         >
           <Award className="w-4 h-4 text-blue-300" />
-          <span>GATC Test Certificates &amp; Reports Ledger ({gatcCertificates.length})</span>
+          <span>Issued GATC Test Reports &amp; Certificates Ledger ({gatcCertificates.length})</span>
         </button>
       </div>
 
-      {/* Tab 1: GATC Testing Execution */}
+      {/* Tab 1: GATC Application Intake & Scrutiny Queue */}
+      {activeTab === 'intake' && (
+        <ScrutinyQueue
+          applications={applications}
+          instruments={instruments}
+          certificates={certificates}
+          sessions={sessions}
+          onApplicationUpdated={loadData}
+          onSelectSessionForTesting={handleSelectSessionForTesting}
+        />
+      )}
+
+      {/* Tab 2: Guided NAWI Testing Execution */}
       {activeTab === 'testing' && (
         <div className="space-y-4">
           {/* Active Testing Queue Picker */}
@@ -267,7 +330,7 @@ export const GATCManagement: React.FC = () => {
                     );
                   })
                 ) : (
-                  <option value="">No pending instruments assigned for GATC testing</option>
+                  <option value="">No pending instruments assigned for GATC testing — Queue clear</option>
                 )}
               </select>
             </div>
@@ -295,7 +358,7 @@ export const GATCManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 2: GATC Accreditation & Working Standards Registry */}
+      {/* Tab 3: GATC Accreditation & Working Standards Registry */}
       {activeTab === 'standards' && (
         <div className="space-y-6">
           {/* GATC Accreditations Scope Card */}
@@ -408,7 +471,7 @@ export const GATCManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 3: GATC Test Certificates & Reports Ledger */}
+      {/* Tab 4: GATC Test Certificates & Reports Ledger */}
       {activeTab === 'ledger' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">

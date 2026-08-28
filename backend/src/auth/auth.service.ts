@@ -29,6 +29,8 @@ export interface RegisterInput {
   password: string;
   fullName: string;
   phone: string;
+  panNumber?: string; // Compulsory PAN (Permanent Account Number)
+  gstNumber?: string; // Optional GSTIN
   // Optional Business / Legal Metrology entity details
   legalName?: string;
   tradeName?: string;
@@ -170,21 +172,34 @@ export class AuthService {
       throw new ValidationError('A valid 10-digit Indian mobile number is required', 'INVALID_PHONE');
     }
 
-    // Optional GSTIN / PAN validation
-    let identifierType = input.identifierType;
-    let identifierValue = input.identifierValue?.trim().toUpperCase();
-    if (identifierValue) {
-      if (identifierType === 'GSTIN' || (!identifierType && identifierValue.length === 15)) {
-        identifierType = 'GSTIN';
-        if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(identifierValue)) {
-          throw new ValidationError('Invalid Indian GSTIN format (e.g. 07AAAAA0000A1Z5)', 'INVALID_GSTIN');
-        }
-      } else if (identifierType === 'PAN' || (!identifierType && identifierValue.length === 10)) {
-        identifierType = 'PAN';
-        if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(identifierValue)) {
-          throw new ValidationError('Invalid Indian PAN format (e.g. ABCDE1234F)', 'INVALID_PAN');
-        }
+    // 1. Compulsory PAN validation (Mandatory for every establishment/trader)
+    const rawPan = (
+      input.panNumber ||
+      (input.identifierType === 'PAN' ? input.identifierValue : undefined) ||
+      (input.identifierValue?.length === 10 ? input.identifierValue : undefined)
+    )?.trim().toUpperCase();
+
+    if (!rawPan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(rawPan)) {
+      throw new ValidationError(
+        'A valid 10-character Indian PAN number is compulsory for establishment registration (e.g. ABCDE1234F).',
+        'INVALID_PAN'
+      );
+    }
+    const panNumber = rawPan;
+
+    // 2. Optional GSTIN validation (Optional for small businesses & unorganized retail)
+    const rawGst = (
+      input.gstNumber ||
+      (input.identifierType === 'GSTIN' ? input.identifierValue : undefined) ||
+      (input.identifierValue?.length === 15 ? input.identifierValue : undefined)
+    )?.trim().toUpperCase();
+
+    let gstNumber: string | undefined = undefined;
+    if (rawGst) {
+      if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(rawGst)) {
+        throw new ValidationError('Invalid Indian GSTIN format (e.g. 07AAAAA0000A1Z5)', 'INVALID_GSTIN');
       }
+      gstNumber = rawGst;
     }
 
     // Optional Pincode validation
@@ -202,17 +217,29 @@ export class AuthService {
       throw new ConflictError('An account with this email address is already registered. Please sign in.', 'EMAIL_EXISTS');
     }
 
-    // Check duplicate identifier if provided
-    if (identifierValue && identifierType) {
-      const existingStakeholder = await prisma.stakeholder.findFirst({
+    // Check duplicate PAN in tenant
+    const existingPan = await prisma.stakeholder.findFirst({
+      where: {
+        tenant_id: tenantId,
+        identifier_type: 'PAN',
+        identifier_value: panNumber,
+      },
+    });
+    if (existingPan) {
+      throw new ConflictError(`A business with this PAN (${panNumber}) is already registered.`, 'IDENTIFIER_EXISTS');
+    }
+
+    // Check duplicate GSTIN if provided
+    if (gstNumber) {
+      const existingGst = await prisma.stakeholder.findFirst({
         where: {
           tenant_id: tenantId,
-          identifier_type: identifierType,
-          identifier_value: identifierValue,
+          identifier_type: 'GSTIN',
+          identifier_value: gstNumber,
         },
       });
-      if (existingStakeholder) {
-        throw new ConflictError(`A business with this ${identifierType} (${identifierValue}) is already registered.`, 'IDENTIFIER_EXISTS');
+      if (existingGst) {
+        throw new ConflictError(`A business with this GSTIN (${gstNumber}) is already registered.`, 'IDENTIFIER_EXISTS');
       }
     }
 
@@ -229,8 +256,8 @@ export class AuthService {
           legal_name: legalName,
           trade_name: tradeName,
           stakeholder_type: stakeholderType,
-          identifier_type: identifierType || null,
-          identifier_value: identifierValue || null,
+          identifier_type: 'PAN',
+          identifier_value: panNumber,
           email,
           phone: tenDigitPhone,
           address_line1: input.addressLine1?.trim() || 'Establishment Address',

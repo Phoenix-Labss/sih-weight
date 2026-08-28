@@ -18,6 +18,8 @@ export interface RegisterPayload {
   password: string;
   fullName: string;
   phone: string;
+  panNumber: string; // Compulsory PAN (Permanent Account Number)
+  gstNumber?: string; // Optional GSTIN
   legalName?: string;
   tradeName?: string;
   stakeholderType?: 'OWNER_USER' | 'MANUFACTURER' | 'DEALER' | 'REPAIRER';

@@ -7,16 +7,14 @@ import {
   Shield,
   User,
   Mail,
-  Phone,
   Lock,
   MapPin,
-  FileText,
   AlertCircle,
   ArrowRight,
   ArrowLeft,
   Store,
-  Sparkles,
-  Info,
+  CreditCard,
+  FileCheck,
 } from 'lucide-react';
 
 interface RegisterModalProps {
@@ -36,19 +34,21 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form State
+  // Form State - Step 1
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Form State - Step 2 (KYC: Compulsory PAN + Optional GSTIN)
   const [stakeholderType, setStakeholderType] = useState<'OWNER_USER' | 'MANUFACTURER' | 'DEALER' | 'REPAIRER'>('OWNER_USER');
-  const [legalName, setLegalName] = useState('');
   const [tradeName, setTradeName] = useState('');
-  const [identifierType, setIdentifierType] = useState<'NONE' | 'GSTIN' | 'PAN' | 'TRADE_LICENSE'>('NONE');
-  const [identifierValue, setIdentifierValue] = useState('');
+  const [legalName, setLegalName] = useState('');
+  const [panNumber, setPanNumber] = useState('');
+  const [gstNumber, setGstNumber] = useState('');
 
+  // Form State - Step 3
   const [addressLine1, setAddressLine1] = useState('');
   const [city, setCity] = useState('New Delhi');
   const [district, setDistrict] = useState('Central Delhi');
@@ -68,6 +68,14 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   const cleanPhone = phone.replace(/[\s\-\+]/g, '');
   const isPhoneValid = /^[6-9]\d{9}$/.test(cleanPhone.slice(-10));
 
+  // PAN validation (Compulsory: 10 chars, 5 letters + 4 digits + 1 letter)
+  const cleanPan = panNumber.trim().toUpperCase();
+  const isPanValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(cleanPan);
+
+  // GSTIN validation (Optional: if entered, must be 15 chars standard format)
+  const cleanGst = gstNumber.trim().toUpperCase();
+  const isGstValid = !cleanGst || /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(cleanGst);
+
   // Pincode validation
   const isPincodeValid = /^[1-9][0-9]{5}$/.test(pincode.trim());
 
@@ -79,10 +87,11 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     isPasswordStrong &&
     isPasswordMatch;
 
-  // Step 2 Validation
+  // Step 2 Validation: PAN is compulsory, GSTIN is optional
   const canProceedStep2 =
-    (tradeName.trim().length > 0 || legalName.trim().length > 0 || fullName.trim().length > 0) &&
-    (identifierType === 'NONE' || identifierValue.trim().length >= 5);
+    (tradeName.trim().length > 0 || fullName.trim().length > 0) &&
+    isPanValid &&
+    isGstValid;
 
   // Step 3 Validation
   const canSubmit =
@@ -102,8 +111,12 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
       if (!tradeName && fullName) setTradeName(fullName);
       setStep(2);
     } else if (step === 2) {
-      if (!canProceedStep2) {
-        setError('Please provide business details.');
+      if (!isPanValid) {
+        setError('Permanent Account Number (PAN) is compulsory. Please enter a valid 10-character PAN (e.g. ABCDE1234F).');
+        return;
+      }
+      if (!isGstValid) {
+        setError('Invalid GSTIN format. Please enter a 15-character GST number or leave it blank.');
         return;
       }
       setStep(3);
@@ -131,11 +144,11 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         password,
         fullName: fullName.trim(),
         phone: cleanPhone.slice(-10),
-        legalName: (legalName.trim() || tradeName.trim() || fullName.trim()),
-        tradeName: (tradeName.trim() || legalName.trim() || fullName.trim()),
+        panNumber: cleanPan,
+        gstNumber: cleanGst || undefined,
+        legalName: legalName.trim() || tradeName.trim() || fullName.trim(),
+        tradeName: tradeName.trim() || legalName.trim() || fullName.trim(),
         stakeholderType,
-        identifierType: identifierType !== 'NONE' ? identifierType : undefined,
-        identifierValue: identifierType !== 'NONE' && identifierValue.trim() ? identifierValue.trim().toUpperCase() : undefined,
         addressLine1: addressLine1.trim(),
         city: city.trim(),
         district: district.trim(),
@@ -176,7 +189,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
           </div>
           <div className="hidden sm:block text-right">
             <span className="text-[10px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30 uppercase">
-              Form LM-1 / LM-2
+              Section 24 / Schedule IX
             </span>
           </div>
         </div>
@@ -194,7 +207,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= 2 ? 'bg-gov-navy text-white' : 'bg-slate-200 text-slate-600'}`}>
               2
             </span>
-            <span className="text-xs">Business & KYC</span>
+            <span className="text-xs">PAN & Business KYC</span>
           </div>
           <div className={`h-0.5 flex-1 mx-3 ${step >= 3 ? 'bg-gov-navy' : 'bg-slate-200'}`} />
           <div className={`flex items-center gap-2 ${step >= 3 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
@@ -339,16 +352,16 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             </div>
           )}
 
-          {/* STEP 2: Business & KYC Particulars */}
+          {/* STEP 2: Business & Statutory KYC (PAN is compulsory, GSTIN is optional) */}
           {step === 2 && (
             <div className="space-y-3.5 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <Store className="w-3.5 h-3.5 text-gov-blue" />
-                  <span>Business & Establishment Profile</span>
+                  <span>Business & Statutory KYC Information</span>
                 </h4>
-                <span className="text-[10px] text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded font-semibold border border-emerald-300">
-                  GSTIN Optional for Small Traders
+                <span className="text-[10px] text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded font-bold border border-amber-300">
+                  PAN is Compulsory • GSTIN is Optional
                 </span>
               </div>
 
@@ -368,7 +381,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     }`}
                   >
                     <span className="text-xs">Commercial Trader / Scale User</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Kirana, Mart, Retail, Warehouse</span>
+                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Kirana, Retail, Mart, Mandi, Factory</span>
                   </button>
 
                   <button
@@ -442,48 +455,81 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 </div>
               </div>
 
-              {/* Business Identifier KYC (Optional) */}
-              <div className="pt-2 border-t border-slate-200/80 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-medium text-slate-700">
-                    Statutory Business Identifier (Optional)
-                  </label>
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <Info className="w-3.5 h-3.5" />
-                    <span>Select if registered with Tax/Municipal auth</span>
-                  </span>
+              {/* Statutory KYC: Compulsory PAN & Optional GSTIN */}
+              <div className="pt-2 border-t border-slate-200 space-y-3">
+                {/* 1. Compulsory PAN Field */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <CreditCard className="w-3.5 h-3.5 text-gov-blue" />
+                      <span>Permanent Account Number (PAN) *</span>
+                    </label>
+                    <span className="text-[10px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-bold border border-rose-200">
+                      Compulsory
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    maxLength={10}
+                    placeholder="e.g. ABCDE1234F"
+                    value={panNumber}
+                    onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
+                    className={`w-full text-xs font-mono font-bold uppercase rounded-lg border px-3 py-2 bg-white focus:ring-2 ${
+                      panNumber && !isPanValid
+                        ? 'border-rose-400 focus:ring-rose-500'
+                        : isPanValid
+                        ? 'border-emerald-400 focus:ring-emerald-500'
+                        : 'border-slate-300 focus:ring-gov-blue'
+                    }`}
+                  />
+                  <div className="flex items-center justify-between mt-1 text-[10px]">
+                    <span className="text-slate-500">
+                      10-character PAN of the business entity or authorized proprietor.
+                    </span>
+                    {panNumber && (
+                      <span className={isPanValid ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
+                        {isPanValid ? '✓ Valid PAN format' : '✗ Must be 5 letters + 4 numbers + 1 letter'}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <select
-                    value={identifierType}
-                    onChange={(e) => {
-                      setIdentifierType(e.target.value as any);
-                      if (e.target.value === 'NONE') setIdentifierValue('');
-                    }}
-                    className="text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
-                  >
-                    <option value="NONE">No GSTIN / Small Unregistered Business</option>
-                    <option value="GSTIN">GSTIN (Goods & Services Tax)</option>
-                    <option value="PAN">PAN (Income Tax PAN)</option>
-                    <option value="TRADE_LICENSE">Municipal Trade License</option>
-                  </select>
-
-                  {identifierType !== 'NONE' && (
-                    <input
-                      type="text"
-                      placeholder={
-                        identifierType === 'GSTIN'
-                          ? 'e.g. 07AAAAA0000A1Z5 (15-digit)'
-                          : identifierType === 'PAN'
-                          ? 'e.g. ABCDE1234F (10-digit)'
-                          : 'e.g. MCD/TL/2026/9942'
-                      }
-                      value={identifierValue}
-                      onChange={(e) => setIdentifierValue(e.target.value.toUpperCase())}
-                      className="text-xs font-mono font-bold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue uppercase"
-                    />
-                  )}
+                {/* 2. Optional GSTIN Field */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-slate-700 flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-slate-400" />
+                      <span>GST Number (GSTIN) (Optional)</span>
+                    </label>
+                    <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
+                      Optional (Not Mandatory)
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    placeholder="e.g. 07AAAAA0000A1Z5 (Leave blank if not registered)"
+                    value={gstNumber}
+                    onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                    className={`w-full text-xs font-mono font-bold uppercase rounded-lg border px-3 py-2 bg-white focus:ring-2 ${
+                      gstNumber && !isGstValid
+                        ? 'border-rose-400 focus:ring-rose-500'
+                        : gstNumber && isGstValid
+                        ? 'border-emerald-400 focus:ring-emerald-500'
+                        : 'border-slate-300 focus:ring-gov-blue'
+                    }`}
+                  />
+                  <div className="flex items-center justify-between mt-1 text-[10px]">
+                    <span className="text-slate-500">
+                      Small vendors & kirana stores below the GST threshold may leave this blank.
+                    </span>
+                    {gstNumber && (
+                      <span className={isGstValid ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
+                        {isGstValid ? '✓ Valid GSTIN format' : '✗ 15-character GST format required'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -571,7 +617,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     className="mt-0.5 rounded border-amber-300 text-gov-navy focus:ring-gov-blue"
                   />
                   <span className="text-[11px] text-amber-950 leading-relaxed font-medium">
-                    I hereby solemnly declare and affirm that the particulars stated above are true and accurate. I undertake to submit all weighing and measuring instruments in my possession for statutory verification under Section 24 of The Legal Metrology Act, 2009.
+                    I hereby solemnly declare and affirm that the particulars stated above (including PAN {cleanPan || '...'}) are true and accurate. I undertake to submit all weighing and measuring instruments in my possession for statutory verification under Section 24 of The Legal Metrology Act, 2009.
                   </span>
                 </label>
               </div>

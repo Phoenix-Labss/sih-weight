@@ -90,10 +90,12 @@ describe('Auth Suite', () => {
   describe('POST register (Government & Small Business Trader Registration)', () => {
     const randomSuffix = Math.floor(100000 + Math.random() * 900000);
     const testEmail = `trader_${randomSuffix}_${Date.now()}@delhitraders.org`;
+    const testPan = `ABCDE${Math.floor(1000 + Math.random() * 9000)}F`;
+    const testSmallVendorPan = `WXYZK${Math.floor(1000 + Math.random() * 9000)}M`;
     const testGstin = `07AAAAA${Math.floor(1000 + Math.random() * 9000)}A1Z5`;
     const testSmallVendorEmail = `kirana_${randomSuffix}_${Date.now()}@delhishop.in`;
 
-    it('successfully registers commercial trader with GSTIN and returns active session', async () => {
+    it('successfully registers commercial trader with compulsory PAN and optional GSTIN', async () => {
       const res = await app.inject({
         method: 'POST',
         url: L + '/register',
@@ -102,11 +104,11 @@ describe('Auth Suite', () => {
           password: 'SecureTrader@2026',
           fullName: 'Vikram Malhotra',
           phone: '9811002233',
+          panNumber: testPan,
+          gstNumber: testGstin,
           legalName: 'Malhotra Weighing Solutions Pvt Ltd',
           tradeName: 'Malhotra Scales & Weighing Co',
           stakeholderType: 'OWNER_USER',
-          identifierType: 'GSTIN',
-          identifierValue: testGstin,
           addressLine1: 'Shop 42, Chandni Chowk Market',
           city: 'New Delhi',
           district: 'Central Delhi',
@@ -127,7 +129,7 @@ describe('Auth Suite', () => {
       expect(cookies['lm_csrf']).toBeTruthy();
     });
 
-    it('successfully registers small vendor/kirana store without mandatory GSTIN', async () => {
+    it('successfully registers small vendor/kirana store with compulsory PAN but NO GSTIN', async () => {
       const res = await app.inject({
         method: 'POST',
         url: L + '/register',
@@ -136,6 +138,7 @@ describe('Auth Suite', () => {
           password: 'KiranaShop@2026',
           fullName: 'Ramesh Kumar',
           phone: '9876543210',
+          panNumber: testSmallVendorPan, // PAN is compulsory
           tradeName: 'Ramesh Kirana Store',
           addressLine1: 'Plot 12, Subzi Mandi',
           city: 'New Delhi',
@@ -150,6 +153,37 @@ describe('Auth Suite', () => {
       expect(body.user.role).toBe('OWNER');
     });
 
+    it('rejects registration without compulsory PAN', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: L + '/register',
+        payload: {
+          email: `nopan_${Date.now()}@example.com`,
+          password: 'ValidPassword@2026',
+          fullName: 'No PAN User',
+          phone: '9811002233',
+        },
+      });
+      expect(res.statusCode).toBe(422);
+      expect(JSON.parse(res.body).errorCode).toBe('INVALID_PAN');
+    });
+
+    it('rejects registration with invalid PAN format', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: L + '/register',
+        payload: {
+          email: `badpan_${Date.now()}@example.com`,
+          password: 'ValidPassword@2026',
+          fullName: 'Bad PAN User',
+          phone: '9811002233',
+          panNumber: '12345BADPAN',
+        },
+      });
+      expect(res.statusCode).toBe(422);
+      expect(JSON.parse(res.body).errorCode).toBe('INVALID_PAN');
+    });
+
     it('rejects registration with weak password (CERT-In compliance)', async () => {
       const res = await app.inject({
         method: 'POST',
@@ -159,6 +193,7 @@ describe('Auth Suite', () => {
           password: 'weakpassword',
           fullName: 'Weak Pass User',
           phone: '9811002233',
+          panNumber: 'ABCDE9999Z',
         },
       });
       expect(res.statusCode).toBe(422);
@@ -174,6 +209,7 @@ describe('Auth Suite', () => {
           password: 'ValidPassword@2026',
           fullName: 'Bad Phone User',
           phone: '12345',
+          panNumber: 'ABCDE9999Z',
         },
       });
       expect(res.statusCode).toBe(422);
@@ -189,8 +225,8 @@ describe('Auth Suite', () => {
           password: 'ValidPassword@2026',
           fullName: 'Bad GSTIN User',
           phone: '9811002233',
-          identifierType: 'GSTIN',
-          identifierValue: 'INVALID-GST-NUMBER',
+          panNumber: 'ABCDE9999Z',
+          gstNumber: 'INVALID-GST-NUMBER',
         },
       });
       expect(res.statusCode).toBe(422);
@@ -206,6 +242,7 @@ describe('Auth Suite', () => {
           password: 'AnotherPassword@2026',
           fullName: 'Duplicate User',
           phone: '9811002233',
+          panNumber: 'ZZZZZ9999Z',
         },
       });
       expect(res.statusCode).toBe(409);

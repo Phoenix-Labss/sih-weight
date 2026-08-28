@@ -11,6 +11,7 @@ import { api } from '../../api/client';
 import { Certificate } from '../../types/certificate';
 import { CertificateModal } from '../trader/CertificateModal';
 import { PhysicalSerialMatchModal } from './PhysicalSerialMatchModal';
+import { PhysicalStamp } from '../../types/stamp';
 import {
   Scale,
   ShieldCheck,
@@ -64,6 +65,23 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   ]);
   const [tempCelsius, setTempCelsius] = useState<number>(Number(session?.environmental_temp_celsius) || 24.5);
   const [humidityPercent, setHumidityPercent] = useState<number>(Number(session?.environmental_humidity_percent) || 55.0);
+
+  // Physical Stamps Tracking
+  const [recordedStamps, setRecordedStamps] = useState<PhysicalStamp[]>([]);
+
+  const loadStamps = async () => {
+    if (!session) return;
+    try {
+      const stamps = await api.stamps.listSessionStamps(user.tenantId, session.session_id);
+      setRecordedStamps(stamps || []);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    loadStamps();
+  }, [session?.session_id, user.tenantId]);
 
   // Modals
   const [isPhysicalMatchModalOpen, setIsPhysicalMatchModalOpen] = useState(false);
@@ -228,12 +246,12 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           </div>
 
           {/* Step-by-Step Action Ribbon */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             {/* Step 1: PLANNED or IDENTITY_CONFIRMED -> Show Start Test Execution */}
             {(session.status === 'PLANNED' || session.status === 'IDENTITY_CONFIRMED') && (
               <button
                 onClick={handleStartSession}
-                className="px-4 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-colors"
+                className="px-4 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
               >
                 <Play className="w-4 h-4" />
                 <span>Start Test Execution</span>
@@ -248,25 +266,37 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               </div>
             )}
 
-            {/* Step 3: SUBMITTED -> Show Affix Physical Seal and Record Legal Disposition */}
-            {session.status === 'SUBMITTED' && (
-              <>
-                <button
-                  onClick={() => setIsStampModalOpen(true)}
-                  className="px-3.5 py-2 rounded-lg bg-slate-800 text-xs font-semibold text-white hover:bg-slate-900 flex items-center gap-1.5 transition-colors shadow-2xs"
-                >
-                  <Stamp className="w-4 h-4 text-amber-400" />
-                  <span>Affix Physical Seal</span>
-                </button>
+            {/* Physical Seal Action — Remains ALWAYS available for SUBMITTED & FINALIZED sessions */}
+            {(session.status === 'SUBMITTED' || session.status === 'FINALIZED') && (
+              <button
+                type="button"
+                onClick={() => setIsStampModalOpen(true)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
+                  recordedStamps.length > 0
+                    ? 'bg-slate-800 text-white hover:bg-slate-900 border border-slate-700'
+                    : 'bg-amber-600 text-white hover:bg-amber-700 ring-2 ring-amber-400/40'
+                }`}
+                title={recordedStamps.length > 0 ? 'View or add physical security seals' : 'Physical seal required'}
+              >
+                <Stamp className={`w-4 h-4 ${recordedStamps.length > 0 ? 'text-amber-400' : 'text-white'}`} />
+                <span>
+                  {recordedStamps.length > 0
+                    ? `Seal: ${recordedStamps[0].seal_identification_number} (${recordedStamps.length})`
+                    : 'Affix Physical Seal'}
+                </span>
+              </button>
+            )}
 
-                <button
-                  onClick={() => setIsDispositionModalOpen(true)}
-                  className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 transition-colors shadow-2xs"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Record Legal Disposition</span>
-                </button>
-              </>
+            {/* Step 3: SUBMITTED -> Show Record Legal Disposition */}
+            {session.status === 'SUBMITTED' && (
+              <button
+                type="button"
+                onClick={() => setIsDispositionModalOpen(true)}
+                className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Record Legal Disposition</span>
+              </button>
             )}
 
             {/* Step 4: FINALIZED -> Show View Certificate or Sign & Issue */}
@@ -275,7 +305,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 {certificate ? (
                   <button
                     onClick={() => setIsCertViewOpen(true)}
-                    className="px-4 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-colors"
+                    className="px-4 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                   >
                     <Award className="w-4 h-4 text-amber-400" />
                     <span>View Issued Certificate ({certificate.certificate_number})</span>
@@ -283,10 +313,10 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 ) : (
                   <button
                     onClick={() => setIsSignModalOpen(true)}
-                    className="px-4 py-2 rounded-lg bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800 flex items-center gap-1.5 shadow-sm transition-colors"
+                    className="px-4 py-2 rounded-lg bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800 flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
                   >
                     <Lock className="w-4 h-4 text-amber-300" />
-                    <span>Sign & Issue Certificate</span>
+                    <span>Sign &amp; Issue Certificate</span>
                   </button>
                 )}
               </>
@@ -294,188 +324,205 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           </div>
         </div>
 
-        {/* Pre-Inspection Verifications: Standards & Environmental Conditions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          {/* Identity confirmation */}
-          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2">
-            <div className="font-bold text-slate-800 flex items-center justify-between">
-              <span>Instrument Physical Check</span>
-              {serialVerified ? (
-                <span className="text-emerald-600 flex items-center gap-1 font-semibold">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Verified
-                </span>
-              ) : (
-                <span className="text-amber-600 font-semibold">Pending Check</span>
-              )}
+        {/* Pre-Inspection & Post-Inspection Verifications: 4 Grid Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* Card 1: Identity confirmation */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="font-bold text-slate-800 flex items-center justify-between">
+                <span>Physical Identity Check</span>
+                {serialVerified ? (
+                  <span className="text-emerald-600 flex items-center gap-1 font-semibold text-[11px]">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Verified
+                  </span>
+                ) : (
+                  <span className="text-amber-600 font-semibold text-[11px]">Pending Check</span>
+                )}
+              </div>
+              <p className="text-slate-600 text-[11px]">
+                Serial: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'DL-2024-8842'}</span>
+              </p>
+              <p className="text-slate-500 text-[10px]">
+                Class: <strong className="text-slate-700">{accuracyClass}</strong> | Model: {instrument?.model?.model_name || 'NAWI'}
+              </p>
             </div>
-            <p className="text-slate-600 text-[11px]">
-              Serial: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'DL-2024-8842'}</span> | Class: {accuracyClass}
-            </p>
+
             {!serialVerified ? (
               <button
                 type="button"
                 onClick={() => setIsPhysicalMatchModalOpen(true)}
-                className="w-full py-1.5 rounded bg-gov-navy text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                className="w-full py-1.5 rounded bg-gov-navy text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
-                <span>Inspect &amp; Match Physical Serial</span>
+                <span>Inspect &amp; Match Serial</span>
               </button>
             ) : (
-              <div className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 flex items-center justify-between font-semibold">
+              <div className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 flex items-center justify-between font-semibold mt-1">
                 <span className="flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                  <span>Physical Stamping Inspected</span>
+                  <span>Plate Inspected</span>
                 </span>
                 <span className="text-[9px] font-mono bg-emerald-100/70 text-emerald-800 px-1 rounded">MATCHED</span>
               </div>
             )}
           </div>
 
-          {/* Reference standards check */}
-          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2">
-            <div className="font-bold text-slate-800 flex items-center justify-between">
-              <span>Reference Standards Suitability</span>
-              <span className="text-emerald-600 font-semibold text-[10px] uppercase">Calibrated & Valid</span>
-            </div>
-            <div className="space-y-1">
-              {defaultStandardWeights.slice(0, 2).map((std) => (
-                <div key={std.id} className="text-[11px] text-slate-600 flex items-center justify-between">
-                  <span className="truncate">{std.name}</span>
-                  <span className="text-emerald-700 font-mono text-[10px] font-bold">PASS</span>
+          {/* Card 2: Physical Seal & Stamping Status */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="font-bold text-slate-800 flex items-center justify-between">
+                <span>Physical Security Seal</span>
+                {recordedStamps.length > 0 ? (
+                  <span className="text-emerald-600 flex items-center gap-1 font-semibold text-[11px]">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Affixed
+                  </span>
+                ) : (
+                  <span className="text-amber-600 font-semibold text-[11px]">Pending Seal</span>
+                )}
+              </div>
+              {recordedStamps.length > 0 ? (
+                <div className="text-[11px] space-y-0.5">
+                  <div className="font-mono font-bold text-slate-900 truncate">
+                    #{recordedStamps[0].seal_identification_number}
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate">
+                    Pos: {recordedStamps[0].seal_position}
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <p className="text-slate-500 text-[11px]">
+                  Lead wire seal required on calibration port after testing.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsStampModalOpen(true)}
+              className={`w-full py-1.5 rounded text-[11px] font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1 ${
+                recordedStamps.length > 0
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
+                  : 'bg-amber-600 hover:bg-amber-700 text-white'
+              }`}
+            >
+              <Stamp className="w-3.5 h-3.5" />
+              <span>{recordedStamps.length > 0 ? `Manage Seals (${recordedStamps.length})` : 'Affix Physical Seal'}</span>
+            </button>
+          </div>
+
+          {/* Card 3: Reference standards check */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="font-bold text-slate-800 flex items-center justify-between">
+                <span>Reference Standards</span>
+                <span className="text-emerald-600 font-semibold text-[10px] uppercase">Calibrated</span>
+              </div>
+              <div className="space-y-1">
+                {defaultStandardWeights.slice(0, 2).map((std) => (
+                  <div key={std.id} className="text-[10px] text-slate-600 flex items-center justify-between">
+                    <span className="truncate max-w-[130px]">{std.name}</span>
+                    <span className="text-emerald-700 font-mono text-[9px] font-bold">PASS</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="text-[10px] text-slate-400 font-mono text-right">
+              Traceability: RRSL / NPL
             </div>
           </div>
 
-          {/* Environmental conditions */}
-          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-2">
-            <div className="font-bold text-slate-800">Environmental Conditions</div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] text-slate-500 block flex items-center gap-1">
-                  <Thermometer className="w-3 h-3 text-rose-500" />
-                  <span>Ambient Temp (°C)</span>
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={tempCelsius}
-                  onChange={(e) => setTempCelsius(parseFloat(e.target.value) || 24)}
-                  className="w-full text-xs font-bold rounded border border-slate-300 px-2 py-1 bg-white"
-                />
+          {/* Card 4: Environmental conditions */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="font-bold text-slate-800 flex items-center justify-between">
+                <span>Environmental State</span>
+                <span className="text-blue-600 font-semibold text-[10px] uppercase">Compliant</span>
               </div>
-              <div>
-                <label className="text-[10px] text-slate-500 block flex items-center gap-1">
-                  <Droplets className="w-3 h-3 text-blue-500" />
-                  <span>Humidity (% RH)</span>
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  value={humidityPercent}
-                  onChange={(e) => setHumidityPercent(parseFloat(e.target.value) || 55)}
-                  className="w-full text-xs font-bold rounded border border-slate-300 px-2 py-1 bg-white"
-                />
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-slate-500 block text-[10px] flex items-center gap-1">
+                    <Thermometer className="w-3 h-3 text-rose-500" />
+                    Temp (°C)
+                  </span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    disabled={isFinalized}
+                    value={tempCelsius}
+                    onChange={(e) => setTempCelsius(Number(e.target.value))}
+                    className="w-full font-mono font-bold bg-white text-slate-900 border rounded px-1.5 py-1 text-xs"
+                  />
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px] flex items-center gap-1">
+                    <Droplets className="w-3 h-3 text-blue-500" />
+                    RH (%)
+                  </span>
+                  <input
+                    type="number"
+                    step="1"
+                    disabled={isFinalized}
+                    value={humidityPercent}
+                    onChange={(e) => setHumidityPercent(Number(e.target.value))}
+                    className="w-full font-mono font-bold bg-white text-slate-900 border rounded px-1.5 py-1 text-xs"
+                  />
+                </div>
               </div>
+            </div>
+            <div className="text-[10px] text-slate-400 text-right">
+              Range: 20–28°C / 45–65% RH
             </div>
           </div>
         </div>
       </div>
 
-      {/* Guided NAWI Procedure Steps Grid */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-5 space-y-4">
+      {/* Observations Worksheet */}
+      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
-          <div>
-            <h3 className="text-sm font-bold text-gov-navy flex items-center gap-2">
-              <Layers className="w-4 h-4 text-gov-blue" />
-              <span>Guided NAWI Test Procedure Execution (Class III / IIII)</span>
-            </h3>
-            <p className="text-xs text-slate-500">
-              Stepped MPE calculation: 0 ≤ m ≤ 500: ±1.0e; 500 &lt; m ≤ 2000: ±2.0e; 2000 &lt; m ≤ 10000: ±3.0e
-            </p>
+          <div className="flex items-center gap-2">
+            <Layers className="w-5 h-5 text-gov-blue" />
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                Guided NAWI Test Procedure Execution (Class III / IIII)
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Stepped MPE calculation: 0 &lt; m ≤ 500: ±1.0e; 500 &lt; m ≤ 2000: ±2.0e; 2000 &lt; m ≤ 10000: ±3.0e
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-slate-500">
-              Interval (e): <strong className="text-slate-800">{scaleIntervalE} kg</strong>
-            </span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-slate-500">Interval (e): <strong className="font-mono text-slate-900">{scaleIntervalE} kg</strong></span>
           </div>
         </div>
 
-        {/* Observation Rows */}
+        {/* Test Step Observations Grid */}
         <div className="space-y-3">
           {observations.map((obs, idx) => (
             <NAWITestStepForm
-              key={`${obs.step_type}-${obs.step_sequence}-${idx}`}
+              key={idx}
               observation={obs}
               scaleIntervalE={scaleIntervalE}
-              accuracyClass={accuracyClass}
+              accuracyClass={accuracyClass as any}
               zeroErrorE0={zeroErrorE0}
-              onChange={(updated) => handleUpdateObservation(idx, updated)}
+              onChange={(updated: ObservationItemInput) => handleUpdateObservation(idx, updated)}
             />
           ))}
         </div>
 
-        {/* Step-by-Step Bottom Guidance / Submission Bar */}
-        {(session.status === 'PLANNED' || session.status === 'IDENTITY_CONFIRMED' || session.status === 'IN_PROGRESS') && (
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-            <div className="text-xs text-slate-500">
-              Deterministic calculation trace is recorded with immutable audit hash.
-            </div>
+        {/* Submit Observations Button (Disabled if Finalized) */}
+        {!isFinalized && (
+          <div className="pt-4 border-t flex justify-end">
             <button
               onClick={handleSubmitObservations}
               disabled={isSubmittingObservations}
-              className="px-6 py-2.5 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-2 shadow-xs transition-all hover:shadow disabled:opacity-50"
+              className="px-6 py-2.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
-              <Save className="w-4 h-4 text-amber-400" />
-              <span>{isSubmittingObservations ? 'Evaluating...' : 'Submit Test Observations & Compute Evaluation'}</span>
+              <Save className="w-4 h-4" />
+              <span>{isSubmittingObservations ? 'Evaluating Tolerance...' : 'Submit Observations & Run Evaluation'}</span>
             </button>
-          </div>
-        )}
-
-        {session.status === 'SUBMITTED' && (
-          <div className="pt-4 border-t border-slate-200 bg-emerald-50/70 p-3 rounded-lg border border-emerald-200 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Observations Evaluated & Passed. Now click "Affix Physical Seal" or "Record Legal Disposition" above.</span>
-            </div>
-            <button
-              onClick={() => setIsDispositionModalOpen(true)}
-              className="px-4 py-1.5 rounded bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors shadow-2xs"
-            >
-              Record Legal Disposition →
-            </button>
-          </div>
-        )}
-
-        {isFinalized && (
-          <div className="pt-4 border-t border-slate-200 bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>
-                {certificate
-                  ? `Statutory certificate ${certificate.certificate_number} is minted and active.`
-                  : 'Legal Disposition Recorded. Click "Sign & Issue Certificate" above to generate statutory certificate.'}
-              </span>
-            </div>
-            {certificate ? (
-              <button
-                onClick={() => setIsCertViewOpen(true)}
-                className="px-4 py-1.5 rounded bg-gov-navy text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-2xs flex items-center gap-1.5"
-              >
-                <Award className="w-3.5 h-3.5 text-amber-400" />
-                <span>View Official Certificate →</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsSignModalOpen(true)}
-                className="px-4 py-1.5 rounded bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition-colors shadow-2xs flex items-center gap-1.5"
-              >
-                <Lock className="w-3.5 h-3.5 text-amber-300" />
-                <span>Sign & Issue Certificate →</span>
-              </button>
-            )}
           </div>
         )}
       </div>
@@ -487,6 +534,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         sessionId={session.session_id}
         instrumentId={session.instrument_id}
         onStampRecorded={() => {
+          loadStamps();
           notify('success', 'Physical Stamp Saved', 'Affixed seal is audited in the physical ledger.');
         }}
       />
@@ -496,6 +544,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         onClose={() => setIsDispositionModalOpen(false)}
         session={session}
         onDispositionRecorded={onSessionUpdated}
+        onStampRecorded={loadStamps}
       />
 
       <CertificateSignModal

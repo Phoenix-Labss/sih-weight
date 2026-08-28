@@ -6,6 +6,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../api/client';
 import { Shield, Camera, CheckCircle2, Lock } from 'lucide-react';
 import { formatDateTime } from '../../utils/formatters';
+import { PhotoEvidenceHasher } from '../common/PhotoEvidenceHasher';
 
 interface StampRecordFormProps {
   isOpen: boolean;
@@ -148,22 +149,14 @@ export const StampRecordForm: React.FC<StampRecordFormProps> = ({
           </div>
         </div>
 
-        {/* Photo evidence SHA-256 */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <Camera className="w-3.5 h-3.5 text-slate-500" />
-              <span>Photo Evidence SHA-256 Hash Digest</span>
-            </span>
-            <span className="text-[10px] text-slate-400 font-mono">Immutable Integrity Check</span>
-          </label>
-          <input
-            type="text"
-            value={photoHash}
-            onChange={(e) => setPhotoHash(e.target.value)}
-            className="w-full text-xs font-mono text-slate-700 rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-gov-blue"
-          />
-        </div>
+        {/* Photo evidence SHA-256 Hasher Engine */}
+        <PhotoEvidenceHasher
+          value={photoHash}
+          onChange={(h) => setPhotoHash(h)}
+          label="Photo Evidence SHA-256 Hash Digest"
+          defaultSampleType="lead_seal"
+          helperText="Captures high-resolution photo evidence of the lead-wire seal & generates canonical SHA-256 byte digest."
+        />
 
         <div>
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">

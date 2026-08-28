@@ -3,6 +3,7 @@ import { Modal } from '../common/Modal';
 import { Instrument } from '../../types/instrument';
 import { VerificationSession } from '../../types/session';
 import { CheckCircle2, AlertTriangle, ShieldCheck, Scale, QrCode } from 'lucide-react';
+import { PhotoEvidenceHasher } from '../common/PhotoEvidenceHasher';
 
 interface PhysicalSerialMatchModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
   const registeredSerial = instrument?.serial_number || 'N/A';
   const [enteredSerial, setEnteredSerial] = useState('');
   const [sealChecked, setSealChecked] = useState(false);
+  const [photoHash, setPhotoHash] = useState('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -135,6 +137,15 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
             }`}
           />
         </div>
+
+        {/* Photo Evidence Hashing Engine */}
+        <PhotoEvidenceHasher
+          value={photoHash}
+          onChange={(h) => setPhotoHash(h)}
+          label="Instrument Nameplate & Chassis Photo Evidence"
+          defaultSampleType="nameplate"
+          helperText="Captures on-site physical photograph of the serial nameplate & computes cryptographic SHA-256 byte digest."
+        />
 
         {/* Checkbox confirmation */}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">

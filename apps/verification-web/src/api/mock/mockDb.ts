@@ -410,8 +410,77 @@ export class MockDatabase {
     return { ...app };
   }
 
+  private ensureEvaluatedObservations(sess: VerificationSession) {
+    if (!sess.observations || sess.observations.length === 0) {
+      const inst = this.getInstrument(sess.instrument_id);
+      const scaleInterval = inst?.model?.verification_scale_interval_e || 0.005;
+      const accuracyClass = (inst?.model?.accuracy_class as any) || 'CLASS_III';
+      const maxCap = Number(inst?.model?.max_capacity) || 30.0;
+      const minCap = Number(inst?.model?.min_capacity) || 0.1;
+
+      const rawTestPoints: ObservationItemInput[] = [
+        { step_type: 'ZERO_TEST', step_sequence: 1, nominal_load: 0.0, raw_indication_reading: 0.0, delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 2, nominal_load: minCap, raw_indication_reading: minCap, delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 3, nominal_load: Number((500 * scaleInterval).toFixed(3)), raw_indication_reading: Number((500 * scaleInterval + 0.001).toFixed(3)), delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 4, nominal_load: Number((2000 * scaleInterval).toFixed(3)), raw_indication_reading: Number((2000 * scaleInterval + 0.002).toFixed(3)), delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 5, nominal_load: maxCap, raw_indication_reading: Number((maxCap + 0.004).toFixed(3)), delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.003).toFixed(3)), eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 1, delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.002).toFixed(3)), repetition_index: 2, delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 3, delta_L: Number((0.5 * scaleInterval).toFixed(4)) },
+      ];
+
+      const evaluatedObs: Observation[] = rawTestPoints.map((obs, idx) => {
+        const evalRes = evaluateNAWIObservation({
+          nominalLoad: obs.nominal_load,
+          rawIndication: obs.raw_indication_reading,
+          deltaL: obs.delta_L,
+          scaleIntervalE: scaleInterval,
+          accuracyClass: accuracyClass,
+          zeroErrorE0: 0,
+        });
+
+        return {
+          observation_id: `OBS-${sess.session_id}-${idx + 1}`,
+          session_id: sess.session_id,
+          step_type: obs.step_type,
+          step_sequence: obs.step_sequence || idx + 1,
+          nominal_load: obs.nominal_load,
+          load_unit: obs.load_unit || 'kg',
+          raw_indication_reading: obs.raw_indication_reading,
+          normalized_indication: evalRes.normalizedIndication,
+          reading_unit: obs.reading_unit || 'kg',
+          observed_error: evalRes.observedError,
+          mpe_allowed: evalRes.mpeAllowed,
+          is_within_mpe: evalRes.isWithinMpe,
+          repetition_index: obs.repetition_index || 1,
+          eccentricity_position: obs.eccentricity_position,
+          calculation_trace: evalRes.calculationTrace,
+          is_immutable: true,
+          recorded_at: sess.created_at || new Date().toISOString(),
+        };
+      });
+
+      sess.observations = evaluatedObs;
+      sess.automated_evaluation_flag = true;
+      if (!sess.environmental_temp_celsius) sess.environmental_temp_celsius = 24.5;
+      if (!sess.environmental_humidity_percent) sess.environmental_humidity_percent = 55.0;
+      save('sessions', this.sessions);
+    }
+  }
+
   // --- Sessions ---
   public getSessions(tenantId?: string): VerificationSession[] {
+    this.sessions.forEach((s) => {
+      if (s.status === 'FINALIZED' || s.status === 'SUBMITTED' || this.certificates.some((c) => c.session_id === s.session_id)) {
+        this.ensureEvaluatedObservations(s);
+      }
+    });
+
     const list = tenantId
       ? this.sessions.filter((s) => s.tenant_id === tenantId)
       : this.sessions;
@@ -439,6 +508,10 @@ export class MockDatabase {
           });
         }
       }
+    }
+
+    if (sess && (sess.status === 'FINALIZED' || sess.status === 'SUBMITTED' || this.certificates.some((c) => c.session_id === sess.session_id))) {
+      this.ensureEvaluatedObservations(sess);
     }
 
     return sess;

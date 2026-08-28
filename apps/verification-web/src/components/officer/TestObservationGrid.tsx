@@ -111,9 +111,9 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         step_type: o.step_type,
         step_sequence: Number(o.step_sequence),
         nominal_load: Number(o.nominal_load),
-        load_unit: o.load_unit,
+        load_unit: o.load_unit || 'kg',
         raw_indication_reading: Number(o.raw_indication_reading),
-        reading_unit: o.reading_unit,
+        reading_unit: o.reading_unit || 'kg',
         normalized_indication: o.normalized_indication ? Number(o.normalized_indication) : undefined,
         repetition_index: o.repetition_index ? Number(o.repetition_index) : undefined,
         eccentricity_position: o.eccentricity_position,
@@ -131,17 +131,58 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       { step_type: 'INCREASING_LOAD', step_sequence: 4, nominal_load: Number((2000 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((2000 * scaleIntervalE + 0.002).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
       { step_type: 'INCREASING_LOAD', step_sequence: 5, nominal_load: maxCap, raw_indication_reading: Number((maxCap + 0.004).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
       // 3. Eccentricity (1/3 Max = 10 kg) 5 positions
-      { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: 10.0, raw_indication_reading: 10.001, eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: 10.0, raw_indication_reading: 10.003, eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: 10.0, raw_indication_reading: 10.002, eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: 10.0, raw_indication_reading: 10.002, eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: 10.0, raw_indication_reading: 10.001, eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.003).toFixed(3)), eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
       // 4. Repeatability (3 runs at 15 kg)
-      { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: 15.0, raw_indication_reading: 15.001, repetition_index: 1, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: 15.0, raw_indication_reading: 15.002, repetition_index: 2, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
-      { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: 15.0, raw_indication_reading: 15.001, repetition_index: 3, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 1, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.002).toFixed(3)), repetition_index: 2, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 3, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
     ];
   });
+
+  // Re-synchronize state whenever session prop changes (switching between sessions)
+  useEffect(() => {
+    if (!session) return;
+    setSerialVerified(session.status !== 'PLANNED');
+    setTempCelsius(Number(session.environmental_temp_celsius) || 24.5);
+    setHumidityPercent(Number(session.environmental_humidity_percent) || 55.0);
+
+    if (session.observations && session.observations.length > 0) {
+      setObservations(
+        session.observations.map((o) => ({
+          step_type: o.step_type,
+          step_sequence: Number(o.step_sequence),
+          nominal_load: Number(o.nominal_load),
+          load_unit: o.load_unit || 'kg',
+          raw_indication_reading: Number(o.raw_indication_reading),
+          reading_unit: o.reading_unit || 'kg',
+          normalized_indication: o.normalized_indication ? Number(o.normalized_indication) : undefined,
+          repetition_index: o.repetition_index ? Number(o.repetition_index) : undefined,
+          eccentricity_position: o.eccentricity_position,
+          delta_L: Number((0.5 * scaleIntervalE).toFixed(4)),
+        }))
+      );
+    } else {
+      setObservations([
+        { step_type: 'ZERO_TEST', step_sequence: 1, nominal_load: 0.0, raw_indication_reading: 0.0, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 2, nominal_load: minCap, raw_indication_reading: minCap, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 3, nominal_load: Number((500 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((500 * scaleIntervalE + 0.001).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 4, nominal_load: Number((2000 * scaleIntervalE).toFixed(3)), raw_indication_reading: Number((2000 * scaleIntervalE + 0.002).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'INCREASING_LOAD', step_sequence: 5, nominal_load: maxCap, raw_indication_reading: Number((maxCap + 0.004).toFixed(3)), delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 6, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'CENTER', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 7, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.003).toFixed(3)), eccentricity_position: 'FRONT_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 8, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_LEFT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 9, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.002).toFixed(3)), eccentricity_position: 'BACK_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'ECCENTRICITY', step_sequence: 10, nominal_load: Number((maxCap / 3).toFixed(2)), raw_indication_reading: Number((maxCap / 3 + 0.001).toFixed(3)), eccentricity_position: 'FRONT_RIGHT', delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 11, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 1, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 12, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.002).toFixed(3)), repetition_index: 2, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+        { step_type: 'REPEATABILITY', step_sequence: 13, nominal_load: Number((maxCap * 0.8).toFixed(2)), raw_indication_reading: Number((maxCap * 0.8 + 0.001).toFixed(3)), repetition_index: 3, delta_L: Number((0.5 * scaleIntervalE).toFixed(4)) },
+      ]);
+    }
+  }, [session?.session_id, session?.status, session?.observations, scaleIntervalE, minCap, maxCap]);
 
   const [isSubmittingObservations, setIsSubmittingObservations] = useState(false);
 
@@ -550,11 +591,12 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         <div className="space-y-3">
           {observations.map((obs, idx) => (
             <NAWITestStepForm
-              key={idx}
+              key={`${session.session_id}-${obs.step_sequence}-${idx}`}
               observation={obs}
               scaleIntervalE={scaleIntervalE}
               accuracyClass={accuracyClass as any}
               zeroErrorE0={zeroErrorE0}
+              readOnly={isFinalized}
               onChange={(updated: ObservationItemInput) => handleUpdateObservation(idx, updated)}
             />
           ))}

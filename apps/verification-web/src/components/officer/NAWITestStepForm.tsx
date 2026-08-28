@@ -8,6 +8,7 @@ interface NAWITestStepFormProps {
   scaleIntervalE: number;
   accuracyClass: 'CLASS_I' | 'CLASS_II' | 'CLASS_III' | 'CLASS_IIII';
   zeroErrorE0: number;
+  readOnly?: boolean;
   onChange: (updated: ObservationItemInput) => void;
 }
 
@@ -16,6 +17,7 @@ export const NAWITestStepForm: React.FC<NAWITestStepFormProps> = ({
   scaleIntervalE,
   accuracyClass,
   zeroErrorE0,
+  readOnly = false,
   onChange,
 }) => {
   const evalResult = evaluateNAWIObservation({
@@ -53,11 +55,12 @@ export const NAWITestStepForm: React.FC<NAWITestStepFormProps> = ({
         {/* Raw Indication Input */}
         <div>
           <label className="block text-[10px] font-semibold text-slate-600 uppercase mb-1">
-            Indication (I) [kg]
+            Indication (I) [{observation.reading_unit || 'kg'}]
           </label>
           <input
             type="number"
             step="any"
+            disabled={readOnly}
             value={observation.raw_indication_reading}
             onChange={(e) => {
               const val = parseFloat(e.target.value) || 0;
@@ -66,18 +69,19 @@ export const NAWITestStepForm: React.FC<NAWITestStepFormProps> = ({
                 raw_indication_reading: val,
               });
             }}
-            className="w-full text-xs font-mono font-bold rounded-lg border border-slate-300 px-2.5 py-1.5 focus:ring-2 focus:ring-gov-blue"
+            className="w-full text-xs font-mono font-bold rounded-lg border border-slate-300 px-2.5 py-1.5 focus:ring-2 focus:ring-gov-blue disabled:bg-slate-100 disabled:text-slate-900 disabled:cursor-not-allowed"
           />
         </div>
 
         {/* Delta L (Small weights) */}
         <div>
           <label className="block text-[10px] font-semibold text-slate-600 uppercase mb-1">
-            Turning ΔL [kg]
+            Turning ΔL [{observation.reading_unit || 'kg'}]
           </label>
           <input
             type="number"
             step="any"
+            disabled={readOnly}
             placeholder={`0.5e = ${(0.5 * scaleIntervalE).toFixed(4)}`}
             value={observation.delta_L !== undefined ? observation.delta_L : (0.5 * scaleIntervalE)}
             onChange={(e) => {
@@ -87,7 +91,7 @@ export const NAWITestStepForm: React.FC<NAWITestStepFormProps> = ({
                 delta_L: isNaN(val) ? 0 : val,
               });
             }}
-            className="w-full text-xs font-mono rounded-lg border border-slate-300 px-2.5 py-1.5 focus:ring-2 focus:ring-gov-blue"
+            className="w-full text-xs font-mono rounded-lg border border-slate-300 px-2.5 py-1.5 focus:ring-2 focus:ring-gov-blue disabled:bg-slate-100 disabled:text-slate-900 disabled:cursor-not-allowed"
           />
         </div>
 

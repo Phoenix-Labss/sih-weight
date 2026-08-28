@@ -662,19 +662,105 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           ))}
         </div>
 
-        {/* Submit Observations Button (Disabled if Finalized) */}
-        {!isFinalized && (
-          <div className="pt-4 border-t flex justify-end">
-            <button
-              onClick={handleSubmitObservations}
-              disabled={isSubmittingObservations}
-              className="px-6 py-2.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>{isSubmittingObservations ? 'Evaluating Tolerance...' : 'Submit Observations & Run Evaluation'}</span>
-            </button>
-          </div>
-        )}
+        {/* Bottom Progression & Action Bar */}
+        <div className="pt-4 border-t flex flex-wrap items-center justify-between gap-3">
+          {session.status === 'PLANNED' || session.status === 'IDENTITY_CONFIRMED' || session.status === 'IN_PROGRESS' ? (
+            <>
+              <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span>Enter all statutory observation readings above before submitting for MPE evaluation.</span>
+              </div>
+              <button
+                onClick={handleSubmitObservations}
+                disabled={isSubmittingObservations}
+                className="px-6 py-2.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSubmittingObservations ? 'Evaluating Tolerance...' : 'Submit Observations & Run Evaluation'}</span>
+              </button>
+            </>
+          ) : session.status === 'SUBMITTED' ? (
+            <>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span className="font-bold text-slate-800">
+                  Readings Evaluated &amp; Submitted
+                </span>
+                <span className="text-slate-500">
+                  ({recordedStamps.length > 0 ? 'Lead Wire Seal Affixed' : 'Physical Seal Pending'})
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleSubmitObservations}
+                  disabled={isSubmittingObservations}
+                  className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-300 transition-colors cursor-pointer"
+                  title="Re-run evaluation if readings were adjusted"
+                >
+                  <Save className="w-3.5 h-3.5 inline mr-1" />
+                  <span>Update Readings</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsStampModalOpen(true)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
+                    recordedStamps.length > 0
+                      ? 'bg-slate-800 text-white hover:bg-slate-900 border border-slate-700'
+                      : 'bg-amber-600 text-white hover:bg-amber-700 ring-2 ring-amber-400/40'
+                  }`}
+                >
+                  <Stamp className="w-4 h-4 text-amber-300" />
+                  <span>
+                    {recordedStamps.length > 0
+                      ? `Manage Seals (${recordedStamps.length})`
+                      : 'Affix Physical Seal'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsDispositionModalOpen(true)}
+                  className="px-5 py-2 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer ring-2 ring-emerald-400/30"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                  <span>Record Legal Disposition &rarr;</span>
+                </button>
+              </div>
+            </>
+          ) : isFinalized ? (
+            <>
+              <div className="flex items-center gap-2 text-xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span className="font-bold text-slate-800">
+                  Verification Finalized — {session.outcome ? session.outcome.replace(/_/g, ' ') : 'Disposition Recorded'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {certificate ? (
+                  <button
+                    onClick={() => setIsCertViewOpen(true)}
+                    className="px-5 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                  >
+                    <Award className="w-4 h-4 text-amber-300" />
+                    <span>View Digital Certificate ({certificate.certificate_number})</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsSignModalOpen(true)}
+                    className="px-5 py-2 rounded-lg bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800 flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                  >
+                    <Lock className="w-4 h-4 text-amber-300" />
+                    <span>Sign &amp; Issue Certificate &rarr;</span>
+                  </button>
+                )}
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
 
       {/* Modals */}

@@ -130,6 +130,10 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       currentStatus === 'ACCEPTED' ||
       currentStatus === 'PAYMENT_PROCESSING');
 
+  const isNeedsScheduling =
+    (currentStatus === 'FEE_PAID' || currentStatus === 'PAYMENT_RECONCILED') &&
+    !application.scheduled_slot_start;
+
   // Scrutiny, scheduling, and testing are officer actions; guide officers
   // directly there. Consumers (OWNER/APPLICANT) cannot access the Officer
   // Workspace after role-gating, so they get a plain status note instead.
@@ -176,7 +180,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
             </button>
           )}
 
-          {isPaid && onOpenSchedulerModal && (
+          {isNeedsScheduling && onOpenSchedulerModal && (
             <button
               onClick={() => onOpenSchedulerModal(application)}
               className="px-3.5 py-1.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow cursor-pointer"

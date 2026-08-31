@@ -112,6 +112,8 @@ const AppContent: React.FC = () => {
         setActiveTab('migration');
       } else if (cleanHash === '#public' || cleanHash === '#/public') {
         setActiveTab('public');
+      } else if (cleanHash === '#login' || cleanHash === '#home' || cleanHash === '') {
+        setActiveTab('trader');
       }
     };
 
@@ -166,7 +168,7 @@ const AppContent: React.FC = () => {
             <div className='flex items-center gap-2.5'>
               <button
                 onClick={() => {
-                  window.location.hash = '#trader';
+                  window.location.hash = '#login';
                   setActiveTab('trader');
                 }}
                 className='px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-xs font-bold text-slate-950 shadow-xs transition-colors'

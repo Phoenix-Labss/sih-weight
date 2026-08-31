@@ -12,9 +12,10 @@ import {
   AlertCircle,
   ArrowRight,
   ArrowLeft,
-  Store,
   CreditCard,
   FileCheck,
+  Check,
+  Loader2,
 } from 'lucide-react';
 
 interface RegisterModalProps {
@@ -105,7 +106,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     setError(null);
     if (step === 1) {
       if (!canProceedStep1) {
-        setError('Please complete all credential fields accurately.');
+        setError('Please complete all credential fields in accordance with the security criteria.');
         return;
       }
       if (!tradeName && fullName) setTradeName(fullName);
@@ -173,178 +174,199 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
       subtitle="National e-Metrology Legal Verification System • Government of India"
       maxWidth="2xl"
     >
-      <div className="space-y-5">
-        {/* National Banner */}
-        <div className="bg-gradient-to-r from-slate-900 to-gov-navy text-white rounded-xl p-4 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 text-amber-400" />
+      <div className="space-y-4">
+        {/* 1. Legal / Statutory Notice Strip */}
+        <div className="bg-slate-50 border border-slate-300 rounded-md p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-700">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5 font-bold text-gov-navy text-xs">
+              <Building2 className="w-3.5 h-3.5 text-gov-blue" />
+              <span>Statutory Establishment Registration (Form LM-REG-01)</span>
             </div>
-            <div>
-              <h3 className="font-bold text-sm text-white">Statutory Establishment Registration</h3>
-              <p className="text-[11px] text-slate-300">
-                Register commercial scale user, shop, dealer, or repairer under Section 24 of The Legal Metrology Act, 2009.
-              </p>
-            </div>
+            <p className="text-[11px] text-slate-600">
+              Official enrollment under Section 24 of The Legal Metrology Act, 2009 &amp; Schedule IX.
+            </p>
           </div>
-          <div className="hidden sm:block text-right">
-            <span className="text-[10px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30 uppercase">
+          <div className="shrink-0">
+            <span className="inline-block text-[10px] font-mono font-bold bg-white text-gov-navy px-2 py-0.5 rounded border border-slate-300 uppercase">
               Section 24 / Schedule IX
             </span>
           </div>
         </div>
 
-        {/* Step Indicator */}
-        <div className="flex items-center justify-between px-2">
-          <div className={`flex items-center gap-2 ${step >= 1 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= 1 ? 'bg-gov-navy text-white' : 'bg-slate-200 text-slate-600'}`}>
-              1
-            </span>
-            <span className="text-xs">Authorized Person</span>
-          </div>
-          <div className={`h-0.5 flex-1 mx-3 ${step >= 2 ? 'bg-gov-navy' : 'bg-slate-200'}`} />
-          <div className={`flex items-center gap-2 ${step >= 2 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= 2 ? 'bg-gov-navy text-white' : 'bg-slate-200 text-slate-600'}`}>
-              2
-            </span>
-            <span className="text-xs">PAN & Business KYC</span>
-          </div>
-          <div className={`h-0.5 flex-1 mx-3 ${step >= 3 ? 'bg-gov-navy' : 'bg-slate-200'}`} />
-          <div className={`flex items-center gap-2 ${step >= 3 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= 3 ? 'bg-gov-navy text-white' : 'bg-slate-200 text-slate-600'}`}>
-              3
-            </span>
-            <span className="text-xs">Establishment Address</span>
+        {/* 2. Institutional Compact Step Indicator */}
+        <div className="bg-white border border-slate-200 rounded-md px-3.5 py-2.5">
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            {/* Step 1 */}
+            <div className={`flex items-center gap-2 ${step === 1 ? 'text-gov-navy font-bold' : step > 1 ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                step === 1
+                  ? 'bg-gov-navy text-white'
+                  : step > 1
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-slate-200 text-slate-600'
+              }`}>
+                {step > 1 ? <Check className="w-3 h-3" /> : '1'}
+              </span>
+              <span className="truncate text-[11px] sm:text-xs">1. Authorized Person</span>
+            </div>
+
+            {/* Step 2 */}
+            <div className={`flex items-center gap-2 ${step === 2 ? 'text-gov-navy font-bold' : step > 2 ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                step === 2
+                  ? 'bg-gov-navy text-white'
+                  : step > 2
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-slate-200 text-slate-600'
+              }`}>
+                {step > 2 ? <Check className="w-3 h-3" /> : '2'}
+              </span>
+              <span className="truncate text-[11px] sm:text-xs">2. Business KYC &amp; PAN</span>
+            </div>
+
+            {/* Step 3 */}
+            <div className={`flex items-center gap-2 ${step === 3 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                step === 3
+                  ? 'bg-gov-navy text-white'
+                  : 'bg-slate-200 text-slate-600'
+              }`}>
+                3
+              </span>
+              <span className="truncate text-[11px] sm:text-xs">3. Premises &amp; Declaration</span>
+            </div>
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* 3. Error Alert */}
         {error && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3 rounded-xl flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="bg-red-50 border border-red-200 text-red-800 text-xs p-3 rounded-md flex items-start gap-2" role="alert">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Multi-step Form */}
+        {/* 4. Multi-step Form Content */}
         <form onSubmit={step === 3 ? handleSubmit : handleNextStep} className="space-y-4">
           
           {/* STEP 1: Personal & Login Credentials */}
           {step === 1 && (
-            <div className="space-y-3.5 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-gov-blue" />
-                <span>Authorized Representative / Scale Owner Particulars</span>
-              </h4>
+            <div className="space-y-3.5 bg-white p-4 rounded-md border border-slate-300">
+              <div className="border-b border-slate-200 pb-2">
+                <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
+                  Authorized Representative / Scale Owner Particulars
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Enter the particulars of the designated proprietor or authorized signatory.
+                </p>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Full Name (Proprietor / Signatory) *
+                  <label htmlFor="reg-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Full Name (Proprietor / Signatory) <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Ramesh Kumar"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
-                    />
-                  </div>
+                  <input
+                    id="reg-fullname"
+                    type="text"
+                    required
+                    placeholder="e.g. Ramesh Kumar"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                  />
                 </div>
 
+                {/* Email Address */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Official / Business Email *
+                  <label htmlFor="reg-email" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Official / Business Email <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. ramesh@kirana.in"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
-                    />
-                  </div>
+                  <input
+                    id="reg-email"
+                    type="email"
+                    required
+                    placeholder="e.g. ramesh@kirana.in"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                  />
                 </div>
 
+                {/* Phone Number */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    10-Digit Mobile Number (SMS OTP) *
+                  <label htmlFor="reg-phone" className="block text-xs font-semibold text-slate-700 mb-1">
+                    10-Digit Mobile Number (SMS OTP) <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
-                    <span className="text-xs font-bold text-slate-500 absolute left-3 top-2.5">+91</span>
+                    <span className="text-xs font-semibold text-slate-600 absolute left-3 top-2 select-none">+91</span>
                     <input
+                      id="reg-phone"
                       type="tel"
                       required
                       maxLength={10}
                       placeholder="9876543210"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                      className="w-full text-xs font-mono rounded-lg border border-slate-300 pl-11 pr-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                      className="w-full text-xs font-mono rounded-md border border-slate-300 pl-11 pr-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                     />
                   </div>
                 </div>
 
+                {/* Password */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Password (CERT-In Standard) *
+                  <label htmlFor="reg-password" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Password (CERT-In Standard) <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                    <input
-                      type="password"
-                      required
-                      placeholder="Minimum 8 characters"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
-                    />
-                  </div>
+                  <input
+                    id="reg-password"
+                    type="password"
+                    required
+                    placeholder="Minimum 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                  />
                 </div>
 
+                {/* Confirm Password */}
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Confirm Password *
+                  <label htmlFor="reg-confirmpassword" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Confirm Password <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                    <input
-                      type="password"
-                      required
-                      placeholder="Re-enter password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 pl-9 pr-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
-                    />
-                  </div>
+                  <input
+                    id="reg-confirmpassword"
+                    type="password"
+                    required
+                    placeholder="Re-enter identical password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                  />
                 </div>
               </div>
 
               {/* Password Strength Checklist */}
-              <div className="bg-white p-3 rounded-lg border border-slate-200 text-[11px] space-y-1">
-                <span className="font-semibold text-slate-600 block">Password Security Requirements:</span>
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-slate-500">
-                  <span className={hasMinLength ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
+              <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-[11px] space-y-1.5">
+                <span className="font-semibold text-slate-700 block">Security &amp; Password Requirements:</span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1 text-slate-600">
+                  <span className={hasMinLength ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
                     {hasMinLength ? '✓' : '•'} At least 8 characters
                   </span>
-                  <span className={hasUppercase ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
-                    {hasUppercase ? '✓' : '•'} 1 uppercase letter (A-Z)
+                  <span className={hasUppercase ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
+                    {hasUppercase ? '✓' : '•'} 1 uppercase (A-Z)
                   </span>
-                  <span className={hasLowercase ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
-                    {hasLowercase ? '✓' : '•'} 1 lowercase letter (a-z)
+                  <span className={hasLowercase ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
+                    {hasLowercase ? '✓' : '•'} 1 lowercase (a-z)
                   </span>
-                  <span className={hasNumber ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
+                  <span className={hasNumber ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
                     {hasNumber ? '✓' : '•'} 1 number (0-9)
                   </span>
-                  <span className={hasSpecial ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
-                    {hasSpecial ? '✓' : '•'} 1 special character (@$!%*?&#)
+                  <span className={hasSpecial ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
+                    {hasSpecial ? '✓' : '•'} 1 special char (@$!%*?&#)
                   </span>
-                  <span className={isPasswordMatch ? 'text-emerald-700 font-bold flex items-center gap-1' : 'flex items-center gap-1'}>
+                  <span className={isPasswordMatch ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
                     {isPasswordMatch ? '✓' : '•'} Passwords match
                   </span>
                 </div>
@@ -354,43 +376,47 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
           {/* STEP 2: Business & Statutory KYC (PAN is compulsory, GSTIN is optional) */}
           {step === 2 && (
-            <div className="space-y-3.5 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Store className="w-3.5 h-3.5 text-gov-blue" />
-                  <span>Business & Statutory KYC Information</span>
-                </h4>
-                <span className="text-[10px] text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded font-bold border border-amber-300">
-                  PAN is Compulsory • GSTIN is Optional
+            <div className="space-y-3.5 bg-white p-4 rounded-md border border-slate-300">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 pb-2">
+                <div>
+                  <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
+                    Business Classification &amp; Statutory KYC
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Provide permanent tax registration and establishment trade identity.
+                  </p>
+                </div>
+                <span className="text-[10px] text-amber-900 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-300 self-start sm:self-auto">
+                  PAN Compulsory • GSTIN Optional
                 </span>
               </div>
 
               {/* Stakeholder Category */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Establishment Classification *
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Establishment Classification <span className="text-red-600">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() => setStakeholderType('OWNER_USER')}
-                    className={`p-2.5 rounded-lg border text-left flex flex-col justify-between transition-colors ${
+                    className={`p-2.5 rounded-md border text-left flex flex-col justify-between transition-colors cursor-pointer ${
                       stakeholderType === 'OWNER_USER'
-                        ? 'border-gov-blue bg-blue-50/70 text-gov-navy font-bold ring-1 ring-gov-blue'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        ? 'border-gov-navy bg-slate-50 text-gov-navy font-semibold ring-1 ring-gov-navy'
+                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <span className="text-xs">Commercial Trader / Scale User</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Kirana, Retail, Mart, Mandi, Factory</span>
+                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Retail, Kirana, Mandi Merchant, Factory</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setStakeholderType('MANUFACTURER')}
-                    className={`p-2.5 rounded-lg border text-left flex flex-col justify-between transition-colors ${
+                    className={`p-2.5 rounded-md border text-left flex flex-col justify-between transition-colors cursor-pointer ${
                       stakeholderType === 'MANUFACTURER'
-                        ? 'border-gov-blue bg-blue-50/70 text-gov-navy font-bold ring-1 ring-gov-blue'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        ? 'border-gov-navy bg-slate-50 text-gov-navy font-semibold ring-1 ring-gov-navy'
+                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <span className="text-xs">Scale Manufacturer</span>
@@ -400,10 +426,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setStakeholderType('REPAIRER')}
-                    className={`p-2.5 rounded-lg border text-left flex flex-col justify-between transition-colors ${
+                    className={`p-2.5 rounded-md border text-left flex flex-col justify-between transition-colors cursor-pointer ${
                       stakeholderType === 'REPAIRER'
-                        ? 'border-gov-blue bg-blue-50/70 text-gov-navy font-bold ring-1 ring-gov-blue'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        ? 'border-gov-navy bg-slate-50 text-gov-navy font-semibold ring-1 ring-gov-navy'
+                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <span className="text-xs">Authorized Repairer</span>
@@ -413,10 +439,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setStakeholderType('DEALER')}
-                    className={`p-2.5 rounded-lg border text-left flex flex-col justify-between transition-colors ${
+                    className={`p-2.5 rounded-md border text-left flex flex-col justify-between transition-colors cursor-pointer ${
                       stakeholderType === 'DEALER'
-                        ? 'border-gov-blue bg-blue-50/70 text-gov-navy font-bold ring-1 ring-gov-blue'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                        ? 'border-gov-navy bg-slate-50 text-gov-navy font-semibold ring-1 ring-gov-navy'
+                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <span className="text-xs">Instrument Dealer</span>
@@ -428,29 +454,31 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               {/* Names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Trade / Shop Name *
+                  <label htmlFor="reg-tradename" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Trade / Shop Name <span className="text-red-600">*</span>
                   </label>
                   <input
+                    id="reg-tradename"
                     type="text"
                     required
                     placeholder="e.g. Ramesh Kirana & General Store"
                     value={tradeName}
                     onChange={(e) => setTradeName(e.target.value)}
-                    className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Legal Business Name (Optional)
+                  <label htmlFor="reg-legalname" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Legal Entity Name (Optional)
                   </label>
                   <input
+                    id="reg-legalname"
                     type="text"
                     placeholder="e.g. M/s Ramesh Enterprises"
                     value={legalName}
                     onChange={(e) => setLegalName(e.target.value)}
-                    className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                   />
                 </div>
               </div>
@@ -460,36 +488,38 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 {/* 1. Compulsory PAN Field */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <label htmlFor="reg-pan" className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <CreditCard className="w-3.5 h-3.5 text-gov-blue" />
-                      <span>Permanent Account Number (PAN) *</span>
+                      <span>Permanent Account Number (PAN)</span>
+                      <span className="text-red-600">*</span>
                     </label>
-                    <span className="text-[10px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-bold border border-rose-200">
+                    <span className="text-[10px] text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold border border-red-200">
                       Compulsory
                     </span>
                   </div>
                   <input
+                    id="reg-pan"
                     type="text"
                     required
                     maxLength={10}
                     placeholder="e.g. ABCDE1234F"
                     value={panNumber}
                     onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
-                    className={`w-full text-xs font-mono font-bold uppercase rounded-lg border px-3 py-2 bg-white focus:ring-2 ${
+                    className={`w-full text-xs font-mono font-bold uppercase rounded-md border px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 ${
                       panNumber && !isPanValid
-                        ? 'border-rose-400 focus:ring-rose-500'
+                        ? 'border-red-400 focus:ring-red-500 focus:border-red-500'
                         : isPanValid
-                        ? 'border-emerald-400 focus:ring-emerald-500'
-                        : 'border-slate-300 focus:ring-gov-blue'
+                        ? 'border-emerald-500 focus:ring-emerald-500 focus:border-emerald-500'
+                        : 'border-slate-300 focus:ring-gov-navy focus:border-gov-navy'
                     }`}
                   />
                   <div className="flex items-center justify-between mt-1 text-[10px]">
                     <span className="text-slate-500">
-                      10-character PAN of the business entity or authorized proprietor.
+                      10-character alphanumeric PAN of the business entity or authorized proprietor.
                     </span>
                     {panNumber && (
-                      <span className={isPanValid ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
-                        {isPanValid ? '✓ Valid PAN format' : '✗ Must be 5 letters + 4 numbers + 1 letter'}
+                      <span className={isPanValid ? 'text-emerald-700 font-semibold' : 'text-red-600 font-semibold'}>
+                        {isPanValid ? '✓ Valid PAN format' : '✗ Format: 5 letters + 4 numbers + 1 letter'}
                       </span>
                     )}
                   </div>
@@ -498,35 +528,36 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 {/* 2. Optional GSTIN Field */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-medium text-slate-700 flex items-center gap-1.5">
-                      <FileCheck className="w-3.5 h-3.5 text-slate-400" />
-                      <span>GST Number (GSTIN) (Optional)</span>
+                    <label htmlFor="reg-gst" className="block text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-slate-500" />
+                      <span>GST Number (GSTIN)</span>
                     </label>
-                    <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
+                    <span className="text-[10px] text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-medium border border-slate-300">
                       Optional (Not Mandatory)
                     </span>
                   </div>
                   <input
+                    id="reg-gst"
                     type="text"
                     maxLength={15}
                     placeholder="e.g. 07AAAAA0000A1Z5 (Leave blank if not registered)"
                     value={gstNumber}
                     onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
-                    className={`w-full text-xs font-mono font-bold uppercase rounded-lg border px-3 py-2 bg-white focus:ring-2 ${
+                    className={`w-full text-xs font-mono font-bold uppercase rounded-md border px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 ${
                       gstNumber && !isGstValid
-                        ? 'border-rose-400 focus:ring-rose-500'
+                        ? 'border-red-400 focus:ring-red-500 focus:border-red-500'
                         : gstNumber && isGstValid
-                        ? 'border-emerald-400 focus:ring-emerald-500'
-                        : 'border-slate-300 focus:ring-gov-blue'
+                        ? 'border-emerald-500 focus:ring-emerald-500 focus:border-emerald-500'
+                        : 'border-slate-300 focus:ring-gov-navy focus:border-gov-navy'
                     }`}
                   />
                   <div className="flex items-center justify-between mt-1 text-[10px]">
                     <span className="text-slate-500">
-                      Small vendors & kirana stores below the GST threshold may leave this blank.
+                      Small vendors &amp; kirana stores below statutory GST turnover threshold may leave this blank.
                     </span>
                     {gstNumber && (
-                      <span className={isGstValid ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
-                        {isGstValid ? '✓ Valid GSTIN format' : '✗ 15-character GST format required'}
+                      <span className={isGstValid ? 'text-emerald-700 font-semibold' : 'text-red-600 font-semibold'}>
+                        {isGstValid ? '✓ Valid GSTIN format' : '✗ 15-character standard GSTIN required'}
                       </span>
                     )}
                   </div>
@@ -537,50 +568,60 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
           {/* STEP 3: Establishment Address & Submission */}
           {step === 3 && (
-            <div className="space-y-3.5 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-gov-blue" />
-                <span>Establishment & Physical Scale Location</span>
-              </h4>
+            <div className="space-y-3.5 bg-white p-4 rounded-md border border-slate-300">
+              <div className="border-b border-slate-200 pb-2">
+                <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
+                  Establishment Premises &amp; Physical Scale Location
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Specify the physical site where commercial weighing instruments are installed or inspected.
+                </p>
+              </div>
 
               <div className="space-y-3">
+                {/* Premises Address */}
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Premises Address (Shop No, Building, Street) *
+                  <label htmlFor="reg-address" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Premises Address (Shop No, Building, Street, Market) <span className="text-red-600">*</span>
                   </label>
                   <input
+                    id="reg-address"
                     type="text"
                     required
                     placeholder="e.g. Shop 14, Main Market, Chandni Chowk"
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
-                    className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* City */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      City / Town *
+                    <label htmlFor="reg-city" className="block text-xs font-semibold text-slate-700 mb-1">
+                      City / Town <span className="text-red-600">*</span>
                     </label>
                     <input
+                      id="reg-city"
                       type="text"
                       required
                       placeholder="New Delhi"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                     />
                   </div>
 
+                  {/* Enforcement Zone / District */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      Enforcement Zone / District *
+                    <label htmlFor="reg-district" className="block text-xs font-semibold text-slate-700 mb-1">
+                      Enforcement Zone / District <span className="text-red-600">*</span>
                     </label>
                     <select
+                      id="reg-district"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy cursor-pointer"
                     >
                       <option value="Central Delhi">Central Delhi Zone (JUR-DL-01)</option>
                       <option value="North Delhi">North Delhi Zone (JUR-DL-02)</option>
@@ -590,34 +631,36 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     </select>
                   </div>
 
+                  {/* PIN Code */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
-                      6-Digit PIN Code *
+                    <label htmlFor="reg-pincode" className="block text-xs font-semibold text-slate-700 mb-1">
+                      6-Digit PIN Code <span className="text-red-600">*</span>
                     </label>
                     <input
+                      id="reg-pincode"
                       type="text"
                       required
                       maxLength={6}
                       placeholder="110006"
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full text-xs font-mono font-bold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-gov-blue"
+                      className="w-full text-xs font-mono font-bold rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Statutory Legal Declaration */}
-              <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3 space-y-2 mt-2">
-                <label className="flex items-start gap-2 cursor-pointer">
+              <div className="bg-slate-50 border border-slate-300 rounded-md p-3 space-y-2 mt-2">
+                <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={declarationAccepted}
                     onChange={(e) => setDeclarationAccepted(e.target.checked)}
-                    className="mt-0.5 rounded border-amber-300 text-gov-navy focus:ring-gov-blue"
+                    className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy"
                   />
-                  <span className="text-[11px] text-amber-950 leading-relaxed font-medium">
-                    I hereby solemnly declare and affirm that the particulars stated above (including PAN {cleanPan || '...'}) are true and accurate. I undertake to submit all weighing and measuring instruments in my possession for statutory verification under Section 24 of The Legal Metrology Act, 2009.
+                  <span className="text-[11px] text-slate-800 leading-relaxed">
+                    I hereby solemnly declare and affirm that the particulars stated above (including Permanent Account Number <strong>{cleanPan || '[PENDING PAN]'}</strong>) are true and accurate. I undertake to submit all weighing and measuring instruments in my possession for statutory verification under Section 24 of The Legal Metrology Act, 2009.
                   </span>
                 </label>
               </div>
@@ -625,13 +668,13 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+          <div className="flex items-center justify-between pt-3 border-t border-slate-200">
             {step > 1 ? (
               <button
                 type="button"
                 onClick={handlePrevStep}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 transition-colors"
+                className="px-4 py-2 rounded-md border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back</span>
@@ -641,7 +684,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 rounded-md border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -650,7 +693,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             {step < 3 ? (
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-gov-navy text-xs font-bold text-white shadow-sm hover:bg-slate-800 flex items-center gap-1.5 transition-colors"
+                className="px-4 py-2 rounded-md bg-gov-navy text-xs font-semibold text-white shadow-xs hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -659,10 +702,19 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <button
                 type="submit"
                 disabled={loading || !canSubmit}
-                className="px-6 py-2.5 rounded-xl bg-emerald-700 text-xs font-bold text-white shadow-md hover:bg-emerald-800 flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 rounded-md bg-emerald-700 text-xs font-semibold text-white shadow-xs hover:bg-emerald-800 flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{loading ? 'Creating Establishment Account...' : 'Complete Registration & Sign In'}</span>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Creating Establishment Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Complete Registration &amp; Sign In</span>
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -671,3 +723,4 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     </Modal>
   );
 };
+

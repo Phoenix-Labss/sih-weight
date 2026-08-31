@@ -14,12 +14,8 @@ export class RAGService {
 
   public async seedKnowledgeBase(): Promise<number> {
     try {
-      const count = await prisma.knowledgeChunk.count();
-      if (count > 0) {
-        this.seeded = true;
-        return count;
-      }
-
+      // Clear out older seed chunks and refresh with latest full corpus
+      await prisma.knowledgeChunk.deleteMany({});
       for (const item of STATUTORY_CORPUS) {
         await prisma.knowledgeChunk.create({
           data: {
@@ -59,7 +55,7 @@ export class RAGService {
       };
     }
 
-    // 1. Retrieve top matching chunks via Hybrid Search
+    // 1. Retrieve top matching chunks via Hybrid Search with phrase boosting
     const citations = await this.retrieveRelevantChunks(queryStr, 3);
 
     // 2. Extract associated portal actions
@@ -97,8 +93,8 @@ export class RAGService {
   }
 
   private async retrieveRelevantChunks(query: string, topK = 3): Promise<StatutoryCitation[]> {
-    const tokens = query
-      .toLowerCase()
+    const queryLower = query.toLowerCase();
+    const tokens = queryLower
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
       .filter((t) => t.length > 2);
@@ -112,20 +108,25 @@ export class RAGService {
       const refLower = item.section_rule_ref.toLowerCase();
       const actLower = item.act_name.toLowerCase();
 
+      // High-priority phrase matching
+      if (item.keywords.some((kw) => queryLower.includes(kw.toLowerCase()))) {
+        score += 8.0;
+      }
+      if (titleLower.includes(queryLower) || queryLower.includes(titleLower)) {
+        score += 6.0;
+      }
+
+      // Token level matching
       for (const token of tokens) {
-        // Keyword exact match
         if (item.keywords.some((kw) => kw.toLowerCase().includes(token))) {
           score += 3.0;
         }
-        // Section/Rule direct mention (e.g. "section 22", "rule 6")
         if (refLower.includes(token)) {
           score += 4.0;
         }
-        // Title match
         if (titleLower.includes(token)) {
           score += 2.5;
         }
-        // Content match
         if (contentLower.includes(token)) {
           score += 1.0;
         }
@@ -160,33 +161,50 @@ export class RAGService {
   public getSuggestions(portalContext?: string): string[] {
     if (portalContext === 'trader') {
       return [
-        'How to register a retail weighing scale?',
-        'Calculate verification fee for 30kg counter scale',
-        'What is the re-verification validity period?',
-        'How to schedule on-site weighbridge verification?',
-      ];
-    }
-
-    if (portalContext === 'public') {
-      return [
-        'How to verify digital certificate using QR code?',
-        'What are mandatory declarations on packaged goods?',
-        'What is the penalty for using an unverified scale?',
-        'What is Section 22 Central Model Approval?',
+        'What to do if my certificate is lost?',
+        'What to do if my physical seal is broken?',
+        'How much time does it typically take to test?',
+        'What documents are required for verification?',
+        'Calculate verification fee for counter scale',
       ];
     }
 
     return [
+      'What to do if my certificate is lost?',
+      'What to do if my physical seal is broken?',
+      'How to verify digital certificate using QR code?',
       'What are mandatory packaging declarations under Rule 6?',
-      'How to calculate statutory verification fees?',
-      'What are Maximum Permissible Errors (MPE) for Class III scales?',
-      'How does Section 22 Model Approval work?',
-      'What is the re-verification due date timeline?',
+      'What is Section 22 Central Model Approval?',
     ];
   }
 
   private deriveFollowups(query: string, citations: StatutoryCitation[]): string[] {
     const q = query.toLowerCase();
+
+    if (q.includes('lost') || q.includes('duplicate')) {
+      return [
+        'How to verify digital certificate using QR code?',
+        'What documents are required for re-verification?',
+        'How to transfer a registered machine to another owner?',
+      ];
+    }
+
+    if (q.includes('seal') || q.includes('broken')) {
+      return [
+        'What is the penalty for using an unsealed scale?',
+        'How to book a re-verification appointment?',
+        'Who is authorized to break or repair an official seal?',
+      ];
+    }
+
+    if (q.includes('time') || q.includes('duration')) {
+      return [
+        'What documents are required for verification?',
+        'How to calculate statutory verification fees?',
+        'What is the re-verification validity period?',
+      ];
+    }
+
     if (q.includes('fee') || q.includes('cost') || q.includes('charge')) {
       return [
         'What are the fees for weighbridge verification?',
@@ -195,25 +213,9 @@ export class RAGService {
       ];
     }
 
-    if (q.includes('package') || q.includes('mrp') || q.includes('label')) {
-      return [
-        'What is Maximum Permissible Error in net quantity?',
-        'Are declarations mandatory on e-commerce websites?',
-        'What is the penalty for missing MRP or net weight?',
-      ];
-    }
-
-    if (q.includes('model') || q.includes('ind/')) {
-      return [
-        'Who issues the Certificate of Model Approval?',
-        'Can I verify a machine without Model Approval?',
-        'How to check approved model numbers on this portal?',
-      ];
-    }
-
     return [
-      'How to book a periodic re-verification slot?',
-      'What happens if an inspector finds broken physical seal?',
+      'What to do if my certificate is lost?',
+      'What to do if my physical seal is broken?',
       'How to verify certificate authenticity via QR code?',
     ];
   }

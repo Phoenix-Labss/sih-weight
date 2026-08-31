@@ -61,6 +61,28 @@ describe('Legal Metrology RAG & Chatbot Engine Suite', () => {
       expect(result.answer.toLowerCase()).toMatch(/fee|counter scale|₹/);
     });
 
+    it('retrieves lost certificate guidance for "What to do if my certificate is lost?"', async () => {
+      const result = await ragService.query({
+        query: 'What to do if my certificate is lost?',
+        language: 'en',
+      });
+
+      expect(result.citations.length).toBeGreaterThan(0);
+      expect(result.citations[0].title).toContain('Lost Certificate');
+      expect(result.answer.toLowerCase()).toMatch(/lost|duplicate|download/);
+    });
+
+    it('retrieves broken seal guidance for broken seal query', async () => {
+      const result = await ragService.query({
+        query: 'What should I do if my weighing machine seal is broken?',
+        language: 'en',
+      });
+
+      expect(result.citations.length).toBeGreaterThan(0);
+      expect(result.citations[0].title).toContain('Broken Physical Seal');
+      expect(result.answer.toLowerCase()).toMatch(/seal|broken|re-verification/);
+    });
+
     it('synthesizes Hindi response when language is "hi"', async () => {
       const result = await ragService.query({
         query: 'तराजू का सत्यापन और मुहर कैसे करवाएं?',

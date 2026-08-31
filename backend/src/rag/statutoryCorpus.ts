@@ -1,7 +1,198 @@
 import { StatutoryKnowledgeItem } from './types.js';
 
 export const STATUTORY_CORPUS: StatutoryKnowledgeItem[] = [
-  // --- 1. THE LEGAL METROLOGY ACT, 2009 ---
+  // --- 1. CITIZEN & TRADER PRACTICAL SCENARIOS ---
+  {
+    category: 'PORTAL_FAQ',
+    act_name: 'e-Metrology Digital Platform User Guide',
+    section_rule_ref: 'Digital Certificate Management § 4',
+    title: 'Lost Certificate & Duplicate Certificate Download',
+    citation_label: 'Digital Certificate Management § 4',
+    keywords: [
+      'lost',
+      'certificate is lost',
+      'lost certificate',
+      'misplaced certificate',
+      'duplicate certificate',
+      'lost my certificate',
+      'copy of certificate',
+      'download again',
+      'lost paper',
+      'print certificate',
+      'get certificate copy',
+      'kho gaya',
+    ],
+    content: `If your verification certificate is lost or misplaced, you do **not** need to pay duplicate paper fees or visit the department office:
+1. **100% Digital & Traceable:** All certificates generated on this portal are digitally authenticated and permanently stored in the PostgreSQL ledger.
+2. **Instant Download:** Log in to your **Trader Portal** $\\to$ navigate to **'My Verification Applications'** $\\to$ click **'Download Signed Certificate (PDF)'**.
+3. **Instant QR Verification:** You can also scan the QR code sticker on your weighing machine or enter your Certificate/Token number on the **Public QR Verify** page to view and download the official signed certificate anytime.`,
+    portal_action: {
+      label: 'Go to My Certificates',
+      action_type: 'NAVIGATE',
+      target_tab: 'trader',
+      description: 'Download signed digital certificates from your dashboard',
+    },
+  },
+  {
+    category: 'ACT',
+    act_name: 'The Legal Metrology Act, 2009',
+    section_rule_ref: 'Section 24 & Rule 27',
+    title: 'Broken Physical Seal or Damaged Tamper Stamp',
+    citation_label: 'Legal Metrology Act 2009 § 24 & Rule 27',
+    keywords: [
+      'broken seal',
+      'seal damaged',
+      'seal broken',
+      'wire broken',
+      'tampered seal',
+      'repair seal',
+      'lead seal broken',
+      'seal toot gaya',
+      'broken stamp',
+      'seal cut',
+    ],
+    content: `If the official lead-wire physical seal on your weighing machine is broken, cut, or damaged:
+1. **Stop Commercial Use Immediately:** Using an unsealed or tampered scale in commercial transactions is a punishable offence under Section 30 of The Legal Metrology Act, 2009.
+2. **Notify the Department within 7 Days:** Submit an intimation to your jurisdictional Legal Metrology Officer (LMO).
+3. **Repair by Licensed Technician:** If the seal broke due to machine malfunction, have it repaired by a licensed Legal Metrology Repairer who will issue a de-stamping/repair memo.
+4. **Apply for Re-Verification:** Submit an online re-verification application on the Trader Portal so an LMO can test the machine and affix a new official physical seal.`,
+    portal_action: {
+      label: 'Apply for Re-Verification',
+      action_type: 'NAVIGATE',
+      target_tab: 'trader',
+      description: 'Book a re-verification session for broken seal or repair',
+    },
+  },
+  {
+    category: 'PORTAL_FAQ',
+    act_name: 'Legal Metrology Citizen Charter & General Rules, 2011',
+    section_rule_ref: 'Citizen Charter SLA & Rule 27',
+    title: 'Verification Testing Duration and Turnaround Time',
+    citation_label: 'Citizen Charter & General Rules 2011',
+    keywords: [
+      'time',
+      'duration',
+      'how long',
+      'how much time',
+      'take to test',
+      'turnaround',
+      'testing time',
+      'inspection duration',
+      'sla',
+      'hours',
+      'minutes',
+      'kitna time',
+    ],
+    content: `The physical verification and testing duration varies by instrument type and testing mode:
+- **Retail Counter Scales (≤ 50 kg):** Approximately 15 to 30 minutes per unit (includes Eccentricity, Repeatability, and Weighing MPE linearity test).
+- **Platform Scales (50 kg to 500 kg):** Approximately 30 to 45 minutes.
+- **Heavy Industrial Weighbridges (10 Tonne to 100 Tonne):** Approximately 1.5 to 3 hours (requires Mobile Test Unit with certified standard weights up to maximum operational load).
+- **Turnaround & Certificate Issuance:** Once the testing is recorded and verified by the LMO or GATC verifier, the digital certificate and QR code are generated and issued within **24 to 48 hours** as per the Departmental Citizen Charter SLA.`,
+    portal_action: {
+      label: 'Book Verification Slot',
+      action_type: 'NAVIGATE',
+      target_tab: 'trader',
+      description: 'Schedule a verification appointment on Trader Portal',
+    },
+  },
+  {
+    category: 'PORTAL_FAQ',
+    act_name: 'Legal Metrology Departmental Procedure',
+    section_rule_ref: 'Rule 16 & Application Checklist',
+    title: 'Documents Required for Instrument Verification',
+    citation_label: 'Departmental Procedure & Rule 16',
+    keywords: [
+      'documents',
+      'docs',
+      'papers',
+      'invoice',
+      'what documents',
+      'requirements',
+      'application checklist',
+      'needed',
+      'kagaz',
+    ],
+    content: `The following documents are required when submitting an application for verification:
+1. **Invoice / Bill of Sale:** Proving legal purchase, manufacturer name, model, and serial number.
+2. **Central Model Approval Certificate (Section 22):** Mandatory for new/first-time verifications.
+3. **Previous Verification Certificate:** Required for periodic re-verification renewals.
+4. **GSTIN / Trade Registration Certificate:** Identification of the trader/establishment.
+5. **Repairer Certificate (Form VR):** Required only if the instrument underwent repair or seal de-stamping prior to re-verification.`,
+  },
+  {
+    category: 'PORTAL_FAQ',
+    act_name: 'e-Metrology Digital Platform User Guide',
+    section_rule_ref: 'Instrument Lifecycle § 5',
+    title: 'Transfer of Machine Ownership & Relocation',
+    citation_label: 'e-Metrology Platform Guide § 5',
+    keywords: [
+      'transfer',
+      'transfer machine',
+      'sold scale',
+      'change location',
+      'move machine',
+      'change owner',
+      'transfer ownership',
+      'relocate',
+      'bech diya',
+    ],
+    content: `To transfer a registered weighing instrument to another business or new location:
+1. Log in to the **Trader Portal** $\\to$ go to **'Registered Instruments'**.
+2. Select the machine and click **'Transfer Ownership / Relocate'**.
+3. Enter the new owner's GSTIN / Trade ID or new facility address.
+4. The system updates the immutable chain-of-custody ledger.
+5. If the instrument is relocated to a different state/jurisdiction, an on-site re-verification is required to verify local gravity calibration.`,
+    portal_action: {
+      label: 'Manage Registered Instruments',
+      action_type: 'NAVIGATE',
+      target_tab: 'trader',
+      description: 'View or transfer registered weighing instruments',
+    },
+  },
+  {
+    category: 'ACT',
+    act_name: 'The Legal Metrology Act, 2009',
+    section_rule_ref: 'Section 15',
+    title: 'Inspector Powers of Search, Seizure and Inspection',
+    citation_label: 'Legal Metrology Act 2009 § 15',
+    keywords: [
+      'inspector visit',
+      'inspection',
+      'lmo powers',
+      'search and seizure',
+      'section 15',
+      'officer rights',
+      'raid',
+      'checking',
+    ],
+    content: `Under Section 15 of The Legal Metrology Act, 2009, an authorized Legal Metrology Officer has statutory powers to:
+1. Enter any commercial premises during normal trading hours to inspect any weight, measure, or pre-packaged commodity.
+2. Demand production of verification certificates, purchase invoices, and calibration records.
+3. Seize unverified, non-standard, tampered, or fraudulent weights and measures and issue a formal Seizure Memo.
+4. Officers must display official departmental ID credentials upon request.`,
+  },
+  {
+    category: 'ACT',
+    act_name: 'The Legal Metrology Act, 2009',
+    section_rule_ref: 'Section 23',
+    title: 'Licensing of Manufacturers, Repairers, and Dealers',
+    citation_label: 'Legal Metrology Act 2009 § 23',
+    keywords: [
+      'license',
+      'dealer license',
+      'manufacturer license',
+      'repairer license',
+      'section 23',
+      'how to become repairer',
+      'licence',
+    ],
+    content: `Under Section 23 of The Legal Metrology Act, 2009:
+- No person may manufacture, repair, or sell any commercial weight or measure without a valid license issued by the State Controller of Legal Metrology.
+- Statutory Licenses include: **Manufacturer License (Form LM-1)**, **Repairer License (Form LR-1)**, and **Dealer License (Form LD-1)**.
+- Operating without a license is an offence punishable under Section 45.`,
+  },
+
+  // --- 2. STATUTORY LEGAL PROVISIONS ---
   {
     category: 'ACT',
     act_name: 'The Legal Metrology Act, 2009',
@@ -67,6 +258,7 @@ export const STATUTORY_CORPUS: StatutoryKnowledgeItem[] = [
       'weighbridge',
       'timeline',
       'how often',
+      'validity period',
     ],
     content: `Every weight or measure verified and stamped under this Act shall be re-verified at prescribed periodic intervals. Commercial Non-Automatic Weighing Instruments (NAWI) such as retail counter scales, platform scales, and electronic weighbridges are subject to mandatory periodic re-verification (typically 12 or 24 months as per state rules). Using an instrument past its validity expiry date constitutes a statutory offence under Section 30.`,
     portal_action: {
@@ -75,60 +267,6 @@ export const STATUTORY_CORPUS: StatutoryKnowledgeItem[] = [
       target_tab: 'trader',
       description: 'View registered machines and verification validity in your Trader Dashboard',
     },
-  },
-  {
-    category: 'PORTAL_FAQ',
-    act_name: 'Legal Metrology Citizen Charter & General Rules, 2011',
-    section_rule_ref: 'Citizen Charter SLA & Rule 27',
-    title: 'Verification Testing Duration and Turnaround Time',
-    citation_label: 'Citizen Charter & General Rules 2011',
-    keywords: [
-      'time',
-      'duration',
-      'how long',
-      'how much time',
-      'take to test',
-      'turnaround',
-      'testing time',
-      'inspection duration',
-      'sla',
-      'hours',
-      'minutes',
-    ],
-    content: `The physical verification and testing duration varies by instrument type and testing mode:
-- **Retail Counter Scales (≤ 50 kg):** Approximately 15 to 30 minutes per unit (includes Eccentricity, Repeatability, and Weighing MPE linearity test).
-- **Platform Scales (50 kg to 500 kg):** Approximately 30 to 45 minutes.
-- **Heavy Industrial Weighbridges (10 Tonne to 100 Tonne):** Approximately 1.5 to 3 hours (requires Mobile Test Unit with certified standard weights up to maximum operational load).
-- **Turnaround & Certificate Issuance:** Once the testing is recorded and verified by the LMO or GATC verifier, the digital certificate and QR code are generated and issued within **24 to 48 hours** as per the Departmental Citizen Charter SLA.`,
-    portal_action: {
-      label: 'Book Verification Slot',
-      action_type: 'NAVIGATE',
-      target_tab: 'trader',
-      description: 'Schedule a verification appointment on Trader Portal',
-    },
-  },
-  {
-    category: 'PORTAL_FAQ',
-    act_name: 'Legal Metrology Departmental Procedure',
-    section_rule_ref: 'Rule 16 & Application Checklist',
-    title: 'Documents Required for Instrument Verification',
-    citation_label: 'Departmental Procedure & Rule 16',
-    keywords: [
-      'documents',
-      'docs',
-      'papers',
-      'invoice',
-      'what documents',
-      'requirements',
-      'application checklist',
-      'needed',
-    ],
-    content: `The following documents are required when submitting an application for verification:
-1. **Invoice / Bill of Sale:** Proving legal purchase, manufacturer name, model, and serial number.
-2. **Central Model Approval Certificate (Section 22):** Mandatory for new/first-time verifications.
-3. **Previous Verification Certificate:** Required for periodic re-verification renewals.
-4. **GSTIN / Trade Registration Certificate:** Identification of the trader/establishment.
-5. **Repairer Certificate (Form VR):** Required only if the instrument underwent repair or seal de-stamping prior to re-verification.`,
   },
   {
     category: 'PENALTIES_COMPOUNDING',
@@ -141,12 +279,11 @@ export const STATUTORY_CORPUS: StatutoryKnowledgeItem[] = [
       'fine',
       'prosecution',
       'unverified',
-      'broken seal',
-      'tampering',
       'compounding',
       'seizure',
       'illegal scale',
       'punishment',
+      'jurmana',
     ],
     content: `Whoever uses any unverified or unstamped weight or measure in any commercial transaction shall be punished with a fine up to ₹10,000 for the first offence, and for a second or subsequent offence with imprisonment for a term which may extend to one year and with fine. Tampering with or altering an approved weight or measure attracts a fine up to ₹25,000 and possible prosecution. Most first-time non-fraudulent offences can be compounded under Section 48 upon payment of the compounding sum.`,
   },
@@ -168,7 +305,7 @@ export const STATUTORY_CORPUS: StatutoryKnowledgeItem[] = [
     content: `Any offence punishable under the Act (other than repeated fraudulent offences) may, either before or after the institution of the prosecution, be compounded by the Controller or authorized Legal Metrology Officer on payment of such compounding sum as prescribed. On compounding, no further criminal proceedings are initiated against the person for that offence.`,
   },
 
-  // --- 2. LEGAL METROLOGY (GENERAL) RULES, 2011 ---
+  // --- 3. GENERAL RULES, 2011 ---
   {
     category: 'GENERAL_RULES',
     act_name: 'Legal Metrology (General) Rules, 2011',
@@ -233,6 +370,7 @@ Example: On a 30 kg / 5 g retail scale (where e = 5 g), at a test load of 10 kg 
       'weighbridge fee',
       'how much',
       'payment rate',
+      'shulk',
     ],
     content: `Statutory verification fees are determined by instrument capacity and service mode:
 - **Counter Scales & Balances (≤ 50 kg):** ₹100 – ₹200.
@@ -249,29 +387,6 @@ Re-verification fees after repair or out-of-premises on-site inspection may incl
       description: 'Compute exact verification fees when creating an application',
     },
   },
-  {
-    category: 'GENERAL_RULES',
-    act_name: 'Legal Metrology (General) Rules, 2011',
-    section_rule_ref: 'Rule 27 & Schedule IX',
-    title: 'Physical Stamping and Security Sealing Procedure',
-    citation_label: 'General Rules 2011 Rule 27',
-    keywords: [
-      'stamp',
-      'seal',
-      'lead wire',
-      'hologram',
-      'tamper evident',
-      'physical mark',
-      'security seal',
-      'broken seal',
-    ],
-    content: `Upon successful verification, the Legal Metrology Officer (or GATC Assessor) must affix:
-1. An official lead-wire or metallic seal passing through the calibration adjustment switch/housing to prevent unauthorized alteration.
-2. A verification stamp/sticker indicating the year, quarter, and state code.
-3. The digital certificate is issued following physical sealing and records the unique physical seal number (e.g. DL-SEAL-2026-XXXX). Breaking this seal invalidates the verification.`,
-  },
-
-  // --- 3. LEGAL METROLOGY (PACKAGED COMMODITIES) RULES, 2011 ---
   {
     category: 'PACKAGED_COMMODITIES',
     act_name: 'Legal Metrology (Packaged Commodities) Rules, 2011',
@@ -302,54 +417,6 @@ Re-verification fees after repair or out-of-premises on-site inspection may incl
 Failure to display these declarations is an offence punishable under Section 36.`,
   },
   {
-    category: 'PACKAGED_COMMODITIES',
-    act_name: 'Legal Metrology (Packaged Commodities) Rules, 2011',
-    section_rule_ref: 'Rule 6(10) & E-Commerce Guidelines',
-    title: 'Mandatory Declarations on E-Commerce Marketplaces',
-    citation_label: 'Packaged Commodities Rules 2011 Rule 6(10)',
-    keywords: [
-      'e-commerce',
-      'online marketplace',
-      'amazon',
-      'flipkart',
-      'digital display',
-      'country of origin',
-      'mrp online',
-      'online selling',
-    ],
-    content: `E-commerce entities displaying pre-packaged commodities for sale must display all mandatory declarations on the digital marketplace product page, including:
-- Country of Origin.
-- Name and address of the manufacturer/importer.
-- Net quantity and Unit Sale Price.
-- MRP (inclusive of all taxes).
-- Expiry date / best before date where applicable.`,
-  },
-  {
-    category: 'PACKAGED_COMMODITIES',
-    act_name: 'Legal Metrology (Packaged Commodities) Rules, 2011',
-    section_rule_ref: 'First Schedule',
-    title: 'Maximum Permissible Error (MPE) in Net Quantity',
-    citation_label: 'Packaged Commodities Rules 2011 Schedule I',
-    keywords: [
-      'net weight tolerance',
-      'underweight package',
-      'short delivery',
-      'net quantity mpe',
-      'pre-packaged tolerance',
-      'less weight',
-    ],
-    content: `The actual net quantity in a package must not fall below the declared net quantity by more than the Maximum Permissible Error:
-- Packages 50 g to 100 g: MPE is 4.5 g.
-- Packages 100 g to 200 g: MPE is 4.5%.
-- Packages 200 g to 300 g: MPE is 9 g.
-- Packages 300 g to 500 g: MPE is 3%.
-- Packages 500 g to 1 kg: MPE is 15 g.
-- Packages 1 kg to 10 kg: MPE is 1.5%.
-Short deliveries beyond these tolerances attract fines up to ₹25,000 per violation under Section 36.`,
-  },
-
-  // --- 4. GATC RULES 2013 ---
-  {
     category: 'GATC_RULES',
     act_name: 'Government Approved Test Centre (GATC) Rules, 2013',
     section_rule_ref: 'Rule 3 & 4',
@@ -373,8 +440,6 @@ Short deliveries beyond these tolerances attract fines up to ₹25,000 per viola
       description: 'Access the GATC testing and verification workspace',
     },
   },
-
-  // --- 5. PORTAL GUIDES & FAQS ---
   {
     category: 'PORTAL_FAQ',
     act_name: 'e-Metrology Digital Platform User Guide',
@@ -402,28 +467,6 @@ Short deliveries beyond these tolerances attract fines up to ₹25,000 per viola
       target_tab: 'trader',
       description: 'Open the instrument registration modal on Trader Portal',
     },
-  },
-  {
-    category: 'PORTAL_FAQ',
-    act_name: 'e-Metrology Digital Platform User Guide',
-    section_rule_ref: 'Trader Guide FAQ 2',
-    title: 'How to Book a Verification Appointment',
-    citation_label: 'e-Metrology Platform Guide § 2',
-    keywords: [
-      'book appointment',
-      'schedule verification',
-      'verification slot',
-      'departmental lab',
-      'on site visit',
-      'gatc centre',
-      'schedule slot',
-    ],
-    content: `To schedule verification:
-1. Go to "My Verification Applications" on the Trader Portal.
-2. Select your registered instrument and choose Service Mode: On-Site Inspection, Departmental Metrology Lab, or GATC Test Centre.
-3. Select an available date/time slot from the calendar.
-4. Pay the assessed statutory fee online or upload the treasury challan receipt.
-5. The assigned Legal Metrology Officer or GATC verifier will conduct the testing at the scheduled slot.`,
   },
   {
     category: 'PORTAL_FAQ',

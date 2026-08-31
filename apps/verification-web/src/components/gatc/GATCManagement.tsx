@@ -597,13 +597,13 @@ export const GATCManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* GATC Verified Header Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-2xl p-6 shadow-md border border-indigo-800/40">
+      <div className="bg-gov-navy text-white rounded-lg p-5 sm:p-6 shadow-card">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <Microscope className="w-6 h-6 text-indigo-400" />
+              <Microscope className="w-6 h-6 text-amber-400" aria-hidden="true" />
               <h2 className="text-xl font-bold tracking-tight">Government Approved Test Centre (GATC) Console</h2>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-white/10 text-amber-300 border border-white/20">
                 GATC RULES, 2013 ACCREDITED
               </span>
             </div>
@@ -613,8 +613,8 @@ export const GATCManagement: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-white/10 px-3.5 py-2 rounded-xl border border-white/15 text-xs text-slate-200 flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-400" />
+            <div className="bg-white/10 px-3.5 py-2 rounded-md border border-white/15 text-xs text-slate-200 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
               <span>GATC Key Slot: <strong className="font-mono text-white">HSM-GATC-01</strong></span>
             </div>
           </div>
@@ -627,11 +627,11 @@ export const GATCManagement: React.FC = () => {
           onClick={() => setActiveTab('intake')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'intake'
-              ? 'bg-gov-navy text-white shadow-xs'
+              ? 'bg-gov-navy text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <FileCheck2 className="w-4 h-4 text-amber-400" />
+          <FileCheck2 className="w-4 h-4 text-gov-goldDeep" aria-hidden="true" />
           <span>Application Intake &amp; Lab Scheduling Queue ({pendingIntakeApps.length} Pending)</span>
         </button>
 
@@ -639,11 +639,11 @@ export const GATCManagement: React.FC = () => {
           onClick={() => setActiveTab('testing')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'testing'
-              ? 'bg-indigo-700 text-white shadow-xs'
+              ? 'bg-gov-blue text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Scale className="w-4 h-4 text-indigo-300" />
+          <Scale className="w-4 h-4 text-gov-blue" aria-hidden="true" />
           <span>Guided NAWI Testing Session Execution ({activeWorkSessions.length} Active Workload)</span>
         </button>
 
@@ -651,11 +651,11 @@ export const GATCManagement: React.FC = () => {
           onClick={() => setActiveTab('standards')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'standards'
-              ? 'bg-slate-800 text-white shadow-xs'
+              ? 'bg-slate-800 text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Building2 className="w-4 h-4 text-amber-400" />
+          <Building2 className="w-4 h-4 text-gov-goldDeep" aria-hidden="true" />
           <span>Accreditation Scope &amp; Working Standards ({allStatutoryWorkingStandards.length})</span>
         </button>
 
@@ -663,7 +663,7 @@ export const GATCManagement: React.FC = () => {
           onClick={() => setActiveTab('ledger')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'ledger'
-              ? 'bg-blue-700 text-white shadow-xs'
+              ? 'bg-gov-blue text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -688,9 +688,9 @@ export const GATCManagement: React.FC = () => {
       {activeTab === 'testing' && (
         <div className="space-y-4">
           {/* Active Testing Queue Picker */}
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-700 shrink-0">
-              <Calendar className="w-4 h-4 text-indigo-600" />
+              <Calendar className="w-4 h-4 text-gov-blue" />
               <span>GATC Lab Queue:</span>
             </div>
             <div className="flex-1 w-full">
@@ -698,7 +698,7 @@ export const GATCManagement: React.FC = () => {
                 value={activeSession?.session_id || ''}
                 onChange={(e) => setSelectedSessionId(e.target.value)}
                 disabled={activeWorkSessions.length === 0}
-                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-600 w-full disabled:bg-slate-50 disabled:text-slate-400"
+                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-blue-600 w-full disabled:bg-slate-50 disabled:text-slate-400"
               >
                 {activeWorkSessions.length > 0 ? (
                   activeWorkSessions.map((s) => {
@@ -748,11 +748,11 @@ export const GATCManagement: React.FC = () => {
       {activeTab === 'standards' && (
         <div className="space-y-6">
           {/* GATC Accreditations Scope Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-card space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
               <div>
                 <h3 className="text-base font-bold text-gov-navy flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                  <ShieldCheck className="w-5 h-5 text-gov-blue" />
                   Statutory GATC Accreditation &amp; Approved Testing Scope
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -767,7 +767,7 @@ export const GATCManagement: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {mockGATCCentres.map((centre) => (
-                <div key={centre.gatcId} className="border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors space-y-3 bg-slate-50/50">
+                <div key={centre.gatcId} className="border border-slate-200 rounded-xl p-5 hover:border-blue-300 transition-colors space-y-3 bg-slate-50/50">
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-bold text-slate-900 text-sm">{centre.facilityName}</h4>
@@ -793,7 +793,7 @@ export const GATCManagement: React.FC = () => {
                     <span className="text-xs text-slate-500 block mb-1">Approved Accuracy Classes:</span>
                     <div className="flex gap-1.5 flex-wrap">
                       {centre.approvedClasses.map((cls) => (
-                        <span key={cls} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-xs font-medium border border-indigo-200">
+                        <span key={cls} className="px-2 py-0.5 bg-blue-50 text-gov-blue rounded text-xs font-medium border border-blue-200">
                           {cls}
                         </span>
                       ))}
@@ -805,15 +805,15 @@ export const GATCManagement: React.FC = () => {
           </div>
 
           {/* Traceable Working Reference Standards Full Catalog */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-card space-y-4">
             <div className="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Layers className="w-5 h-5 text-amber-600" />
+                <Layers className="w-5 h-5 text-amber-700" />
                 <h3 className="font-bold text-sm text-gov-navy uppercase tracking-wider">
                   Statutory Working Reference Standards Inventory
                 </h3>
               </div>
-              <span className="text-xs font-mono font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200">
+              <span className="text-xs font-mono font-bold text-gov-blue bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
                 {filteredStandards.length} of {allStatutoryWorkingStandards.length} Traceable Standards
               </span>
             </div>
@@ -824,7 +824,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('all')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                   standardCategory === 'all'
-                    ? 'bg-gov-navy text-white shadow-2xs'
+                    ? 'bg-gov-navy text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -834,7 +834,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('mass')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'mass'
-                    ? 'bg-indigo-700 text-white shadow-2xs'
+                    ? 'bg-gov-blue text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -845,7 +845,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('volume')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'volume'
-                    ? 'bg-blue-700 text-white shadow-2xs'
+                    ? 'bg-gov-blue text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -856,7 +856,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('length')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'length'
-                    ? 'bg-amber-700 text-white shadow-2xs'
+                    ? 'bg-amber-700 text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -867,7 +867,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('pressure')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'pressure'
-                    ? 'bg-rose-700 text-white shadow-2xs'
+                    ? 'bg-red-700 text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -878,7 +878,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('temperature')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'temperature'
-                    ? 'bg-emerald-700 text-white shadow-2xs'
+                    ? 'bg-emerald-700 text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -889,7 +889,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('flow')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'flow'
-                    ? 'bg-cyan-700 text-white shadow-2xs'
+                    ? 'bg-cyan-700 text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -900,7 +900,7 @@ export const GATCManagement: React.FC = () => {
                 onClick={() => setStandardCategory('taxi')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   standardCategory === 'taxi'
-                    ? 'bg-purple-700 text-white shadow-2xs'
+                    ? 'bg-blue-700 text-white shadow-card'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -918,13 +918,13 @@ export const GATCManagement: React.FC = () => {
                   placeholder="Search standard by ID, description, class, certificate, or machine type..."
                   value={standardSearch}
                   onChange={(e) => setStandardSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-600 bg-white"
+                  className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 bg-white"
                 />
               </div>
               <select
                 value={standardStatus}
                 onChange={(e) => setStandardStatus(e.target.value)}
-                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-600"
+                className="text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 bg-white focus:ring-2 focus:ring-blue-600"
               >
                 <option value="ALL">All Calibration Statuses</option>
                 <option value="ACTIVE">Active &amp; Traceable Only</option>
@@ -935,7 +935,7 @@ export const GATCManagement: React.FC = () => {
             {/* Comprehensive Table */}
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs">
                   <tr>
                     <th className="py-2.5 px-3">Standard Identifier</th>
                     <th className="py-2.5 px-3">Description &amp; Nominal Range</th>
@@ -953,26 +953,26 @@ export const GATCManagement: React.FC = () => {
                       <tr key={std.standardId} className="hover:bg-slate-50">
                         <td className="py-3 px-3">
                           <span className="font-bold text-slate-900 block">{std.standardId}</span>
-                          <span className="text-[10px] font-sans text-indigo-600 font-medium">{std.categoryLabel}</span>
+                          <span className="text-xs font-sans text-gov-blue font-medium">{std.categoryLabel}</span>
                         </td>
                         <td className="py-3 px-3 font-sans text-slate-700 max-w-xs">
                           <strong className="block text-slate-900">{std.description}</strong>
                           <span className="text-xs text-slate-500 font-mono block">{std.nominalValue}</span>
-                          <span className="text-[10px] text-slate-400 block mt-0.5">Applied on: {std.applicableInstruments}</span>
+                          <span className="text-xs text-slate-400 block mt-0.5">Applied on: {std.applicableInstruments}</span>
                         </td>
-                        <td className="py-3 px-3 font-sans font-bold text-indigo-700 whitespace-nowrap">
+                        <td className="py-3 px-3 font-sans font-bold text-gov-blue whitespace-nowrap">
                           {std.accuracyClass}
                         </td>
                         <td className="py-3 px-3 text-gov-blue whitespace-nowrap">{std.calibrationCertificate}</td>
                         <td className="py-3 px-3 font-sans text-slate-600 whitespace-nowrap">{std.calibratedBy}</td>
-                        <td className="py-3 px-3 text-slate-700 whitespace-nowrap font-sans font-medium text-[11px]">
+                        <td className="py-3 px-3 text-slate-700 whitespace-nowrap font-sans font-medium text-xs">
                           {std.expandedUncertainty}
                         </td>
                         <td className="py-3 px-3 font-sans font-bold text-slate-900 whitespace-nowrap">
                           {std.validUntil}
                         </td>
                         <td className="py-3 px-3 font-sans whitespace-nowrap">
-                          <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                          <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold inline-flex items-center gap-1">
                             <span>✓</span> ACTIVE &amp; TRACEABLE
                           </span>
                         </td>
@@ -995,10 +995,10 @@ export const GATCManagement: React.FC = () => {
       {/* Tab 4: GATC Test Certificates & Reports Ledger */}
       {activeTab === 'ledger' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-card space-y-4">
             <div className="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-indigo-600" />
+                <Award className="w-5 h-5 text-gov-blue" />
                 <h3 className="font-bold text-sm text-gov-navy uppercase tracking-wider">
                   GATC Verification Certificates &amp; Test Reports Master Ledger
                 </h3>
@@ -1014,7 +1014,7 @@ export const GATCManagement: React.FC = () => {
                       notify('success', 'Database Reset', 'All demo certificates cleared and state restored to baseline.');
                     }
                   }}
-                  className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold border border-rose-200 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold border border-red-200 transition-colors cursor-pointer"
                   title="Clear all generated mock certificates and reset database"
                 >
                   Clear All Data / Reset
@@ -1024,7 +1024,7 @@ export const GATCManagement: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs">
                   <tr>
                     <th className="py-2.5 px-3">GATC Certificate / Report Number</th>
                     <th className="py-2.5 px-3">Validity Period</th>
@@ -1038,7 +1038,7 @@ export const GATCManagement: React.FC = () => {
                   {gatcCertificates.length > 0 ? (
                     gatcCertificates.map((cert) => (
                       <tr key={cert.certificate_id} className="hover:bg-slate-50">
-                        <td className="py-3 px-3 font-bold text-indigo-900">{cert.certificate_number}</td>
+                        <td className="py-3 px-3 font-bold text-blue-900">{cert.certificate_number}</td>
                         <td className="py-3 px-3 font-sans text-slate-700">
                           {cert.issue_date} to <strong className="text-slate-900">{cert.valid_until}</strong>
                         </td>
@@ -1066,7 +1066,7 @@ export const GATCManagement: React.FC = () => {
                                 setSelectedCertForView(cert);
                                 setIsCertModalOpen(true);
                               }}
-                              className="px-2.5 py-1 rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold cursor-pointer"
+                              className="px-2.5 py-1 rounded bg-blue-50 text-gov-blue hover:bg-blue-100 font-semibold cursor-pointer"
                             >
                               View Certificate
                             </button>

@@ -23,13 +23,13 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
     tokens.forEach((token, idx) => {
       if (token.startsWith('**') && token.endsWith('**')) {
         parts.push(
-          <strong key={idx} className="font-semibold text-slate-900 dark:text-slate-100">
+          <strong key={idx} className="font-bold text-slate-900">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith('*') && token.endsWith('*')) {
         parts.push(
-          <em key={idx} className="italic text-slate-700 dark:text-slate-300">
+          <em key={idx} className="italic text-slate-700">
             {token.slice(1, -1)}
           </em>
         );
@@ -37,7 +37,7 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
         parts.push(
           <code
             key={idx}
-            className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 font-mono text-[10px] rounded font-semibold"
+            className="px-1 py-0.5 bg-slate-100 border border-slate-200 text-gov-blue font-mono text-[0.85em] rounded font-semibold"
           >
             {token.slice(1, -1)}
           </code>
@@ -67,9 +67,8 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
       elements.push(
         <h4
           key={`h4-${i}`}
-          className="font-bold text-[13px] text-indigo-700 dark:text-indigo-300 mt-2 mb-1 flex items-center gap-1.5"
+          className="font-bold text-[0.95em] text-gov-navy mt-2 mb-1"
         >
-          <span className="w-1.5 h-3.5 bg-amber-500 rounded-full inline-block" />
           {renderInline(line.replace(/^###\s+/, ''))}
         </h4>
       );
@@ -80,21 +79,20 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
       elements.push(
         <h3
           key={`h3-${i}`}
-          className="font-bold text-sm text-indigo-800 dark:text-indigo-200 mt-2.5 mb-1 flex items-center gap-1.5"
+          className="font-bold text-gov-navy border-b border-slate-200 pb-1 mt-2.5 mb-1.5"
         >
-          <span className="w-2 h-4 bg-indigo-500 rounded-full inline-block" />
           {renderInline(line.replace(/^#+\s+/, ''))}
         </h3>
       );
       continue;
     }
 
-    // 2. Blockquotes: > quote text
+    // 2. Blockquotes: > quote text (statutory citations / references)
     if (line.startsWith('> ')) {
       elements.push(
         <div
           key={`quote-${i}`}
-          className="border-l-2 border-amber-500 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-r-lg my-1.5 text-[11px] leading-relaxed"
+          className="border-l-[3px] border-gov-gold bg-slate-50 text-slate-700 px-3 py-2 rounded-r-md my-1.5 leading-relaxed"
         >
           {renderInline(line.replace(/^>\s+/, ''))}
         </div>
@@ -109,7 +107,7 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
       const rest = numMatch[2];
       elements.push(
         <div key={`num-${i}`} className="flex items-start gap-2 my-1">
-          <span className="w-4 h-4 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5 border border-indigo-200 dark:border-indigo-800">
+          <span className="w-5 h-5 rounded-full bg-slate-100 text-gov-blue text-[0.75em] font-bold flex items-center justify-center shrink-0 mt-0.5 border border-slate-200">
             {num}
           </span>
           <div className="flex-1 leading-relaxed">{renderInline(rest)}</div>
@@ -122,7 +120,7 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
     if (line.startsWith('* ') || line.startsWith('- ') || line.startsWith('• ')) {
       elements.push(
         <div key={`bullet-${i}`} className="flex items-start gap-2 my-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
+          <span className="w-1.5 h-1.5 rounded-full bg-gov-gold shrink-0 mt-[0.55em]" aria-hidden="true" />
           <div className="flex-1 leading-relaxed">
             {renderInline(line.replace(/^[\*\-•]\s+/, ''))}
           </div>
@@ -139,5 +137,5 @@ export const FormattedMarkdown: React.FC<FormattedMarkdownProps> = ({
     );
   }
 
-  return <div className="space-y-0.5 text-xs font-sans">{elements}</div>;
+  return <div className="space-y-0.5 text-sm">{elements}</div>;
 };

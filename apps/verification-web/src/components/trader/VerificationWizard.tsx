@@ -137,7 +137,7 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
                         <div className="text-xs font-bold text-slate-900">
                           {inst.model?.model_name || 'Standard Scale'}
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono">
+                        <div className="text-xs text-slate-500 font-mono">
                           Serial: {inst.serial_number} | Class: {inst.model?.accuracy_class} | Max: {inst.model?.max_capacity} {inst.model?.capacity_unit}
                         </div>
                       </div>
@@ -145,7 +145,7 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
                     {isSelected && <CheckCircle2 className="w-5 h-5 text-gov-blue" />}
                   </div>
                   {inst.installation_location_notes && (
-                    <div className="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
+                    <div className="mt-2 text-xs text-slate-500 flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-slate-400" />
                       <span>{inst.installation_location_notes}</span>
                     </div>
@@ -208,7 +208,7 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
                   }`}
                 >
                   <div className="font-bold text-slate-900">{m.title}</div>
-                  <div className="text-[10px] text-slate-500 font-normal mt-0.5">{m.desc}</div>
+                  <div className="text-xs text-slate-500 font-normal mt-0.5">{m.desc}</div>
                 </div>
               ))}
             </div>

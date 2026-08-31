@@ -89,7 +89,7 @@ export const FeePaymentModal: React.FC<FeePaymentModalProps> = ({
         <div className="space-y-5">
           {/* Itemized Assessment Bill */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs">
-            <h4 className="font-bold text-gov-navy uppercase tracking-wider text-[11px] mb-2 flex items-center justify-between">
+            <h4 className="font-bold text-gov-navy uppercase tracking-wider text-xs mb-2 flex items-center justify-between">
               <span>Itemized Statutory Assessment</span>
               <span className="text-slate-400 font-normal">Policy: {assessment.policy_version}</span>
             </h4>
@@ -106,7 +106,7 @@ export const FeePaymentModal: React.FC<FeePaymentModalProps> = ({
               </span>
             </div>
             {assessment.late_fee > 0 && (
-              <div className="flex justify-between py-1 border-b border-slate-200 text-rose-700">
+              <div className="flex justify-between py-1 border-b border-slate-200 text-red-700">
                 <span>Statutory Late Surcharge:</span>
                 <span className="font-mono font-semibold">{formatCurrency(assessment.late_fee)}</span>
               </div>
@@ -159,7 +159,7 @@ export const FeePaymentModal: React.FC<FeePaymentModalProps> = ({
                   >
                     <Icon className={`w-5 h-5 mb-1.5 ${isSelected ? 'text-gov-blue' : 'text-slate-500'}`} />
                     <div className="text-xs font-bold">{g.name}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{g.desc}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{g.desc}</div>
                   </div>
                 );
               })}
@@ -199,7 +199,7 @@ export const FeePaymentModal: React.FC<FeePaymentModalProps> = ({
         </div>
       ) : (
         <div className="space-y-5 text-center py-4">
-          <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-7 h-7" />
           </div>
 

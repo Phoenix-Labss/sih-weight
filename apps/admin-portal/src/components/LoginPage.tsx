@@ -33,28 +33,28 @@ export const LoginPage: React.FC = () => {
       </header>
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-xl border border-gov-border p-8">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gov-navy mb-4">
-                <Shield className="h-7 w-7 text-amber-400" />
+          <div className="rounded-md border border-gov-border bg-white p-8 shadow-card">
+            <div className="mb-6 text-center">
+              <div className="mb-4 inline-flex w-12 h-12 items-center justify-center rounded-md bg-gov-navy">
+                <Shield className="h-6 w-6 text-amber-400" aria-hidden="true" />
               </div>
               <h2 className="text-lg font-bold text-gov-navy">Admin Sign In</h2>
-              <p className="text-xs text-slate-500 mt-1">Restricted to authorised system administrators</p>
+              <p className="mt-1 text-xs text-slate-500">Restricted to authorised system administrators</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="admin-email" className="block text-xs font-medium text-slate-600 mb-1">Email</label>
-                <input id="admin-email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full rounded-xl border border-gov-border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-blue" placeholder="admin.delhi@gov.in" autoComplete="email" autoFocus />
+                <label htmlFor="admin-email" className="mb-1 block text-sm font-semibold text-slate-700">Email</label>
+                <input id="admin-email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full rounded-md border border-gov-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue" placeholder="admin.delhi@gov.in" autoComplete="email" autoFocus />
               </div>
               <div>
-                <label htmlFor="admin-password" className="block text-xs font-medium text-slate-600 mb-1">Password</label>
-                <input id="admin-password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full rounded-xl border border-gov-border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gov-blue" placeholder="••••••••" autoComplete="current-password" />
+                <label htmlFor="admin-password" className="mb-1 block text-sm font-semibold text-slate-700">Password</label>
+                <input id="admin-password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full rounded-md border border-gov-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue" placeholder="••••••••" autoComplete="current-password" />
               </div>
-              {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 flex items-center gap-2"><Lock className="h-4 w-4 shrink-0" />{error}</div>}
-              <button type="submit" disabled={submitting} className="w-full rounded-xl bg-gov-blue px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60">{submitting ? 'Signing in...' : 'Sign In'}</button>
+              {error && <div role="alert" className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700"><Lock className="h-4 w-4 shrink-0" aria-hidden="true" />{error}</div>}
+              <button type="submit" disabled={submitting} className="btn-primary w-full">{submitting ? 'Signing in…' : 'Sign In'}</button>
             </form>
-            <div className="mt-4 pt-4 border-t border-gov-border text-[11px] text-slate-400 text-center">
-              Demo: admin.delhi@gov.in / Admin@2026
+            <div className="mt-4 border-t border-gov-border pt-4 text-center text-xs text-slate-500">
+              Demo credentials: admin.delhi@gov.in / Admin@2026
             </div>
           </div>
         </div>

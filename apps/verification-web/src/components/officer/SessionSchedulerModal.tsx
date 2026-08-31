@@ -139,10 +139,10 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
             <Building className="w-4 h-4 text-gov-navy shrink-0" />
             <div>
               <div className="font-bold text-gov-navy">{jurisdictionName}</div>
-              <div className="text-[11px] text-slate-500">Service Mode: {application.service_mode.replace(/_/g, ' ')}</div>
+              <div className="text-xs text-slate-500">Service Mode: {application.service_mode.replace(/_/g, ' ')}</div>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold shrink-0">
+          <div className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold shrink-0">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Statutory Fee Reconciled</span>
           </div>
@@ -221,7 +221,7 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition-colors disabled:opacity-50 cursor-pointer"
+            className="px-5 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white shadow-card hover:bg-blue-800 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? 'Confirming Slot...' : 'Confirm & Schedule Appointment'}
           </button>

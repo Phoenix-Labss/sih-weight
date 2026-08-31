@@ -77,14 +77,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       case 'REVOKED':
         return {
           label: 'REVOKED / CANCELLED',
-          badgeClass: 'text-rose-950 bg-rose-100 border-rose-300 ring-1 ring-rose-400/40',
-          icon: <XCircle className="w-3.5 h-3.5 text-rose-700 shrink-0" />,
+          badgeClass: 'text-red-950 bg-red-100 border-red-300 ring-1 ring-red-400/40',
+          icon: <XCircle className="w-3.5 h-3.5 text-red-700 shrink-0" />,
         };
       case 'SUPERSEDED':
         return {
           label: 'SUPERSEDED',
           badgeClass: 'text-blue-950 bg-blue-100 border-blue-300 ring-1 ring-blue-400/40',
-          icon: <RefreshCw className="w-3.5 h-3.5 text-blue-700 shrink-0" />,
+          icon: <RefreshCw className="w-3.5 h-3.5 text-gov-blue shrink-0" />,
         };
       default:
         return {
@@ -107,7 +107,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         return {
           title: 'Statutory Expiry (Overdue)',
           value: `${formatDate(certificate.valid_until)} (Expired)`,
-          pillClass: 'font-bold text-rose-800 text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block',
+          pillClass: 'font-bold text-red-800 text-xs bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-block',
         };
       case 'SUSPENDED':
         return {
@@ -119,7 +119,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         return {
           title: 'Certificate Validity',
           value: 'Null & Void (Revoked by Dept)',
-          pillClass: 'font-bold text-rose-900 text-xs bg-rose-100 px-2 py-0.5 rounded border border-rose-300 inline-block line-through',
+          pillClass: 'font-bold text-red-900 text-xs bg-red-100 px-2 py-0.5 rounded border border-red-300 inline-block line-through',
         };
       case 'SUPERSEDED':
         return {
@@ -150,7 +150,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
     >
       <div className="space-y-6">
         {/* Certificate Container with Security Border */}
-        <div className="relative bg-[#FCFDFE] text-slate-900 font-sans rounded-2xl shadow-xl border-2 border-amber-600/30 p-1 sm:p-2 print:border-none print:p-0 print:shadow-none overflow-hidden">
+        <div className="relative bg-[#FCFDFE] text-slate-900 font-sans rounded-lg shadow-lg border-2 border-amber-600/30 p-1 sm:p-2 print:border-none print:p-0 print:shadow-none overflow-hidden">
           
           {/* Inner Golden Guilloche Security Border */}
           <div className="relative border border-gov-navy/20 rounded-xl p-5 sm:p-8 bg-white overflow-hidden">
@@ -204,10 +204,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 </div>
 
                 <div className="space-y-0.5">
-                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-slate-600">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-600">
                     भारत सरकार | GOVERNMENT OF INDIA
                   </h4>
-                  <h5 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     MINISTRY OF CONSUMER AFFAIRS, FOOD & PUBLIC DISTRIBUTION
                   </h5>
                   <h2 className="text-lg sm:text-xl font-extrabold text-gov-navy uppercase tracking-tight font-serif pt-0.5">
@@ -221,12 +221,12 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 </div>
 
                 <div className="pt-2">
-                  <div className={`inline-block font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider shadow-xs ${
-                    isGatc ? 'bg-indigo-900 text-indigo-200' : 'bg-slate-900 text-amber-400'
+                  <div className={`inline-block font-bold px-4 py-1 rounded-full text-xs uppercase tracking-wider shadow-card ${
+                    isGatc ? 'bg-blue-900 text-blue-200' : 'bg-slate-900 text-amber-400'
                   }`}>
                     {isGatc ? 'GATC VERIFICATION TEST REPORT & CERTIFICATE' : 'CERTIFICATE OF VERIFICATION OF WEIGHTS & MEASURES'}
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1 font-medium">
+                  <p className="text-xs text-slate-500 mt-1 font-medium">
                     {isGatc
                       ? '[Issued under Section 19 of The Legal Metrology Act, 2009 & Rule 13, Schedule II of Legal Metrology (GATC) Rules, 2013]'
                       : '[Issued under Section 24 of The Legal Metrology Act, 2009 (1 of 2010) & Rule 14, Schedule IX of The Legal Metrology General Rules, 2011]'}
@@ -234,11 +234,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
                   {/* Non-Active Certificate Warning Banner */}
                   {status !== 'ISSUED' && (
-                    <div className={`mt-2.5 p-2 rounded-lg border text-[11px] flex items-center justify-center gap-2 font-bold ${
+                    <div className={`mt-2.5 p-2 rounded-lg border text-xs flex items-center justify-center gap-2 font-bold ${
                       status === 'EXPIRED'
                         ? 'bg-orange-50 text-orange-950 border-orange-300'
                         : status === 'REVOKED'
-                        ? 'bg-rose-50 text-rose-950 border-rose-300'
+                        ? 'bg-red-50 text-red-950 border-red-300'
                         : status === 'SUSPENDED'
                         ? 'bg-amber-50 text-amber-950 border-amber-300'
                         : 'bg-blue-50 text-blue-950 border-blue-300'
@@ -265,7 +265,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 <div className="md:col-span-2 bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 space-y-3 flex flex-col justify-between min-w-0">
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                         Certificate Number
                       </span>
                       <span className="font-mono font-extrabold text-sm text-gov-navy tracking-tight truncate block">
@@ -274,7 +274,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                         Statutory Status
                       </span>
                       <span className={`inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-md border ${statusBadge.badgeClass}`}>
@@ -284,7 +284,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                         Date of Verification
                       </span>
                       <span className="font-bold text-slate-800 text-xs">
@@ -293,7 +293,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                         {dueInfo.title}
                       </span>
                       <span className={dueInfo.pillClass}>
@@ -303,7 +303,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                   </div>
 
                   <div className="pt-2 border-t border-slate-200/60 text-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                       Issuing Departmental Authority
                     </span>
                     <span className="font-semibold text-slate-800 block truncate">
@@ -313,7 +313,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 </div>
 
                 {/* Secure QR Verification Code Card */}
-                <div className="bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col items-center justify-between text-center shadow-2xs min-w-0">
+                <div className="bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col items-center justify-between text-center shadow-card min-w-0">
                   <a
                     href={verificationUrl}
                     target="_blank"
@@ -339,7 +339,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                     </div>
 
                     <div className="mt-2 space-y-0.5">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-gov-blue group-hover:underline">
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-gov-blue group-hover:underline">
                         <QrCode className="w-3 h-3" />
                         <span>Scan to Verify</span>
                       </span>
@@ -362,57 +362,57 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50/90 p-3.5 rounded-xl border border-slate-200 text-xs">
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Instrument Category:</span>
+                    <span className="text-xs text-slate-400 font-medium block">Instrument Category:</span>
                     <span className="font-bold text-slate-800 truncate block">
                       {instrument?.model?.category || 'NAWI'} — {instrument?.model?.subtype || 'Commercial Counter Scale'}
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Model Approval Ref (Sec 22):</span>
+                    <span className="text-xs text-slate-400 font-medium block">Model Approval Ref (Sec 22):</span>
                     <span className="font-mono font-bold text-slate-800 truncate block">
                       {instrument?.model?.model_approval_number || 'IND/09/2024/8842'}
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Accuracy Class:</span>
+                    <span className="text-xs text-slate-400 font-medium block">Accuracy Class:</span>
                     <span className="font-bold text-gov-navy block">
                       Class {instrument?.model?.accuracy_class?.replace(/CLASS_/g, '') || 'III'} (Medium)
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Instrument Serial No:</span>
+                    <span className="text-xs text-slate-400 font-medium block">Instrument Serial No:</span>
                     <span className="font-mono font-bold text-slate-900 bg-white px-1.5 py-0.5 rounded border border-slate-200 inline-block truncate max-w-full">
                       {maskSerialNumber(instrument?.serial_number || 'DL-2026-9042')}
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Maximum Capacity (Max):</span>
+                    <span className="text-xs text-slate-400 font-medium block">Maximum Capacity (Max):</span>
                     <span className="font-bold text-slate-800 block">
                       {instrument?.model?.max_capacity || 30.0} {instrument?.model?.capacity_unit || 'kg'}
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Scale Interval (e = d):</span>
+                    <span className="text-xs text-slate-400 font-medium block">Scale Interval (e = d):</span>
                     <span className="font-bold text-slate-800 block">
                       {instrument?.model?.verification_scale_interval_e || 0.005} {instrument?.model?.capacity_unit || 'kg'}
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Physical Stamp / Lead Seal:</span>
+                    <span className="text-xs text-slate-400 font-medium block">Physical Stamp / Lead Seal:</span>
                     <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block truncate max-w-full">
                       DL-SEAL-2026-0042
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <span className="text-[10px] text-slate-400 font-medium block">Procedure Version:</span>
-                    <span className="font-mono text-[10px] text-slate-600 truncate block">
+                    <span className="text-xs text-slate-400 font-medium block">Procedure Version:</span>
+                    <span className="font-mono text-xs text-slate-600 truncate block">
                       {certificate.procedure_pack_id || 'IND-LM-NAWI-2026.1'}
                     </span>
                   </div>
@@ -426,14 +426,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 min-w-0 flex flex-col justify-between overflow-hidden">
                   <div>
                     <div className="flex items-center gap-1.5 font-bold text-emerald-800 text-xs">
-                      <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <Lock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                       <span>Tamper-Evident eSign Seal</span>
                     </div>
-                    <p className="text-[10px] font-mono text-slate-500 truncate mt-1">
+                    <p className="text-xs font-mono text-slate-500 truncate mt-1">
                       SHA-256: {truncateHash(certificate.certificate_bytes_sha256 || '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945', 24)}
                     </p>
                   </div>
-                  <p className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/50">
+                  <p className="text-xs text-slate-500 pt-1 border-t border-slate-200/50">
                     Signed & Timestamped: <span className="font-medium text-slate-700">{formatDateTime(certificate.signature_timestamp || certificate.created_at)}</span>
                   </p>
                 </div>
@@ -442,13 +442,13 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 <div className="bg-emerald-50/90 border border-emerald-200 rounded-xl p-3 space-y-1 min-w-0 flex flex-col justify-between overflow-hidden">
                   <div>
                     <div className="flex items-center gap-1 text-emerald-800 font-bold text-xs mb-0.5">
-                      <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <Award className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                       <span>{isGatc ? 'GATC Approved & Signed' : 'Digitally Approved & Signed'}</span>
                     </div>
                     <span className="font-bold text-slate-900 text-xs block truncate">
                       {certificate.verifier_name || (isGatc ? 'Dr. Priya Nair' : 'Shri Arvind Sharma')}
                     </span>
-                    <span className="text-[10px] text-slate-600 block truncate">
+                    <span className="text-xs text-slate-600 block truncate">
                       {certificate.verifier_designation || (isGatc ? 'Approved GATC Verifier (Apex Calibration Lab)' : 'Legal Metrology Officer (Central Delhi Zone)')}
                     </span>
                   </div>
@@ -459,7 +459,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               </div>
 
               {/* Official Statutory Footnote */}
-              <div className="text-[10px] text-center text-slate-500 pt-1.5 border-t border-slate-100 font-medium">
+              <div className="text-xs text-center text-slate-500 pt-1.5 border-t border-slate-100 font-medium">
                 {isGatc
                   ? 'This statutory test report and digital verification certificate is generated and issued under Section 19 of The Legal Metrology Act, 2009 & GATC Rules, 2013.'
                   : 'This digital certificate is generated and issued under Section 24 of The Legal Metrology Act, 2009. The physical instrument bears the statutory stamp and seal as prescribed in Schedule VIII of The General Rules, 2011.'}
@@ -471,7 +471,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         {/* Modal Action Footer */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div className="text-xs text-slate-500 flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
             <span>Official Government Digital Certificate • Valid throughout the Union of India.</span>
           </div>
 

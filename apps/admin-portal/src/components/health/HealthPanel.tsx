@@ -19,7 +19,7 @@ export const HealthPanel: React.FC = () => {
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={load}
-          className="inline-flex items-center gap-1 rounded-lg border border-gov-border bg-white px-3 py-1.5 text-xs text-slate-600"
+          className="inline-flex items-center gap-1 rounded-md border border-gov-border bg-white px-3 py-1.5 text-xs text-slate-600"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Re-check
         </button>

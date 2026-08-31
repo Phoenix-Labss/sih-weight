@@ -347,7 +347,7 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-100/90 text-slate-900 selection:bg-amber-500 selection:text-slate-950 font-sans">
       {/* 1. LAYER 1: UTILITY BAR (Low-contrast, quiet metadata) */}
-      <div className="bg-slate-100/90 text-slate-500 text-[11px] border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2 select-none">
+      <div className="bg-slate-100/90 text-slate-500 text-xs border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2 select-none">
         <div className="flex items-center gap-2">
           <span className="font-medium text-slate-700">{t.govOfIndia}</span>
           <span className="text-slate-300">|</span>
@@ -357,12 +357,12 @@ export const LoginPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 text-slate-500 shrink-0">
-          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-slate-400">
-            <Shield className="w-3 h-3 text-emerald-600" />
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400">
+            <Shield className="w-3 h-3 text-emerald-700" />
             <span>NIC / MeitY Aligned</span>
           </span>
           <span className="text-slate-300 hidden sm:inline">|</span>
-          <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+          <div className="flex items-center gap-1 text-xs text-slate-400 font-mono">
             <span className="cursor-pointer hover:text-slate-700 px-0.5">A-</span>
             <span className="cursor-pointer hover:text-slate-700 px-0.5 font-bold">A</span>
             <span className="cursor-pointer hover:text-slate-700 px-0.5">A+</span>
@@ -372,7 +372,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-              className="px-1.5 py-0.5 text-gov-navy text-[10px] font-bold hover:underline transition-colors cursor-pointer"
+              className="px-1.5 py-0.5 text-gov-navy text-xs font-bold hover:underline transition-colors cursor-pointer"
               aria-label="Switch portal language"
             >
               {language === 'en' ? 'हिन्दी (HI)' : 'ENGLISH (EN)'}
@@ -382,14 +382,14 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {/* 2. LAYER 2: INSTITUTIONAL MASTHEAD */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-card">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 lg:gap-6">
             
             {/* LEFT: Legal Metrology Emblem & Institutional Identity */}
             <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
-              <div className="w-11 h-11 rounded border border-amber-400/50 bg-amber-50 flex items-center justify-center shrink-0 shadow-2xs">
-                <Scale className="h-6 w-6 text-amber-600" />
+              <div className="w-11 h-11 rounded border border-amber-400/50 bg-amber-50 flex items-center justify-center shrink-0 shadow-card">
+                <Scale className="h-6 w-6 text-amber-700" />
               </div>
               <div className="text-left leading-tight">
                 <div className="text-xl sm:text-2xl font-bold tracking-tight text-gov-navy leading-none">
@@ -398,7 +398,7 @@ export const LoginPage: React.FC = () => {
                 <div className="text-xs font-semibold text-slate-700 mt-0.5">
                   National Legal Metrology Verification System
                 </div>
-                <div className="text-[10px] text-slate-400 font-normal hidden sm:block">
+                <div className="text-xs text-slate-400 font-normal hidden sm:block">
                   Statutory Portal under The Legal Metrology Act, 2009 &amp; General Rules, 2011
                 </div>
               </div>
@@ -410,7 +410,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsRegisterOpen(true)}
-                className="px-3.5 py-1.5 sm:py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 text-xs sm:text-sm font-bold border border-amber-500 shadow-2xs transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-1.5 sm:py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 text-xs sm:text-sm font-bold border border-amber-500 shadow-card transition-all cursor-pointer flex items-center gap-1.5"
                 title="Register New Commercial Establishment"
               >
                 <UserPlus className="w-4 h-4 text-slate-950 shrink-0" />
@@ -418,7 +418,7 @@ export const LoginPage: React.FC = () => {
               </button>
 
               {/* Enter as Demo User Button + Role Switcher */}
-              <div className="relative inline-flex items-center shadow-2xs rounded" ref={demoMenuRef}>
+              <div className="relative inline-flex items-center shadow-card rounded" ref={demoMenuRef}>
                 <button
                   type="button"
                   disabled={authenticatingRoleId !== null}
@@ -429,7 +429,7 @@ export const LoginPage: React.FC = () => {
                   {authenticatingRoleId === 'trader' ? (
                     <Loader2 className="w-3.5 h-3.5 text-gov-blue animate-spin" />
                   ) : (
-                    <UserCheck className="w-3.5 h-3.5 text-amber-600" />
+                    <UserCheck className="w-3.5 h-3.5 text-amber-700" />
                   )}
                   <span>Enter as Demo User</span>
                 </button>
@@ -447,17 +447,17 @@ export const LoginPage: React.FC = () => {
 
                 {/* Dropdown Menu for Demo Roles */}
                 {demoMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1.5 w-84 sm:w-96 bg-white rounded-md shadow-2xl border border-slate-300 text-slate-900 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                  <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 bg-white rounded-md shadow-lg border border-slate-300 text-slate-900 py-2 z-50 animate-fade-in text-left">
                     <div className="px-4 py-2 border-b border-slate-200 bg-slate-50">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-gov-navy uppercase tracking-wider">
                           Select Stakeholder Role
                         </span>
-                        <span className="text-[10px] font-bold text-slate-700 bg-amber-400/30 border border-amber-400/50 px-2 py-0.5 rounded-xs">
+                        <span className="text-xs font-bold text-slate-700 bg-amber-400/30 border border-amber-400/50 px-2 py-0.5 rounded">
                           1-Click Direct Entry
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500 mt-0.5">
                         Click any role to enter the portal immediately:
                       </p>
                     </div>
@@ -478,12 +478,12 @@ export const LoginPage: React.FC = () => {
                                 <span className="text-xs font-bold text-slate-800 group-hover:text-gov-navy">
                                   {role.name}
                                 </span>
-                                <span className="text-[10px] font-semibold text-gov-navy bg-slate-100 px-1.5 py-0.2 rounded-xs border border-slate-200 shrink-0">
+                                <span className="text-xs font-semibold text-gov-navy bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200 shrink-0">
                                   {role.badge}
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-500 truncate">{role.description}</p>
-                              <div className="text-[10px] font-mono text-slate-400 flex items-center gap-2 pt-0.5">
+                              <p className="text-xs text-slate-500 truncate">{role.description}</p>
+                              <div className="text-xs font-mono text-slate-400 flex items-center gap-2 pt-0.5">
                                 <span>{role.email}</span>
                               </div>
                             </div>
@@ -491,7 +491,7 @@ export const LoginPage: React.FC = () => {
                               {isThisRoleAuthenticating ? (
                                 <Loader2 className="w-4 h-4 text-gov-blue animate-spin" />
                               ) : (
-                                <span className="text-[10px] font-bold text-slate-900 bg-amber-400 border border-amber-500 px-2 py-0.5 rounded-xs group-hover:bg-amber-300 transition-colors">
+                                <span className="text-xs font-bold text-slate-900 bg-amber-400 border border-amber-500 px-2 py-0.5 rounded group-hover:bg-amber-300 transition-colors">
                                   Enter Portal →
                                 </span>
                               )}
@@ -501,7 +501,7 @@ export const LoginPage: React.FC = () => {
                       })}
                     </div>
 
-                    <div className="px-4 py-2 border-t border-slate-200 bg-slate-50 text-[11px] text-slate-600 flex items-center justify-between">
+                    <div className="px-4 py-2 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 flex items-center justify-between">
                       <span>Clicking any role redirects inside</span>
                       <button
                         type="button"
@@ -532,7 +532,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-5 sm:px-6 py-2.5 sm:py-3 font-bold flex items-center transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'home'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -549,7 +549,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'about'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -566,7 +566,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'information'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -582,7 +582,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'eservices'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -598,7 +598,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'faq'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -615,7 +615,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'contact'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -632,7 +632,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
                   activeSection === 'archive'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
                     : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
                 }`}
               >
@@ -666,9 +666,9 @@ export const LoginPage: React.FC = () => {
             
             {/* SECTION 1: HOME */}
             {activeSection === 'home' && (
-              <div className="space-y-5 animate-in fade-in duration-200">
+              <div className="space-y-5 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <Shield className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Statutory Digital Metrology Service • Government of India</span>
                   </div>
@@ -681,10 +681,10 @@ export const LoginPage: React.FC = () => {
                 </div>
 
                 {/* OFFICIAL PUBLIC QR SERVICE PANEL */}
-                <div className="bg-white border-l-4 border-l-gov-blue border-y border-r border-slate-200 rounded-r p-5 shadow-xs space-y-3">
+                <div className="bg-white border-l-4 border-l-gov-blue border-y border-r border-slate-200 rounded-r p-5 shadow-card space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-gov-blue uppercase tracking-wider">
+                      <span className="text-xs font-bold text-gov-blue uppercase tracking-wider">
                         Public Service Directive
                       </span>
                       <h3 className="text-base font-bold text-gov-navy leading-tight">
@@ -706,19 +706,19 @@ export const LoginPage: React.FC = () => {
                         window.location.hash = '#public';
                         window.dispatchEvent(new HashChangeEvent('hashchange'));
                       }}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-gov-navy hover:bg-slate-800 text-white text-xs font-semibold transition-colors shadow-2xs cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-gov-navy hover:bg-slate-800 text-white text-xs font-semibold transition-colors shadow-card cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5 text-amber-400" />
                       <span>Verify Certificate via Public QR →</span>
                     </a>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-xs text-slate-400">
                       Statutory record lookup under Section 24
                     </span>
                   </div>
                 </div>
 
                 {/* MANDATORY COMPLIANCE DIRECTIVES */}
-                <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-3.5">
+                <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-3.5">
                   <div className="border-b border-slate-200 pb-2">
                     <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                       Mandatory Metrological Compliance Directives
@@ -728,7 +728,7 @@ export const LoginPage: React.FC = () => {
                   <div className="divide-y divide-slate-100 text-xs text-slate-600">
                     <div className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-semibold text-slate-800 block">Section 24 Mandatory Periodic Verification</span>
                           <span className="text-slate-500">Commercial weighing instruments (Class I, II, III, IV) must be submitted for statutory verification within prescribed periods.</span>
@@ -745,7 +745,7 @@ export const LoginPage: React.FC = () => {
 
                     <div className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-semibold text-slate-800 block">Immutable Digital Certificates</span>
                           <span className="text-slate-500">Certificates are cryptographically hashed (SHA-256) and verified through zero-PII public QR references.</span>
@@ -765,7 +765,7 @@ export const LoginPage: React.FC = () => {
 
                     <div className="py-2.5 first:pt-0 last:pb-0 flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-semibold text-slate-800 block">Physical Stamping &amp; Seal Chain</span>
                           <span className="text-slate-500">Physical stamp impressions, laser markings, and security lead seals are reconciled against an active inspector inventory ledger.</span>
@@ -783,7 +783,7 @@ export const LoginPage: React.FC = () => {
                 </div>
 
                 {/* Statutory Advisory Notice */}
-                <div className="flex items-start gap-2 text-[11px] text-slate-500 px-1">
+                <div className="flex items-start gap-2 text-xs text-slate-500 px-1">
                   <ShieldAlert className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <span>
                     Using unverified or non-standard weights &amp; measures is an offence under Section 30 of The Legal Metrology Act, 2009 punishable with fine and imprisonment.
@@ -794,9 +794,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 2: ABOUT US */}
             {activeSection === 'about' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <Building2 className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Statutory Mandate • Directorate of Legal Metrology</span>
                   </div>
@@ -815,7 +815,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setAboutSubtopic('overview')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       aboutSubtopic === 'overview'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -826,7 +826,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setAboutSubtopic('acts')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       aboutSubtopic === 'acts'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -837,7 +837,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setAboutSubtopic('rules')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       aboutSubtopic === 'rules'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -848,7 +848,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setAboutSubtopic('org')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       aboutSubtopic === 'org'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -858,10 +858,10 @@ export const LoginPage: React.FC = () => {
 
                 {/* Selected Subtopic Detail Card */}
                 {STATUTORY_TOPICS[aboutSubtopic === 'overview' ? 'about' : aboutSubtopic] && (
-                  <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-4">
+                  <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-[10px] font-bold text-gov-blue uppercase tracking-wider block">
+                        <span className="text-xs font-bold text-gov-blue uppercase tracking-wider block">
                           {STATUTORY_TOPICS[aboutSubtopic === 'overview' ? 'about' : aboutSubtopic].badge}
                         </span>
                         <h3 className="text-base font-bold text-gov-navy">
@@ -884,7 +884,7 @@ export const LoginPage: React.FC = () => {
                       <div className="divide-y divide-slate-100 border border-slate-200 rounded bg-white overflow-hidden">
                         {STATUTORY_TOPICS[aboutSubtopic === 'overview' ? 'about' : aboutSubtopic].points.map((pt, idx) => (
                           <div key={idx} className="p-3 flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                             <div>
                               <span className="font-semibold text-slate-800 block text-xs sm:text-sm">
                                 {pt.title}
@@ -902,7 +902,7 @@ export const LoginPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIsRegisterOpen(true)}
-                        className="px-3.5 py-1.5 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-colors cursor-pointer border border-amber-500 shadow-2xs"
+                        className="px-3.5 py-1.5 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-colors cursor-pointer border border-amber-500 shadow-card"
                       >
                         Register New Commercial Establishment (Form LM-REG-01) →
                       </button>
@@ -924,9 +924,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 3: INFORMATION */}
             {activeSection === 'information' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <FileText className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Technical Specifications &amp; Tariffs</span>
                   </div>
@@ -945,7 +945,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setInfoSubtopic('standards')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       infoSubtopic === 'standards'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -956,7 +956,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setInfoSubtopic('models')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       infoSubtopic === 'models'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -967,7 +967,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setInfoSubtopic('fees')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       infoSubtopic === 'fees'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -978,7 +978,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setInfoSubtopic('gatc-info')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       infoSubtopic === 'gatc-info'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -988,10 +988,10 @@ export const LoginPage: React.FC = () => {
 
                 {/* Selected Subtopic Detail Card */}
                 {STATUTORY_TOPICS[infoSubtopic] && (
-                  <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-4">
+                  <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-[10px] font-bold text-gov-blue uppercase tracking-wider block">
+                        <span className="text-xs font-bold text-gov-blue uppercase tracking-wider block">
                           {STATUTORY_TOPICS[infoSubtopic].badge}
                         </span>
                         <h3 className="text-base font-bold text-gov-navy">
@@ -1014,7 +1014,7 @@ export const LoginPage: React.FC = () => {
                       <div className="divide-y divide-slate-100 border border-slate-200 rounded bg-white overflow-hidden">
                         {STATUTORY_TOPICS[infoSubtopic].points.map((pt, idx) => (
                           <div key={idx} className="p-3 flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                             <div>
                               <span className="font-semibold text-slate-800 block text-xs sm:text-sm">
                                 {pt.title}
@@ -1032,11 +1032,11 @@ export const LoginPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setIsRegisterOpen(true)}
-                        className="px-3.5 py-1.5 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-colors cursor-pointer border border-amber-500 shadow-2xs"
+                        className="px-3.5 py-1.5 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-colors cursor-pointer border border-amber-500 shadow-card"
                       >
                         Submit Verification Application →
                       </button>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-xs text-slate-400">
                         Under Legal Metrology (General) Rules, 2011
                       </span>
                     </div>
@@ -1047,9 +1047,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 4: E-SERVICES */}
             {activeSection === 'eservices' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <UserCheck className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Citizen &amp; Trader Portal</span>
                   </div>
@@ -1063,10 +1063,10 @@ export const LoginPage: React.FC = () => {
 
                 <div className="space-y-3">
                   {/* Service 1 */}
-                  <div className="bg-white border border-slate-200 rounded p-4 shadow-xs flex items-start justify-between gap-4">
+                  <div className="bg-white border border-slate-200 rounded p-4 shadow-card flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-[10px] uppercase">Form LM-REG-01</span>
+                        <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-xs uppercase">Form LM-REG-01</span>
                         <h3 className="font-bold text-sm text-gov-navy">Establishment &amp; Weighing Scale Registration</h3>
                       </div>
                       <p className="text-xs text-slate-600 leading-relaxed">
@@ -1076,17 +1076,17 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsRegisterOpen(true)}
-                      className="px-3.5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shrink-0 transition-colors cursor-pointer border border-amber-500 shadow-2xs"
+                      className="px-3.5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shrink-0 transition-colors cursor-pointer border border-amber-500 shadow-card"
                     >
                       Register Now →
                     </button>
                   </div>
 
                   {/* Service 2 */}
-                  <div className="bg-white border border-slate-200 rounded p-4 shadow-xs flex items-start justify-between gap-4">
+                  <div className="bg-white border border-slate-200 rounded p-4 shadow-card flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold text-[10px] uppercase">Section 24</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold text-xs uppercase">Section 24</span>
                         <h3 className="font-bold text-sm text-gov-navy">Mandatory Periodic Scale Verification</h3>
                       </div>
                       <p className="text-xs text-slate-600 leading-relaxed">
@@ -1096,17 +1096,17 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsRegisterOpen(true)}
-                      className="px-3.5 py-2 rounded bg-gov-navy hover:bg-slate-800 text-white font-semibold text-xs shrink-0 transition-colors cursor-pointer shadow-2xs"
+                      className="px-3.5 py-2 rounded bg-gov-navy hover:bg-slate-800 text-white font-semibold text-xs shrink-0 transition-colors cursor-pointer shadow-card"
                     >
                       Apply for Verification →
                     </button>
                   </div>
 
                   {/* Service 3 */}
-                  <div className="bg-white border border-slate-200 rounded p-4 shadow-xs flex items-start justify-between gap-4">
+                  <div className="bg-white border border-slate-200 rounded p-4 shadow-card flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold text-[10px] uppercase">Zero-PII</span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold text-xs uppercase">Zero-PII</span>
                         <h3 className="font-bold text-sm text-gov-navy">Zero-PII Public QR Certificate Verification</h3>
                       </div>
                       <p className="text-xs text-slate-600 leading-relaxed">
@@ -1119,7 +1119,7 @@ export const LoginPage: React.FC = () => {
                         window.location.hash = '#public';
                         window.dispatchEvent(new HashChangeEvent('hashchange'));
                       }}
-                      className="px-3.5 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shrink-0 transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                      className="px-3.5 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shrink-0 transition-colors cursor-pointer shadow-card flex items-center gap-1.5"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       <span>Verify Public QR →</span>
@@ -1127,10 +1127,10 @@ export const LoginPage: React.FC = () => {
                   </div>
 
                   {/* Service 4 */}
-                  <div className="bg-white border border-slate-200 rounded p-4 shadow-xs flex items-start justify-between gap-4">
+                  <div className="bg-white border border-slate-200 rounded p-4 shadow-card flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-bold text-[10px] uppercase">Field Inspection</span>
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-bold text-xs uppercase">Field Inspection</span>
                         <h3 className="font-bold text-sm text-gov-navy">Physical Stamping &amp; Inspector Inventory Ledger</h3>
                       </div>
                       <p className="text-xs text-slate-600 leading-relaxed">
@@ -1151,9 +1151,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 5: FAQ */}
             {activeSection === 'faq' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <HelpCircle className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Compliance Guidance &amp; Citizen FAQs</span>
                   </div>
@@ -1165,7 +1165,7 @@ export const LoginPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-3">
+                <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-3">
                   <div className="divide-y divide-slate-100">
                     {STATUTORY_TOPICS.faq.points.map((pt, idx) => (
                       <div key={idx} className="py-3 first:pt-0 last:pb-0 space-y-1">
@@ -1186,7 +1186,7 @@ export const LoginPage: React.FC = () => {
                         window.location.hash = '#public';
                         window.dispatchEvent(new HashChangeEvent('hashchange'));
                       }}
-                      className="px-3.5 py-1.5 rounded bg-gov-navy hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 rounded bg-gov-navy hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-card flex items-center gap-1.5"
                     >
                       <QrCode className="w-3.5 h-3.5 text-amber-400" />
                       <span>Verify Certificate via Public QR →</span>
@@ -1205,9 +1205,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 6: CONTACT US */}
             {activeSection === 'contact' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <Phone className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Official Directories &amp; Helplines</span>
                   </div>
@@ -1226,7 +1226,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setContactSubtopic('contact-hq')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       contactSubtopic === 'contact-hq'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1237,7 +1237,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setContactSubtopic('contact-states')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       contactSubtopic === 'contact-states'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1248,7 +1248,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setContactSubtopic('helpline')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       contactSubtopic === 'helpline'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1258,10 +1258,10 @@ export const LoginPage: React.FC = () => {
 
                 {/* Selected Subtopic Detail Card */}
                 {STATUTORY_TOPICS[contactSubtopic] && (
-                  <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-4">
+                  <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-[10px] font-bold text-gov-blue uppercase tracking-wider block">
+                        <span className="text-xs font-bold text-gov-blue uppercase tracking-wider block">
                           {STATUTORY_TOPICS[contactSubtopic].badge}
                         </span>
                         <h3 className="text-base font-bold text-gov-navy">
@@ -1284,7 +1284,7 @@ export const LoginPage: React.FC = () => {
                       <div className="divide-y divide-slate-100 border border-slate-200 rounded bg-white overflow-hidden">
                         {STATUTORY_TOPICS[contactSubtopic].points.map((pt, idx) => (
                           <div key={idx} className="p-3 flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                             <div>
                               <span className="font-semibold text-slate-800 block text-xs sm:text-sm">
                                 {pt.title}
@@ -1309,9 +1309,9 @@ export const LoginPage: React.FC = () => {
 
             {/* SECTION 7: ARCHIVE */}
             {activeSection === 'archive' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-fade-in">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-[11px] font-semibold mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-gov-navy/5 border border-gov-navy/10 text-gov-navy text-xs font-semibold mb-2">
                     <BookOpen className="w-3.5 h-3.5 text-gov-blue" />
                     <span>Public Records &amp; Gazette Archives</span>
                   </div>
@@ -1330,7 +1330,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setArchiveSubtopic('gazette')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       archiveSubtopic === 'gazette'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1341,7 +1341,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setArchiveSubtopic('circulars')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       archiveSubtopic === 'circulars'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1352,7 +1352,7 @@ export const LoginPage: React.FC = () => {
                     onClick={() => setArchiveSubtopic('reports')}
                     className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                       archiveSubtopic === 'reports'
-                        ? 'bg-gov-navy text-white shadow-2xs'
+                        ? 'bg-gov-navy text-white shadow-card'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
@@ -1362,10 +1362,10 @@ export const LoginPage: React.FC = () => {
 
                 {/* Selected Subtopic Detail Card */}
                 {STATUTORY_TOPICS[archiveSubtopic] && (
-                  <div className="bg-white border border-slate-200 rounded p-5 shadow-xs space-y-4">
+                  <div className="bg-white border border-slate-200 rounded p-5 shadow-card space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-[10px] font-bold text-gov-blue uppercase tracking-wider block">
+                        <span className="text-xs font-bold text-gov-blue uppercase tracking-wider block">
                           {STATUTORY_TOPICS[archiveSubtopic].badge}
                         </span>
                         <h3 className="text-base font-bold text-gov-navy">
@@ -1388,7 +1388,7 @@ export const LoginPage: React.FC = () => {
                       <div className="divide-y divide-slate-100 border border-slate-200 rounded bg-white overflow-hidden">
                         {STATUTORY_TOPICS[archiveSubtopic].points.map((pt, idx) => (
                           <div key={idx} className="p-3 flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                             <div>
                               <span className="font-semibold text-slate-800 block text-xs sm:text-sm">
                                 {pt.title}
@@ -1424,13 +1424,13 @@ export const LoginPage: React.FC = () => {
 
           {/* Right Column: Portal Authentication Container */}
           <div className="lg:col-span-5 w-full">
-            <div className="bg-white rounded border border-slate-200 shadow-xs overflow-hidden">
+            <div className="bg-white rounded border border-slate-200 shadow-card overflow-hidden">
               
               {/* Header */}
               <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-bold text-gov-navy">{t.loginTitle}</h2>
-                  <p className="text-[11px] text-slate-500">Authorized Stakeholder Sign In</p>
+                  <p className="text-xs text-slate-500">Authorized Stakeholder Sign In</p>
                 </div>
                 <div className="w-7 h-7 rounded bg-slate-200/70 flex items-center justify-center text-slate-700">
                   <Lock className="w-3.5 h-3.5 text-gov-navy" />
@@ -1450,7 +1450,7 @@ export const LoginPage: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 bg-white focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy transition-colors"
+                      className="w-full rounded border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue transition-colors"
                       placeholder="e.g. trader@example.com or officer@gov.in"
                       autoComplete="email"
                       autoFocus
@@ -1469,7 +1469,7 @@ export const LoginPage: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full rounded border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 pr-9 bg-white focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy transition-colors"
+                        className="w-full rounded border border-slate-300 px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder-slate-400 pr-9 bg-white focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue transition-colors"
                         placeholder="••••••••"
                         autoComplete="current-password"
                         required
@@ -1498,7 +1498,7 @@ export const LoginPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded bg-gov-navy hover:bg-slate-800 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-2xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full rounded bg-gov-navy hover:bg-slate-800 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-card transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {submitting ? (
                       <>
@@ -1516,22 +1516,22 @@ export const LoginPage: React.FC = () => {
 
                 {/* 1-Click Quick Demo Sign-In Buttons */}
                 <div className="pt-2 border-t border-slate-200">
-                  <span className="text-[11px] font-bold text-gov-navy uppercase tracking-wider block mb-1.5">
+                  <span className="text-xs font-bold text-gov-navy uppercase tracking-wider block mb-1.5">
                     Quick Demo User Access (1-Click Entry)
                   </span>
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleDemoSelect(DEMO_ROLES[0])}
-                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-amber-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-amber-100 text-slate-800 font-semibold text-xs transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <UserCheck className="w-3 h-3 text-amber-600 shrink-0" />
+                      <UserCheck className="w-3 h-3 text-amber-700 shrink-0" />
                       <span>Trader Portal</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDemoSelect(DEMO_ROLES[1])}
-                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-blue-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-blue-100 text-slate-800 font-semibold text-xs transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <Shield className="w-3 h-3 text-gov-blue shrink-0" />
                       <span>LMO Officer</span>
@@ -1539,17 +1539,17 @@ export const LoginPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleDemoSelect(DEMO_ROLES[2])}
-                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-emerald-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-emerald-100 text-slate-800 font-semibold text-xs transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <Building2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <Building2 className="w-3 h-3 text-emerald-700 shrink-0" />
                       <span>Supervisor</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDemoSelect(DEMO_ROLES[3])}
-                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-purple-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-blue-100 text-slate-800 font-semibold text-xs transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
                     >
-                      <Lock className="w-3 h-3 text-purple-600 shrink-0" />
+                      <Lock className="w-3 h-3 text-gov-blue shrink-0" />
                       <span>Admin Portal</span>
                     </button>
                   </div>
@@ -1562,14 +1562,14 @@ export const LoginPage: React.FC = () => {
                       <span className="text-xs font-bold text-slate-800 block">
                         New Commercial Establishment or Scale Owner?
                       </span>
-                      <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                      <p className="text-xs text-slate-500 mt-0.5 leading-tight">
                         Register under The Legal Metrology Act to submit statutory scale verification applications.
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setIsRegisterOpen(true)}
-                      className="w-full py-2 px-3 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500 shadow-2xs"
+                      className="w-full py-2 px-3 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500 shadow-card"
                     >
                       <UserPlus className="w-3.5 h-3.5 text-slate-950 shrink-0" />
                       <span>Register New Establishment (Form LM-REG-01) →</span>
@@ -1579,7 +1579,7 @@ export const LoginPage: React.FC = () => {
               </div>
 
               {/* Security Advisory Footer */}
-              <div className="px-5 py-2.5 bg-slate-50 border-t border-slate-200 text-[10px] text-slate-500 leading-relaxed">
+              <div className="px-5 py-2.5 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 leading-relaxed">
                 <p>
                   Protected government system under the Information Technology Act, 2000 &amp; Section 25 of The Legal Metrology Act, 2009.
                 </p>
@@ -1593,7 +1593,7 @@ export const LoginPage: React.FC = () => {
 
       {/* 4. Footer */}
       <footer className="bg-gov-dark text-slate-400 text-xs border-t border-slate-800 py-6 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div>
             © {new Date().getFullYear()} Department of Legal Metrology, Ministry of Consumer Affairs, Government of India.
           </div>

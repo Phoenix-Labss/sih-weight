@@ -30,21 +30,21 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="p-8 max-w-4xl mx-auto my-8 bg-rose-50 border border-rose-200 rounded-2xl shadow-sm text-slate-800 space-y-4">
+        <div className="p-8 max-w-4xl mx-auto my-8 bg-red-50 border border-red-200 rounded-lg shadow-sm text-slate-800 space-y-4">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-8 h-8 text-rose-600" />
+            <AlertTriangle className="w-8 h-8 text-red-600" />
             <div>
-              <h2 className="text-lg font-bold text-rose-900">Application Error Caught</h2>
-              <p className="text-xs text-rose-700">An unexpected error occurred during rendering.</p>
+              <h2 className="text-lg font-bold text-red-900">Application Error Caught</h2>
+              <p className="text-xs text-red-700">An unexpected error occurred during rendering.</p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-rose-200 font-mono text-xs text-rose-900 overflow-x-auto">
+          <div className="bg-white p-4 rounded-xl border border-red-200 font-mono text-xs text-red-900 overflow-x-auto">
             <strong>{this.state.error?.name}: </strong> {this.state.error?.message}
           </div>
 
           {this.state.errorInfo && (
-            <details className="bg-slate-900 text-slate-200 p-4 rounded-xl text-[11px] font-mono whitespace-pre-wrap overflow-x-auto">
+            <details className="bg-slate-900 text-slate-200 p-4 rounded-xl text-xs font-mono whitespace-pre-wrap overflow-x-auto">
               <summary className="cursor-pointer text-amber-400 font-bold mb-2">Component Stack Trace</summary>
               {this.state.errorInfo.componentStack}
             </details>
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="flex items-center gap-3 pt-2">
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-rose-700 text-white rounded-lg text-xs font-semibold hover:bg-rose-800 flex items-center gap-2"
+              className="px-4 py-2 bg-red-700 text-white rounded-lg text-xs font-semibold hover:bg-red-800 flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Reload Page</span>

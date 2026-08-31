@@ -75,7 +75,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
             <p className="text-xs text-slate-300">
               Government of NCT of Delhi • Central Enforcement Zone (JUR-DL-01)
             </p>
-            <p className="text-[10px] text-amber-300 font-mono">
+            <p className="text-xs text-amber-300 font-mono">
               Statutory Basis: Rule 14, Schedule IX of The Legal Metrology (General) Rules, 2011 &amp; Section 24 of Act 1 of 2010
             </p>
           </div>
@@ -97,7 +97,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           {/* Card 1: Instrument */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
               Instrument Particulars
             </span>
             <div className="font-bold text-slate-900 text-sm truncate">
@@ -116,7 +116,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
 
           {/* Card 2: Officer & Session */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
               Verification Session
             </span>
             <div className="font-mono font-bold text-slate-900 truncate">
@@ -139,35 +139,35 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
             const rh = Number(session.environmental_humidity_percent) || 55.0;
             const isEnvPass = temp >= 20.0 && temp <= 28.0 && rh >= 45.0 && rh <= 65.0;
             return (
-              <div className={`border rounded-xl p-3.5 space-y-1.5 ${isEnvPass ? 'bg-slate-50 border-slate-200' : 'bg-rose-50/50 border-rose-300'}`}>
+              <div className={`border rounded-xl p-3.5 space-y-1.5 ${isEnvPass ? 'bg-slate-50 border-slate-200' : 'bg-red-50/50 border-red-300'}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
                     Environmental Controls
                   </span>
                   {isEnvPass ? (
-                    <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
+                    <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-xs uppercase px-1.5 py-0.5 rounded">
                       Pass
                     </span>
                   ) : (
-                    <span className="text-rose-700 bg-rose-100 border border-rose-300 font-bold text-[9px] uppercase px-1.5 py-0.5 rounded">
+                    <span className="text-red-700 bg-red-100 border border-red-300 font-bold text-xs uppercase px-1.5 py-0.5 rounded">
                       Out of Range
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 pt-1">
-                  <Thermometer className="w-4 h-4 text-rose-500 shrink-0" />
+                  <Thermometer className="w-4 h-4 text-red-500 shrink-0" />
                   <div>
-                    <span className="text-slate-500 text-[10px] block">Temperature:</span>
-                    <span className={`font-mono font-bold text-sm ${temp >= 20.0 && temp <= 28.0 ? 'text-slate-900' : 'text-rose-700'}`}>
+                    <span className="text-slate-500 text-xs block">Temperature:</span>
+                    <span className={`font-mono font-bold text-sm ${temp >= 20.0 && temp <= 28.0 ? 'text-slate-900' : 'text-red-700'}`}>
                       {temp}°C {temp >= 20.0 && temp <= 28.0 ? '' : '(Limit: 20–28°C)'}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pt-1">
-                  <Droplets className="w-4 h-4 text-blue-500 shrink-0" />
+                  <Droplets className="w-4 h-4 text-gov-blue shrink-0" />
                   <div>
-                    <span className="text-slate-500 text-[10px] block">Relative Humidity:</span>
-                    <span className={`font-mono font-bold text-sm ${rh >= 45.0 && rh <= 65.0 ? 'text-slate-900' : 'text-rose-700'}`}>
+                    <span className="text-slate-500 text-xs block">Relative Humidity:</span>
+                    <span className={`font-mono font-bold text-sm ${rh >= 45.0 && rh <= 65.0 ? 'text-slate-900' : 'text-red-700'}`}>
                       {rh}% RH {rh >= 45.0 && rh <= 65.0 ? '' : '(Limit: 45–65%)'}
                     </span>
                   </div>
@@ -178,18 +178,18 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
 
           {/* Card 4: Reference Standards & Wire Seal */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
               Standards &amp; Physical Seal
             </span>
             <div>
-              <span className="text-slate-500 text-[10px] block">Working Standards:</span>
-              <span className="font-semibold text-slate-800 text-[11px] block truncate">
+              <span className="text-slate-500 text-xs block">Working Standards:</span>
+              <span className="font-semibold text-slate-800 text-xs block truncate">
                 F2 Mass Set (CAL-NPL-2025-F2)
               </span>
             </div>
             <div className="pt-1">
-              <span className="text-slate-500 text-[10px] block">Affixed Wire Seal:</span>
-              <span className="font-mono font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 inline-block text-[11px]">
+              <span className="text-slate-500 text-xs block">Affixed Wire Seal:</span>
+              <span className="font-mono font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 inline-block text-xs">
                 DL-SEAL-2026-0042
               </span>
             </div>
@@ -197,7 +197,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
         </div>
 
         {/* NAWI Observations Execution Table */}
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-card">
           <div className="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-gov-blue" />
@@ -205,14 +205,14 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                 NAWI Class III / IIII Stepped Tolerance Observations Table
               </h4>
             </div>
-            <span className="text-[11px] font-mono text-slate-500">
+            <span className="text-xs font-mono text-slate-500">
               Total Points: {observations.length} Recorded Readings
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <thead className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs">
                 <tr>
                   <th className="py-2.5 px-3">#</th>
                   <th className="py-2.5 px-3">Step Type</th>
@@ -244,11 +244,11 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                       </td>
                       <td className="py-2.5 px-3 text-slate-600">
                         {obs.eccentricity_position ? (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
                             {obs.eccentricity_position}
                           </span>
                         ) : obs.repetition_index ? (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
                             Run #{obs.repetition_index}
                           </span>
                         ) : (
@@ -272,13 +272,13 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                       </td>
                       <td className="py-2.5 px-3 text-right">
                         {evalResult.isWithinMpe ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
                             <CheckCircle2 className="w-3 h-3 text-emerald-700" />
                             <span>PASS</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-100/90 px-2 py-0.5 rounded-full border border-rose-300">
-                            <AlertCircle className="w-3 h-3 text-rose-700" />
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-red-800 bg-red-100/90 px-2 py-0.5 rounded-full border border-red-300">
+                            <AlertCircle className="w-3 h-3 text-red-700" />
                             <span>FAIL</span>
                           </span>
                         )}
@@ -295,10 +295,10 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 font-bold text-gov-navy">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
               <span>Officer Disposition &amp; Statutory Attestation</span>
             </div>
-            <span className="text-[11px] text-slate-500 font-mono">
+            <span className="text-xs text-slate-500 font-mono">
               Timestamp: {formatDateTime(session.updated_at || session.created_at)}
             </span>
           </div>
@@ -310,7 +310,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
 
         {/* Footer Actions */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
-          <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
+          <div className="text-xs text-slate-500 flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5 text-slate-400" />
             <span>Immutable Statutory Record • Hash Pinned per AGENTS.md §3.4</span>
           </div>
@@ -330,7 +330,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                   onClose();
                   onViewCertificate(certificate);
                 }}
-                className="px-4 py-2 rounded-lg bg-gov-navy text-white hover:bg-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-gov-navy text-white hover:bg-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-card transition-colors cursor-pointer"
               >
                 <Award className="w-4 h-4 text-amber-400" />
                 <span>View Certificate</span>

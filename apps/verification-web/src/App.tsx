@@ -17,6 +17,7 @@ import { RoleType } from './types/api';
 import { I18nProvider } from './i18n';
 import { ApiModeProvider } from './context/ApiModeContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { Scale } from 'lucide-react';
 
 export type TabId = 'trader' | 'officer' | 'public' | 'supervisor' | 'gatc' | 'migration' | 'admin';
 
@@ -151,17 +152,17 @@ const AppContent: React.FC = () => {
         <header className='bg-gov-navy text-white border-b border-slate-700 shadow-md sticky top-0 z-30'>
           <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between'>
             <div className='flex items-center gap-3'>
-              <div className='w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center font-serif text-amber-400 font-bold text-lg'>
-                ⚖
+              <div className='w-9 h-9 rounded-md border border-white/25 bg-white/10 flex items-center justify-center'>
+                <Scale className='w-5 h-5 text-amber-400' aria-hidden='true' />
               </div>
               <div>
                 <h1 className='text-sm font-bold text-white leading-tight flex items-center gap-1.5'>
                   <span>e-Metrology Public Verification</span>
-                  <span className='text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-400/30 font-semibold'>
+                  <span className='text-xs font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-400/30 font-semibold'>
                     OFFICIAL
                   </span>
                 </h1>
-                <p className='text-[11px] text-slate-300'>Department of Legal Metrology • Government of India</p>
+                <p className='text-xs text-slate-300'>Department of Legal Metrology • Government of India</p>
               </div>
             </div>
 
@@ -171,7 +172,7 @@ const AppContent: React.FC = () => {
                   window.location.hash = '#login';
                   setActiveTab('trader');
                 }}
-                className='px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-xs font-bold text-slate-950 shadow-xs transition-colors'
+                className='px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-xs font-bold text-slate-950 shadow-card transition-colors'
               >
                 Sign In / Portal Login
               </button>

@@ -121,7 +121,7 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
     let StatusIcon = CheckCircle;
 
     if (isFull) {
-      badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+      badgeColor = 'bg-red-50 text-red-700 border-red-200';
       badgeText = 'Fully Booked (0 left)';
       StatusIcon = XCircle;
     } else if (isFillingFast) {
@@ -138,10 +138,10 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
         onClick={() => onSelectSlot(slot.slotId)}
         className={`p-3 rounded-xl border text-left transition-all relative cursor-pointer ${
           isSelected
-            ? 'border-gov-blue bg-blue-50/70 ring-2 ring-gov-blue/30 shadow-xs'
+            ? 'border-gov-blue bg-blue-50/70 ring-2 ring-gov-blue/30 shadow-card'
             : isFull
             ? 'border-slate-200 bg-slate-100/60 opacity-60 cursor-not-allowed'
-            : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-2xs'
+            : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-card'
         }`}
       >
         <div className="flex items-start justify-between gap-1 mb-1.5">
@@ -152,10 +152,10 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
         </div>
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-          <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
             {slot.period} (1.5 hrs)
           </span>
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex items-center gap-1 ${badgeColor}`}>
+          <span className={`px-2 py-0.5 rounded text-xs font-bold border flex items-center gap-1 ${badgeColor}`}>
             <StatusIcon className="w-2.5 h-2.5" />
             <span>{badgeText}</span>
           </span>
@@ -175,7 +175,7 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-500 font-mono">
+          <span className="text-xs text-slate-500 font-mono">
             Daily Capacity: <strong className="text-gov-navy">{totalDailyRemaining} / {totalDailyCapacity}</strong> slots open (60 slots/day)
           </span>
         </div>
@@ -183,7 +183,7 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
 
       {/* Morning Shift (09:00 - 12:00) */}
       <div>
-        <div className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+        <div className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
           <span>Morning Inspection Shift (09:00 AM – 12:00 PM)</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -199,19 +199,19 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
           </div>
           <div>
             <div className="font-bold text-amber-950">12:00 PM – 01:00 PM: Official Lunch &amp; Calibration Recess</div>
-            <div className="text-[11px] text-amber-800">
+            <div className="text-xs text-amber-800">
               Departmental testing &amp; field inspection paused for reference standard thermal equilibrium &amp; lunch.
             </div>
           </div>
         </div>
-        <span className="px-2.5 py-1 rounded bg-amber-200/70 text-amber-900 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+        <span className="px-2.5 py-1 rounded bg-amber-200/70 text-amber-900 text-xs font-extrabold uppercase tracking-wide shrink-0">
           1 Hr Recess
         </span>
       </div>
 
       {/* Afternoon & Evening Shift (13:00 - 19:00) */}
       <div>
-        <div className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+        <div className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
           <span>Afternoon &amp; Evening Inspection Shift (01:00 PM – 07:00 PM)</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2.5">
@@ -219,7 +219,7 @@ export const DynamicSlotPicker: React.FC<DynamicSlotPickerProps> = ({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-500 italic">
+      <p className="text-xs text-slate-500 italic">
         * Standard departmental verification sessions run for 1.5 hours per instrument. 6 daily slot windows across 10 certified inspectors provide a maximum quota of 60 verification slots per day for this zone.
       </p>
     </div>

@@ -33,12 +33,12 @@ export const CertificateSecurityBadge: React.FC<CertificateSecurityBadgeProps> =
             <span>Cryptographic Trust Attestation</span>
           </div>
           {isValidSignature ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>VALID HSM SIGNATURE</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-400 bg-rose-950/80 px-2.5 py-0.5 rounded-full border border-rose-500/30">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-red-400 bg-red-950/80 px-2.5 py-0.5 rounded-full border border-red-500/30">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>INVALID / COMPROMISED</span>
             </span>
@@ -46,7 +46,7 @@ export const CertificateSecurityBadge: React.FC<CertificateSecurityBadgeProps> =
         </div>
 
         <div>
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">
+          <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">
             Canonical SHA-256 Integrity Digest:
           </div>
           <div className="flex items-center justify-between bg-slate-950/90 p-2.5 rounded-lg border border-slate-800 font-mono text-xs text-amber-300 break-all">

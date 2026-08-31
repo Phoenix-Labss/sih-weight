@@ -182,12 +182,12 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <Building2 className="w-3.5 h-3.5 text-gov-blue" />
               <span>Statutory Establishment Registration (Form LM-REG-01)</span>
             </div>
-            <p className="text-[11px] text-slate-600">
+            <p className="text-xs text-slate-600">
               Official enrollment under Section 24 of The Legal Metrology Act, 2009 &amp; Schedule IX.
             </p>
           </div>
           <div className="shrink-0">
-            <span className="inline-block text-[10px] font-mono font-bold bg-white text-gov-navy px-2 py-0.5 rounded border border-slate-300 uppercase">
+            <span className="inline-block text-xs font-mono font-bold bg-white text-gov-navy px-2 py-0.5 rounded border border-slate-300 uppercase">
               Section 24 / Schedule IX
             </span>
           </div>
@@ -198,7 +198,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
           <div className="grid grid-cols-3 gap-2 text-xs">
             {/* Step 1 */}
             <div className={`flex items-center gap-2 ${step === 1 ? 'text-gov-navy font-bold' : step > 1 ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                 step === 1
                   ? 'bg-gov-navy text-white'
                   : step > 1
@@ -207,12 +207,12 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               }`}>
                 {step > 1 ? <Check className="w-3 h-3" /> : '1'}
               </span>
-              <span className="truncate text-[11px] sm:text-xs">1. Authorized Person</span>
+              <span className="truncate text-xs sm:text-xs">1. Authorized Person</span>
             </div>
 
             {/* Step 2 */}
             <div className={`flex items-center gap-2 ${step === 2 ? 'text-gov-navy font-bold' : step > 2 ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                 step === 2
                   ? 'bg-gov-navy text-white'
                   : step > 2
@@ -221,19 +221,19 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               }`}>
                 {step > 2 ? <Check className="w-3 h-3" /> : '2'}
               </span>
-              <span className="truncate text-[11px] sm:text-xs">2. Business KYC &amp; PAN</span>
+              <span className="truncate text-xs sm:text-xs">2. Business KYC &amp; PAN</span>
             </div>
 
             {/* Step 3 */}
             <div className={`flex items-center gap-2 ${step === 3 ? 'text-gov-navy font-bold' : 'text-slate-400'}`}>
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                 step === 3
                   ? 'bg-gov-navy text-white'
                   : 'bg-slate-200 text-slate-600'
               }`}>
                 3
               </span>
-              <span className="truncate text-[11px] sm:text-xs">3. Premises &amp; Declaration</span>
+              <span className="truncate text-xs sm:text-xs">3. Premises &amp; Declaration</span>
             </div>
           </div>
         </div>
@@ -256,7 +256,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
                   Authorized Representative / Scale Owner Particulars
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Enter the particulars of the designated proprietor or authorized signatory.
                 </p>
               </div>
@@ -274,7 +274,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="e.g. Ramesh Kumar"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
 
@@ -290,7 +290,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="e.g. ramesh@kirana.in"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
 
@@ -309,7 +309,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       placeholder="9876543210"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                      className="w-full text-xs font-mono rounded-md border border-slate-300 pl-11 pr-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                      className="w-full text-xs font-mono rounded-md border border-slate-300 pl-11 pr-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                     />
                   </div>
                 </div>
@@ -326,7 +326,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="Minimum 8 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
 
@@ -342,13 +342,13 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="Re-enter identical password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
               </div>
 
               {/* Password Strength Checklist */}
-              <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-[11px] space-y-1.5">
+              <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-xs space-y-1.5">
                 <span className="font-semibold text-slate-700 block">Security &amp; Password Requirements:</span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1 text-slate-600">
                   <span className={hasMinLength ? 'text-emerald-700 font-semibold flex items-center gap-1' : 'flex items-center gap-1'}>
@@ -382,11 +382,11 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                   <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
                     Business Classification &amp; Statutory KYC
                   </h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Provide permanent tax registration and establishment trade identity.
                   </p>
                 </div>
-                <span className="text-[10px] text-amber-900 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-300 self-start sm:self-auto">
+                <span className="text-xs text-amber-900 bg-amber-50 px-2 py-0.5 rounded font-bold border border-amber-300 self-start sm:self-auto">
                   PAN Compulsory • GSTIN Optional
                 </span>
               </div>
@@ -407,7 +407,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     }`}
                   >
                     <span className="text-xs">Commercial Trader / Scale User</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Retail, Kirana, Mandi Merchant, Factory</span>
+                    <span className="text-xs text-slate-500 font-normal mt-0.5">Retail, Kirana, Mandi Merchant, Factory</span>
                   </button>
 
                   <button
@@ -420,7 +420,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     }`}
                   >
                     <span className="text-xs">Scale Manufacturer</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">LM-1 / LM-2 License Holder</span>
+                    <span className="text-xs text-slate-500 font-normal mt-0.5">LM-1 / LM-2 License Holder</span>
                   </button>
 
                   <button
@@ -433,7 +433,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     }`}
                   >
                     <span className="text-xs">Authorized Repairer</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">LM-3 License Holder</span>
+                    <span className="text-xs text-slate-500 font-normal mt-0.5">LM-3 License Holder</span>
                   </button>
 
                   <button
@@ -446,7 +446,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     }`}
                   >
                     <span className="text-xs">Instrument Dealer</span>
-                    <span className="text-[10px] text-slate-500 font-normal mt-0.5">Wholesale / Retail Scale Vendor</span>
+                    <span className="text-xs text-slate-500 font-normal mt-0.5">Wholesale / Retail Scale Vendor</span>
                   </button>
                 </div>
               </div>
@@ -464,7 +464,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="e.g. Ramesh Kirana & General Store"
                     value={tradeName}
                     onChange={(e) => setTradeName(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
 
@@ -478,7 +478,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="e.g. M/s Ramesh Enterprises"
                     value={legalName}
                     onChange={(e) => setLegalName(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
               </div>
@@ -493,7 +493,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       <span>Permanent Account Number (PAN)</span>
                       <span className="text-red-600">*</span>
                     </label>
-                    <span className="text-[10px] text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold border border-red-200">
+                    <span className="text-xs text-red-700 bg-red-50 px-2 py-0.5 rounded font-bold border border-red-200">
                       Compulsory
                     </span>
                   </div>
@@ -510,10 +510,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                         ? 'border-red-400 focus:ring-red-500 focus:border-red-500'
                         : isPanValid
                         ? 'border-emerald-500 focus:ring-emerald-500 focus:border-emerald-500'
-                        : 'border-slate-300 focus:ring-gov-navy focus:border-gov-navy'
+                        : 'border-slate-300 focus:ring-gov-blue focus:border-gov-blue'
                     }`}
                   />
-                  <div className="flex items-center justify-between mt-1 text-[10px]">
+                  <div className="flex items-center justify-between mt-1 text-xs">
                     <span className="text-slate-500">
                       10-character alphanumeric PAN of the business entity or authorized proprietor.
                     </span>
@@ -532,7 +532,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       <FileCheck className="w-3.5 h-3.5 text-slate-500" />
                       <span>GST Number (GSTIN)</span>
                     </label>
-                    <span className="text-[10px] text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-medium border border-slate-300">
+                    <span className="text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded font-medium border border-slate-300">
                       Optional (Not Mandatory)
                     </span>
                   </div>
@@ -548,10 +548,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                         ? 'border-red-400 focus:ring-red-500 focus:border-red-500'
                         : gstNumber && isGstValid
                         ? 'border-emerald-500 focus:ring-emerald-500 focus:border-emerald-500'
-                        : 'border-slate-300 focus:ring-gov-navy focus:border-gov-navy'
+                        : 'border-slate-300 focus:ring-gov-blue focus:border-gov-blue'
                     }`}
                   />
-                  <div className="flex items-center justify-between mt-1 text-[10px]">
+                  <div className="flex items-center justify-between mt-1 text-xs">
                     <span className="text-slate-500">
                       Small vendors &amp; kirana stores below statutory GST turnover threshold may leave this blank.
                     </span>
@@ -573,7 +573,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider">
                   Establishment Premises &amp; Physical Scale Location
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Specify the physical site where commercial weighing instruments are installed or inspected.
                 </p>
               </div>
@@ -591,7 +591,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     placeholder="e.g. Shop 14, Main Market, Chandni Chowk"
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
-                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                    className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                   />
                 </div>
 
@@ -608,7 +608,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       placeholder="New Delhi"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                     />
                   </div>
 
@@ -621,7 +621,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       id="reg-district"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy cursor-pointer"
+                      className="w-full text-xs rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue cursor-pointer"
                     >
                       <option value="Central Delhi">Central Delhi Zone (JUR-DL-01)</option>
                       <option value="North Delhi">North Delhi Zone (JUR-DL-02)</option>
@@ -644,7 +644,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       placeholder="110006"
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full text-xs font-mono font-bold rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-gov-navy focus:border-gov-navy"
+                      className="w-full text-xs font-mono font-bold rounded-md border border-slate-300 px-3 py-2 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue"
                     />
                   </div>
                 </div>
@@ -657,9 +657,9 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                     type="checkbox"
                     checked={declarationAccepted}
                     onChange={(e) => setDeclarationAccepted(e.target.checked)}
-                    className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy"
+                    className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-blue"
                   />
-                  <span className="text-[11px] text-slate-800 leading-relaxed">
+                  <span className="text-xs text-slate-800 leading-relaxed">
                     I hereby solemnly declare and affirm that the particulars stated above (including Permanent Account Number <strong>{cleanPan || '[PENDING PAN]'}</strong>) are true and accurate. I undertake to submit all weighing and measuring instruments in my possession for statutory verification under Section 24 of The Legal Metrology Act, 2009.
                   </span>
                 </label>
@@ -693,7 +693,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             {step < 3 ? (
               <button
                 type="submit"
-                className="px-4 py-2 rounded-md bg-gov-navy text-xs font-semibold text-white shadow-xs hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-md bg-gov-navy text-xs font-semibold text-white shadow-card hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -702,7 +702,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <button
                 type="submit"
                 disabled={loading || !canSubmit}
-                className="px-5 py-2 rounded-md bg-emerald-700 text-xs font-semibold text-white shadow-xs hover:bg-emerald-800 flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 rounded-md bg-emerald-700 text-xs font-semibold text-white shadow-card hover:bg-emerald-800 flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>

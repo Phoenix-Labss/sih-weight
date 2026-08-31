@@ -68,7 +68,7 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
       {/* Mobile-Friendly National Header */}
       <div className="text-center space-y-2 pt-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold uppercase tracking-wider">
-          <Shield className="w-3.5 h-3.5 text-amber-600" />
+          <Shield className="w-3.5 h-3.5 text-amber-700" />
           <span>Department of Legal Metrology — Official Public Verification</span>
         </div>
         <h1 className="text-2xl font-extrabold text-gov-navy tracking-tight">
@@ -80,31 +80,32 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
       </div>
 
       {/* Search / Token Input Form */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
+      <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-card space-y-3">
+        <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
-            <QrCode className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+            <QrCode className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" aria-hidden="true" />
             <input
               type="text"
+              aria-label="Certificate verification token or certificate number"
               placeholder="Enter QR token or Certificate No (e.g. TOKEN_VALID_2026)..."
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
-              className="w-full text-xs font-mono font-bold rounded-xl border border-slate-300 pl-10 pr-3 py-2.5 focus:ring-2 focus:ring-gov-blue"
+              className="input-field pl-9 font-mono font-semibold"
             />
           </div>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-5 py-2.5 rounded-xl bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50"
+            className="btn-primary shrink-0"
           >
-            <Search className="w-4 h-4" />
-            <span>{isLoading ? 'Verifying...' : 'Verify'}</span>
+            <Search className="w-4 h-4" aria-hidden="true" />
+            <span>{isLoading ? 'Verifying…' : 'Verify Certificate'}</span>
           </button>
         </form>
 
         {/* Quick Test Sample Tokens for Evaluator/Auditor */}
         <div className="pt-2 border-t border-slate-100">
-          <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1.5">
+          <div className="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1.5">
             Test Sample Scenarios (Click to Verify):
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -115,9 +116,9 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
                   setTokenInput(s.token);
                   handleVerify(s.token);
                 }}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
                   tokenInput === s.token
-                    ? 'bg-gov-navy text-white border-gov-navy shadow-2xs font-bold'
+                    ? 'bg-gov-navy text-white border-gov-navy shadow-card font-bold'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                 }`}
               >
@@ -130,12 +131,12 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
 
       {/* Error Message Display */}
       {errorMessage && (
-        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 text-rose-900 text-xs flex items-start gap-3 animate-in fade-in">
-          <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+        <div role="alert" className="alert alert-error animate-fade-in">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1">
             <h4 className="font-bold text-sm">Certificate Verification Failed</h4>
             <p>{errorMessage}</p>
-            <p className="text-[11px] text-rose-700">
+            <p className="text-xs text-red-700">
               Please ensure the QR code is intact and from an official Government of India Legal Metrology seal.
             </p>
           </div>
@@ -144,7 +145,7 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
 
       {/* Verification Result Section */}
       {verificationResult && (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+        <div className="space-y-6 animate-fade-in">
           {/* Status Card */}
           <VerificationStatusCard
             status={verificationResult.status}

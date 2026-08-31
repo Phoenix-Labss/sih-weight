@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Application } from '../../types/application';
 import { Instrument } from '../../types/instrument';
 import { VerificationSession } from '../../types/session';
@@ -132,13 +132,13 @@ export const OfficerWorkspace: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Officer Header Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-gov-navy to-emerald-950 text-white rounded-2xl p-6 shadow-md">
+      <div className="bg-gov-navy text-white rounded-lg p-5 sm:p-6 shadow-card">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-emerald-400" />
+            <div className="flex items-center gap-2 flex-wrap">
+              <ShieldCheck className="w-6 h-6 text-amber-400" aria-hidden="true" />
               <h2 className="text-xl font-bold tracking-tight">Legal Metrology Officer Enforcement Console</h2>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-white/10 text-amber-300 border border-white/20">
                 LMO STATUTORY AUTHORITY
               </span>
             </div>
@@ -148,8 +148,8 @@ export const OfficerWorkspace: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-white/10 px-3.5 py-2 rounded-xl border border-white/15 text-xs text-slate-200 flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-400" />
+            <div className="bg-white/10 px-3.5 py-2 rounded-md border border-white/15 text-xs text-slate-200 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
               <span>Key Slot: <strong className="font-mono text-white">HSM-DL-01</strong></span>
             </div>
           </div>
@@ -162,11 +162,11 @@ export const OfficerWorkspace: React.FC = () => {
           onClick={() => setActiveTab('scrutiny')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'scrutiny'
-              ? 'bg-gov-navy text-white shadow-xs'
+              ? 'bg-gov-navy text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <FileCheck2 className="w-4 h-4 text-amber-400" />
+          <FileCheck2 className="w-4 h-4 text-gov-goldDeep" aria-hidden="true" />
           <span>Application Scrutiny &amp; Scheduling Queue ({pendingScrutinyApps.length} Pending)</span>
         </button>
 
@@ -174,7 +174,7 @@ export const OfficerWorkspace: React.FC = () => {
           onClick={() => setActiveTab('testing')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'testing'
-              ? 'bg-emerald-700 text-white shadow-xs'
+              ? 'bg-emerald-700 text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -186,11 +186,11 @@ export const OfficerWorkspace: React.FC = () => {
           onClick={() => setActiveTab('ledger')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
             activeTab === 'ledger'
-              ? 'bg-indigo-700 text-white shadow-xs'
+              ? 'bg-gov-blue text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          <Award className="w-4 h-4 text-indigo-300" />
+          <Award className="w-4 h-4 text-gov-blue" aria-hidden="true" />
           <span>Issued Departmental Certificates Ledger ({lmoCertificates.length})</span>
         </button>
       </div>
@@ -211,7 +211,7 @@ export const OfficerWorkspace: React.FC = () => {
       {activeTab === 'testing' && (
         <div className="space-y-4">
           {/* Session Picker Bar (Strictly Active Workload) */}
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-700 shrink-0">
               <Calendar className="w-4 h-4 text-gov-blue" />
               <span>Active Testing Queue:</span>
@@ -271,10 +271,10 @@ export const OfficerWorkspace: React.FC = () => {
       {activeTab === 'ledger' && (
         <div className="space-y-6">
           {/* Issued Certificates Ledger */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-card space-y-4">
             <div className="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-emerald-600" />
+                <Award className="w-5 h-5 text-emerald-700" />
                 <h3 className="font-bold text-sm text-gov-navy uppercase tracking-wider">
                   Departmental Statutory Verification Certificates Master Ledger
                 </h3>
@@ -290,7 +290,7 @@ export const OfficerWorkspace: React.FC = () => {
                       notify('success', 'Database Reset', 'All demo certificates cleared and state restored to baseline.');
                     }
                   }}
-                  className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold border border-rose-200 transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold border border-red-200 transition-colors cursor-pointer"
                   title="Clear all generated mock certificates and reset database"
                 >
                   Clear All Data / Reset
@@ -300,7 +300,7 @@ export const OfficerWorkspace: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs">
                   <tr>
                     <th className="py-2.5 px-3">Certificate Number</th>
                     <th className="py-2.5 px-3">Validity Period</th>

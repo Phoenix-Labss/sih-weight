@@ -2,33 +2,181 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens — shared motion primitives (restrained, professional only) */
+@keyframes gov-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes gov-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes gov-modal-in {
+  from { opacity: 0; transform: scale(0.98) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 @layer base {
+  html {
+    /* Slightly larger base scale for public-sector readability
+       (scales the entire rem-based type system proportionally) */
+    font-size: 17px;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-slate-100 text-slate-900 font-sans antialiased;
+  }
+  :where(a, button, [role='button'], summary):focus-visible {
+    outline: 2px solid #1E40AF;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  :where(input, select, textarea):focus-visible {
+    outline: none;
+    border-color: #1E40AF;
+    box-shadow: 0 0 0 1px #1E40AF;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    @apply bg-amber-200 text-slate-900;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Motion utilities (replace dead tailwindcss-animate classes) */
+  .animate-fade-in  { animation: gov-fade-in 150ms ease-out; }
+  .animate-toast-in { animation: gov-toast-in 200ms ease-out; }
+  .animate-modal-in { animation: gov-modal-in 150ms ease-out; }
+
+  /* Buttons — three-tier hierarchy: primary / secondary / tertiary */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-gov-navy px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-gov-dark disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-amber-500 bg-amber-400 px-4 py-2 text-sm font-bold text-slate-950 transition-colors duration-150 hover:bg-amber-300 active:bg-amber-500 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-slate-400 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-red-700 px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-red-800 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-tertiary {
+    @apply inline-flex items-center gap-1 rounded text-sm font-semibold text-gov-blue underline-offset-2 transition-colors duration-150 hover:text-blue-800 hover:underline disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* Form controls */
+  .field-label {
+    @apply mb-1 block text-sm font-semibold text-slate-700;
+  }
+  .input-field {
+    @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-500;
+  }
+  .select-field {
+    @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-gov-blue disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500;
+  }
+  .help-text {
+    @apply mt-1 block text-xs text-slate-500;
+  }
+  .field-error {
+    @apply mt-1 block text-xs font-medium text-red-700;
+  }
+  /* Surfaces */
+  .card {
+    @apply rounded-lg border border-slate-200 bg-white;
+    box-shadow: 0 1px 2px 0 rgb(15 41 66 / 0.05), 0 1px 3px 0 rgb(15 41 66 / 0.04);
+  }
+  .card-header {
+    @apply flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5;
+  }
+  .card-title {
+    @apply text-sm font-bold text-gov-navy;
+  }
+  .card-body {
+    @apply px-4 py-4 sm:px-5;
+  }
+
+  /* Typography roles */
+  .page-title {
+    @apply text-xl font-bold tracking-tight text-gov-navy sm:text-2xl;
+  }
+  .section-heading {
+    @apply text-xs font-bold uppercase tracking-wider text-slate-600;
+  }
+  .meta-text {
+    @apply text-xs text-slate-500;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold;
+  }
+
+  /* Alerts */
+  .alert {
+    @apply flex items-start gap-3 rounded-md border px-4 py-3 text-sm;
+  }
+  .alert-error {
+    @apply border-red-200 bg-red-50 text-red-800;
+  }
+  .alert-warning {
+    @apply border-amber-300 bg-amber-50 text-amber-900;
+  }
+  .alert-info {
+    @apply border-blue-200 bg-blue-50 text-blue-900;
+  }
+  .alert-success {
+    @apply border-emerald-200 bg-emerald-50 text-emerald-900;
+  }
+
+  /* Data tables */
+  .gov-table {
+    @apply w-full border-collapse text-sm;
+  }
+  .gov-table thead th {
+    @apply whitespace-nowrap border-b border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wide text-slate-600;
+  }
+  .gov-table tbody td {
+    @apply border-b border-slate-100 px-3 py-2.5 align-middle text-slate-700;
+  }
+  .gov-table tbody tr:hover {
+    @apply bg-slate-50;
+  }
+
+  /* Sub-navigation tabs */
+  .tab {
+    @apply inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-transparent px-4 py-2 text-xs font-semibold transition-colors duration-150;
+  }
+  .tab-active {
+    @apply border-slate-300 bg-gov-navy text-white;
+  }
+  .tab-inactive {
+    @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900;
   }
 }
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

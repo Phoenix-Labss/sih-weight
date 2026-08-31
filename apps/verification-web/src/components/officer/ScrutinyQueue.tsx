@@ -286,9 +286,9 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
   return (
     <div className="space-y-4">
       {/* Header Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gov-navy text-amber-400 shadow-xs">
+          <div className="p-2.5 rounded-xl bg-gov-navy text-amber-400 shadow-card">
             <FileCheck2 className="w-5 h-5" />
           </div>
           <div>
@@ -320,14 +320,14 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
           }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeQueueTab === 'active'
-              ? 'bg-gov-navy text-white shadow-xs'
+              ? 'bg-gov-navy text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
           }`}
         >
           <Clock className="w-4 h-4 text-amber-400" />
           <span>Active In-Progress Queue</span>
           <span
-            className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
+            className={`px-1.5 py-0.5 rounded-full text-xs font-mono ${
               activeQueueTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
             }`}
           >
@@ -342,14 +342,14 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
           }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeQueueTab === 'completed'
-              ? 'bg-emerald-700 text-white shadow-xs'
+              ? 'bg-emerald-700 text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
           }`}
         >
           <ShieldCheck className="w-4 h-4 text-emerald-300" />
           <span>Completed &amp; Certified Archive</span>
           <span
-            className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
+            className={`px-1.5 py-0.5 rounded-full text-xs font-mono ${
               activeQueueTab === 'completed' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
             }`}
           >
@@ -364,14 +364,14 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
           }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeQueueTab === 'queries'
-              ? 'bg-amber-600 text-white shadow-xs'
+              ? 'bg-amber-600 text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
           }`}
         >
           <AlertTriangle className="w-4 h-4 text-amber-300" />
           <span>Deficiency Queries &amp; Rejected</span>
           <span
-            className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
+            className={`px-1.5 py-0.5 rounded-full text-xs font-mono ${
               activeQueueTab === 'queries' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'
             }`}
           >
@@ -386,14 +386,14 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
           }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeQueueTab === 'all'
-              ? 'bg-slate-800 text-white shadow-xs'
+              ? 'bg-slate-800 text-white shadow-card'
               : 'text-slate-600 hover:bg-slate-100 bg-white border border-slate-200'
           }`}
         >
           <Layers className="w-4 h-4 text-slate-300" />
           <span>All Applications Catalog</span>
           <span
-            className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
+            className={`px-1.5 py-0.5 rounded-full text-xs font-mono ${
               activeQueueTab === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
             }`}
           >
@@ -404,37 +404,37 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
 
       {/* KPI Stats Bar specifically for Completed Tab */}
       {activeQueueTab === 'completed' && (
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white p-4 rounded-xl shadow-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-gov-navy text-white p-4 rounded-lg shadow-card">
           <div className="border-r border-white/10 pr-3">
-            <div className="text-[11px] text-emerald-300 font-semibold uppercase tracking-wider">Certified Instruments</div>
+            <div className="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Certified Instruments</div>
             <div className="text-2xl font-extrabold font-mono mt-0.5">{completedApps.length}</div>
-            <p className="text-[10px] text-slate-300">Form IX Digital Certificates Issued</p>
+            <p className="text-xs text-slate-300">Form IX Digital Certificates Issued</p>
           </div>
 
           <div className="border-r border-white/10 pr-3">
-            <div className="text-[11px] text-emerald-300 font-semibold uppercase tracking-wider">Reconciled Revenue</div>
+            <div className="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Reconciled Revenue</div>
             <div className="text-2xl font-extrabold font-mono text-amber-300 mt-0.5">
               {formatCurrency(totalCompletedRevenue)}
             </div>
-            <p className="text-[10px] text-slate-300">Treasury Head 1475 Settled</p>
+            <p className="text-xs text-slate-300">Treasury Head 1475 Settled</p>
           </div>
 
           <div className="border-r border-white/10 pr-3">
-            <div className="text-[11px] text-emerald-300 font-semibold uppercase tracking-wider">Statutory Compliance</div>
+            <div className="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Statutory Compliance</div>
             <div className="text-2xl font-extrabold font-mono text-emerald-400 mt-0.5">100%</div>
-            <p className="text-[10px] text-slate-300">NAWI MPE &amp; Lead Seal Verified</p>
+            <p className="text-xs text-slate-300">NAWI MPE &amp; Lead Seal Verified</p>
           </div>
 
           <div>
-            <div className="text-[11px] text-emerald-300 font-semibold uppercase tracking-wider">Avg. Turnaround SLA</div>
+            <div className="text-xs text-emerald-300 font-semibold uppercase tracking-wider">Avg. Turnaround SLA</div>
             <div className="text-2xl font-extrabold font-mono mt-0.5">1.2 Days</div>
-            <p className="text-[10px] text-slate-300">Filing to Cryptographic Issuance</p>
+            <p className="text-xs text-slate-300">Filing to Cryptographic Issuance</p>
           </div>
         </div>
       )}
 
       {/* Search, Sorting, and Filter Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-col lg:flex-row items-center gap-3">
+      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card flex flex-col lg:flex-row items-center gap-3">
         {/* Search */}
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
@@ -496,7 +496,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
 
           {/* Sort By Dropdown */}
           <div className="flex items-center gap-1 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1">
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Sort:</span>
+            <span className="text-xs font-bold text-slate-500 uppercase">Sort:</span>
             <select
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
@@ -520,10 +520,10 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
       </div>
 
       {/* Applications Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs tracking-wider">
               <tr>
                 <th
                   onClick={() => handleSortToggle('app_num')}
@@ -570,7 +570,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Layers className="w-8 h-8 text-slate-300" />
                       <span className="font-semibold">No applications found in this view.</span>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-xs text-slate-400">
                         {activeQueueTab === 'completed'
                           ? 'Completed verification certificates will appear here once disposition is finalized.'
                           : 'Try clearing your search query or filters.'}
@@ -612,12 +612,12 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                         <div className="font-bold text-gov-navy font-mono flex items-center gap-1.5">
                           <span>{app.application_number}</span>
                           {isCompleted && (
-                            <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-bold">
                               CERTIFIED
                             </span>
                           )}
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">
+                        <div className="text-xs text-slate-500 mt-0.5">
                           Filed: {formatDateTime(app.created_at)}
                         </div>
                       </td>
@@ -627,7 +627,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                         <div className="font-semibold text-slate-800">
                           {inst?.model?.model_name || 'Electronic Counter Scale'}
                         </div>
-                        <div className="text-[10px] text-slate-500 font-mono">
+                        <div className="text-xs text-slate-500 font-mono">
                           SN: <span className="font-bold text-slate-700">{inst?.serial_number || 'N/A'}</span> | Class:{' '}
                           {inst?.model?.accuracy_class || 'CLASS_III'}
                         </div>
@@ -636,7 +636,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                       {/* Verification Type & Mode */}
                       <td className="py-3.5 px-4">
                         <div className="font-medium text-slate-800">{app.application_type.replace(/_/g, ' ')}</div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">{app.service_mode.replace(/_/g, ' ')}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{app.service_mode.replace(/_/g, ' ')}</div>
                       </td>
 
                       {/* Fee / Treasury Status */}
@@ -646,8 +646,8 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                             <div className="font-mono font-semibold text-slate-900">
                               {formatCurrency(app.fee_assessment?.total_assessed_amount || 750)}
                             </div>
-                            <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600 inline" />
+                            <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-700 inline" />
                               <span>PAYMENT_RECONCILED</span>
                             </span>
                           </div>
@@ -657,7 +657,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                               {formatCurrency(app.fee_assessment.total_assessed_amount || 750)}
                             </div>
                             <span
-                              className={`text-[10px] font-bold ${
+                              className={`text-xs font-bold ${
                                 app.fee_assessment.payment_status === 'PAYMENT_RECONCILED'
                                   ? 'text-emerald-700'
                                   : 'text-amber-700'
@@ -667,7 +667,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 text-[11px]">Not Assessed</span>
+                          <span className="text-slate-400 text-xs">Not Assessed</span>
                         )}
                       </td>
 
@@ -684,7 +684,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                             <>
                               <button
                                 onClick={() => handleViewCertificate(app)}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold inline-flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold inline-flex items-center gap-1 transition-colors shadow-card cursor-pointer"
                                 title="View Cryptographic Certificate of Verification"
                               >
                                 <Award className="w-3.5 h-3.5 text-amber-300" />
@@ -693,7 +693,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
 
                               <button
                                 onClick={() => handleOpenReceipt(app)}
-                                className="px-2.5 py-1 rounded-lg bg-slate-900 text-white hover:bg-slate-800 font-semibold inline-flex items-center gap-1 transition-colors shadow-2xs border border-slate-700 cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg bg-slate-900 text-white hover:bg-slate-800 font-semibold inline-flex items-center gap-1 transition-colors shadow-card border border-slate-700 cursor-pointer"
                                 title="View Reconciled Statutory Treasury Receipt"
                               >
                                 <Receipt className="w-3.5 h-3.5 text-emerald-400" />
@@ -717,7 +717,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                               {isSubmittedOrQuery && (
                                 <button
                                   onClick={() => handleOpenScrutiny(app)}
-                                  className="px-2.5 py-1 rounded-lg bg-gov-blue text-white hover:bg-blue-800 font-semibold inline-flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                  className="px-2.5 py-1 rounded-lg bg-gov-blue text-white hover:bg-blue-800 font-semibold inline-flex items-center gap-1 transition-colors shadow-card cursor-pointer"
                                 >
                                   <FileCheck2 className="w-3 h-3" />
                                   <span>Scrutinize</span>
@@ -727,7 +727,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                               {isPaidReadyToSchedule && !isScheduled && (
                                 <button
                                   onClick={() => handleOpenSchedule(app)}
-                                  className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold inline-flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-semibold inline-flex items-center gap-1 transition-colors shadow-card cursor-pointer"
                                   title="Allocate verification slot and assign LMO inspector"
                                 >
                                   <Calendar className="w-3 h-3" />
@@ -737,7 +737,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
 
                               {isFeePending && !isPaidReadyToSchedule && !isScheduled && (
                                 <span
-                                  className="px-2 py-1 rounded bg-amber-50 text-amber-800 font-semibold text-[10px] border border-amber-200"
+                                  className="px-2 py-1 rounded bg-amber-50 text-amber-800 font-semibold text-xs border border-amber-200"
                                   title="Waiting for applicant to pay statutory fees before scheduling"
                                 >
                                   Fee Pending
@@ -747,7 +747,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
                               {onSelectSessionForTesting && isScheduled && (
                                 <button
                                   onClick={() => onSelectSessionForTesting(app.application_id)}
-                                  className="px-2.5 py-1 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-semibold inline-flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                  className="px-2.5 py-1 rounded-lg bg-slate-800 text-white hover:bg-slate-900 font-semibold inline-flex items-center gap-1 transition-colors shadow-card cursor-pointer"
                                   title="Launch NAWI test observation grid for this instrument"
                                 >
                                   <Scale className="w-3 h-3 text-amber-400" />

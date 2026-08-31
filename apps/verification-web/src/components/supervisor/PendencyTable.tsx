@@ -102,7 +102,7 @@ export const PendencyTable: React.FC = () => {
 
               return (
                 <tr key={item.applicationId} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono font-medium text-indigo-700">{item.applicationNumber}</td>
+                  <td className="px-4 py-3 font-mono font-medium text-gov-blue">{item.applicationNumber}</td>
                   <td className="px-4 py-3 font-medium text-gray-900">{item.applicantName}</td>
                   <td className="px-4 py-3 text-gray-600">{item.instrumentCategory}</td>
                   <td className="px-4 py-3 font-semibold text-gray-900">{item.daysPending} days</td>

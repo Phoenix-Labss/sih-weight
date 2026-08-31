@@ -147,7 +147,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                 <ShieldCheck className="w-5 h-5 text-emerald-700" />
                 <span>{isGatcUser ? 'GATC Verification Testing Complete' : 'Statutory Verification Complete'}</span>
               </div>
-              <p className="leading-relaxed text-[11px]">
+              <p className="leading-relaxed text-xs">
                 The verification session passed all deterministic test steps. Ready to generate canonical SHA-256 digest and execute digital signing under the authority of <strong className="font-semibold">{user.actorName}</strong> ({isGatcUser ? 'Approved GATC Verifier' : 'Legal Metrology Officer'}).
               </p>
             </div>
@@ -156,12 +156,12 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
             {existingStamps.length > 0 ? (
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-700">
-                  <Stamp className="w-4 h-4 text-emerald-600" />
+                  <Stamp className="w-4 h-4 text-emerald-700" />
                   <span>
                     Physical Security Seal Audited: <strong className="font-mono text-slate-900">#{existingStamps[0].seal_identification_number}</strong> ({existingStamps[0].seal_position})
                   </span>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded uppercase">
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded uppercase">
                   Audited
                 </span>
               </div>
@@ -173,12 +173,12 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                       type="checkbox"
                       checked={affixSealNow}
                       onChange={(e) => setAffixSealNow(e.target.checked)}
-                      className="rounded border-amber-300 text-gov-navy focus:ring-gov-navy"
+                      className="rounded border-amber-300 text-gov-navy focus:ring-gov-blue"
                     />
                     <Stamp className="w-4 h-4 text-amber-700" />
                     <span>Affix Physical Security Seal with Digital Signing (Required)</span>
                   </label>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-200/70 text-amber-900 uppercase">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-200/70 text-amber-900 uppercase">
                     Seal Pending
                   </span>
                 </div>
@@ -186,7 +186,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                 {affixSealNow && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1.5 border-t border-amber-200/60 text-xs">
                     <div>
-                      <label className="block text-[11px] font-semibold text-amber-900 mb-1">
+                      <label className="block text-xs font-semibold text-amber-900 mb-1">
                         Seal Identification Number *
                       </label>
                       <input
@@ -199,7 +199,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-amber-900 mb-1">
+                      <label className="block text-xs font-semibold text-amber-900 mb-1">
                         Seal Position
                       </label>
                       <select
@@ -238,7 +238,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Digital Signing Key Slot
                 </label>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 font-mono text-[11px] text-slate-700">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 bg-slate-50 font-mono text-xs text-slate-700">
                   <Key className="w-3.5 h-3.5 text-amber-500" />
                   <span>HSM Slot 0: LMO-DELHI-CENTRAL</span>
                 </div>
@@ -284,7 +284,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
           </div>
         ) : (
           <div className="space-y-4 text-center py-2">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-7 h-7" />
             </div>
 
@@ -316,7 +316,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                 <span className="text-slate-500 font-medium">Public QR Token:</span>
                 <span className="font-mono text-gov-blue font-bold">{issuedCert.public_verification_token}</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono pt-1.5 border-t">
+              <div className="flex justify-between items-center text-xs text-slate-500 font-mono pt-1.5 border-t">
                 <span>SHA-256 Digest:</span>
                 <span className="truncate max-w-[200px]">{issuedCert.certificate_bytes_sha256}</span>
               </div>
@@ -327,7 +327,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
               <button
                 type="button"
                 onClick={() => setIsViewingFullCert(true)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 transition-colors shadow-card flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <FileText className="w-4 h-4 text-amber-300" />
                 <span>View Full Digital Certificate &amp; PDF</span>
@@ -339,7 +339,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
                   window.location.hash = `#public?token=${encodeURIComponent(issuedCert.public_verification_token)}`;
                   window.dispatchEvent(new HashChangeEvent('hashchange'));
                 }}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors shadow-card flex items-center justify-center gap-1.5 cursor-pointer border border-amber-500"
               >
                 <QrCode className="w-4 h-4 text-slate-950" />
                 <span>Verify Public QR Token</span>
@@ -348,7 +348,7 @@ export const CertificateSignModal: React.FC<CertificateSignModalProps> = ({
               <button
                 type="button"
                 onClick={handleDone}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800 transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-emerald-700 text-xs font-bold text-white hover:bg-emerald-800 transition-colors shadow-card flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Award className="w-4 h-4 text-amber-300" />
                 <span>Done &amp; View Ledger</span>

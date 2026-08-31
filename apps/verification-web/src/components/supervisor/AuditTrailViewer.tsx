@@ -75,7 +75,7 @@ export const AuditTrailViewer: React.FC = () => {
           placeholder="Search by action, officer, or ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="text-xs px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full sm:w-64"
+          className="text-xs px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gov-blue w-full sm:w-64"
         />
       </div>
 
@@ -95,7 +95,7 @@ export const AuditTrailViewer: React.FC = () => {
             {filtered.map((log) => (
               <tr key={log.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{log.timestamp}</td>
-                <td className="px-4 py-3 font-semibold text-indigo-700">{log.action}</td>
+                <td className="px-4 py-3 font-semibold text-gov-blue">{log.action}</td>
                 <td className="px-4 py-3 text-gray-800">{log.entityType} ({log.entityId})</td>
                 <td className="px-4 py-3 text-gray-900 font-sans">{log.performedBy}</td>
                 <td className="px-4 py-3 text-gray-500">{log.ipAddress}</td>

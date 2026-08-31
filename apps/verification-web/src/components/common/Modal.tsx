@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -18,14 +18,19 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = '2xl',
 }) => {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const titleId = React.useId();
+  const subtitleId = React.useId();
+
   useEffect(() => {
+    if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    // Move focus into the dialog for keyboard users
+    closeButtonRef.current?.focus();
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
@@ -45,31 +50,39 @@ export const Modal: React.FC<ModalProps> = ({
   }[maxWidth];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4 animate-fade-in">
       <div
         className="fixed inset-0"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
-        className={`relative w-full ${maxWidthClasses} bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all my-8 z-10`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={subtitle ? subtitleId : undefined}
+        className={`animate-modal-in relative z-10 my-8 w-full ${maxWidthClasses} overflow-hidden rounded-lg border border-slate-200 bg-white shadow-overlay`}
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
           <div>
-            <h3 className="text-lg font-bold text-gov-navy">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            <h3 id={titleId} className="text-base font-bold text-gov-navy">{title}</h3>
+            {subtitle && (
+              <p id={subtitleId} className="mt-0.5 text-xs text-slate-500">{subtitle}</p>
+            )}
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+            aria-label="Close dialog"
+            className="rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-600"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 max-h-[calc(85vh-8rem)] overflow-y-auto">{children}</div>
+        <div className="max-h-[calc(85vh-8rem)] overflow-y-auto p-6">{children}</div>
       </div>
     </div>
   );

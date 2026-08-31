@@ -295,14 +295,14 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
   return (
     <div className="space-y-6">
       {/* Session Title & Progression Bar */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-card space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-extrabold text-base text-gov-navy">
                 {application?.application_number || 'Verification Worksheet'}
               </span>
-              <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
+              <span className="font-mono text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
                 {session.session_id.length > 18 ? `SESS-${session.session_id.slice(0, 8)}` : session.session_id}
               </span>
               <StatusBadge status={currentStatus} size="sm" />
@@ -319,7 +319,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             {(currentStatus === 'PLANNED' || currentStatus === 'IDENTITY_CONFIRMED') && (
               <button
                 onClick={handleStartSession}
-                className="px-4 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-card transition-colors cursor-pointer"
               >
                 <Play className="w-4 h-4" />
                 <span>Start Test Execution</span>
@@ -329,7 +329,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             {/* Step 2: IN_PROGRESS -> Show active indicator */}
             {currentStatus === 'IN_PROGRESS' && (
               <div className="px-3.5 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-gov-blue animate-pulse"></span>
                 <span>Testing In Progress — Enter Readings Below</span>
               </div>
             )}
@@ -339,7 +339,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 type="button"
                 onClick={() => setIsStampModalOpen(true)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
+                className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-card cursor-pointer ${
                   recordedStamps.length > 0
                     ? 'bg-slate-800 text-white hover:bg-slate-900 border border-slate-700'
                     : 'bg-amber-600 text-white hover:bg-amber-700 ring-2 ring-amber-400/40'
@@ -360,7 +360,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDispositionModalOpen(true)}
-                className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 transition-colors shadow-card cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>Record Legal Disposition</span>
@@ -373,7 +373,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 {certificate ? (
                   <button
                     onClick={() => setIsCertViewOpen(true)}
-                    className="px-4 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-card transition-colors cursor-pointer"
                   >
                     <Award className="w-4 h-4 text-amber-400" />
                     <span>View Issued Certificate ({certificate.certificate_number})</span>
@@ -394,12 +394,12 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
 
         {/* Verification & Certification Complete Banner */}
         {isFinalized && certificate && (
-          <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-2xs">
+          <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-card">
             <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
               <div>
                 <strong className="text-emerald-950 font-bold text-sm">Verification &amp; Digital Certification Complete</strong>
-                <p className="text-emerald-800 text-[11px] mt-0.5">
+                <p className="text-emerald-800 text-xs mt-0.5">
                   Statutory certificate <span className="font-mono font-bold text-emerald-950">{certificate.certificate_number}</span> is published &amp; physical seals are recorded. This completed verification is archived in the Master Ledger.
                 </p>
               </div>
@@ -407,7 +407,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             <button
               type="button"
               onClick={() => onNavigateToLedger?.()}
-              className="px-4 py-2 rounded-lg bg-gov-navy hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-xs cursor-pointer transition-colors"
+              className="px-4 py-2 rounded-lg bg-gov-navy hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 whitespace-nowrap shadow-card cursor-pointer transition-colors"
             >
               <Award className="w-4 h-4 text-amber-300" />
               <span>Go to Issued Ledger &rarr;</span>
@@ -423,18 +423,18 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <div className="font-bold text-slate-800 flex items-center justify-between">
                 <span>Physical Identity Check</span>
                 {serialVerified ? (
-                  <span className="text-emerald-600 flex items-center gap-1 font-semibold text-[11px]">
+                  <span className="text-emerald-700 flex items-center gap-1 font-semibold text-xs">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Verified
                   </span>
                 ) : (
-                  <span className="text-amber-600 font-semibold text-[11px]">Pending Check</span>
+                  <span className="text-amber-700 font-semibold text-xs">Pending Check</span>
                 )}
               </div>
-              <p className="text-slate-600 text-[11px]">
+              <p className="text-slate-600 text-xs">
                 Serial: <span className="font-mono font-bold text-slate-900">{instrument?.serial_number || 'DL-2024-8842'}</span>
               </p>
-              <p className="text-slate-500 text-[10px]">
+              <p className="text-slate-500 text-xs">
                 Class: <strong className="text-slate-700">{accuracyClass}</strong> | Model: {instrument?.model?.model_name || 'NAWI'}
               </p>
             </div>
@@ -443,18 +443,18 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 type="button"
                 onClick={() => setIsPhysicalMatchModalOpen(true)}
-                className="w-full py-1.5 rounded bg-gov-navy text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1"
+                className="w-full py-1.5 rounded bg-gov-navy text-white text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-card mt-1"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
                 <span>Inspect &amp; Match Serial</span>
               </button>
             ) : (
-              <div className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 flex items-center justify-between font-semibold mt-1">
+              <div className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 flex items-center justify-between font-semibold mt-1">
                 <span className="flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-3 h-3 text-emerald-700 shrink-0" />
                   <span>Plate Inspected</span>
                 </span>
-                <span className="text-[9px] font-mono bg-emerald-100/70 text-emerald-800 px-1 rounded">MATCHED</span>
+                <span className="text-xs font-mono bg-emerald-100/70 text-emerald-800 px-1 rounded">MATCHED</span>
               </div>
             )}
           </div>
@@ -465,31 +465,31 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <div className="font-bold text-slate-800 flex items-center justify-between">
                 <span>Physical Security Seal</span>
                 {recordedStamps.length > 0 ? (
-                  <span className="text-emerald-600 flex items-center gap-1 font-semibold text-[11px]">
+                  <span className="text-emerald-700 flex items-center gap-1 font-semibold text-xs">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Affixed
                   </span>
                 ) : currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED' ? (
-                  <span className="text-amber-600 font-semibold text-[11px]">Seal Required</span>
+                  <span className="text-amber-700 font-semibold text-xs">Seal Required</span>
                 ) : (
-                  <span className="text-slate-400 font-medium text-[10px] uppercase">Locked</span>
+                  <span className="text-slate-400 font-medium text-xs uppercase">Locked</span>
                 )}
               </div>
               {recordedStamps.length > 0 ? (
-                <div className="text-[11px] space-y-0.5">
+                <div className="text-xs space-y-0.5">
                   <div className="font-mono font-bold text-slate-900 truncate">
                     #{recordedStamps[0].seal_identification_number}
                   </div>
-                  <div className="text-[10px] text-slate-500 truncate">
+                  <div className="text-xs text-slate-500 truncate">
                     Pos: {recordedStamps[0].seal_position}
                   </div>
                 </div>
               ) : currentStatus === 'SUBMITTED' || currentStatus === 'FINALIZED' ? (
-                <p className="text-slate-600 text-[11px]">
+                <p className="text-slate-600 text-xs">
                   Testing complete. Lead wire seal required on calibration port.
                 </p>
               ) : (
-                <p className="text-slate-400 text-[11px]">
+                <p className="text-slate-400 text-xs">
                   Lead wire seal option unlocks after test observations are completed and submitted.
                 </p>
               )}
@@ -499,7 +499,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 type="button"
                 onClick={() => setIsStampModalOpen(true)}
-                className={`w-full py-1.5 rounded text-[11px] font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs mt-1 ${
+                className={`w-full py-1.5 rounded text-xs font-semibold transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-card mt-1 ${
                   recordedStamps.length > 0
                     ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
                     : 'bg-amber-600 hover:bg-amber-700 text-white'
@@ -518,7 +518,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 type="button"
                 disabled
-                className="w-full py-1.5 rounded text-[11px] font-medium flex items-center justify-center gap-1 mt-1 bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                className="w-full py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 mt-1 bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
                 title="Complete and submit test readings below to unlock physical seal stamping"
               >
                 <Lock className="w-3 h-3 text-slate-400" />
@@ -532,18 +532,18 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             <div className="space-y-1.5">
               <div className="font-bold text-slate-800 flex items-center justify-between">
                 <span>Reference Standards</span>
-                <span className="text-emerald-600 font-semibold text-[10px] uppercase">Calibrated</span>
+                <span className="text-emerald-700 font-semibold text-xs uppercase">Calibrated</span>
               </div>
               <div className="space-y-1">
                 {defaultStandardWeights.slice(0, 2).map((std) => (
-                  <div key={std.id} className="text-[10px] text-slate-600 flex items-center justify-between">
+                  <div key={std.id} className="text-xs text-slate-600 flex items-center justify-between">
                     <span className="truncate max-w-[130px]">{std.name}</span>
-                    <span className="text-emerald-700 font-mono text-[9px] font-bold">PASS</span>
+                    <span className="text-emerald-700 font-mono text-xs font-bold">PASS</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono text-right">
+            <div className="text-xs text-slate-400 font-mono text-right">
               Traceability: RRSL / NPL
             </div>
           </div>
@@ -553,28 +553,28 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
             className={`p-3.5 rounded-xl border space-y-2 flex flex-col justify-between transition-colors ${
               tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
                 ? 'bg-slate-50 border-slate-200'
-                : 'bg-rose-50/50 border-rose-300 ring-1 ring-rose-200'
+                : 'bg-red-50/50 border-red-300 ring-1 ring-red-200'
             }`}
           >
             <div className="space-y-1.5">
               <div className="font-bold text-slate-800 flex items-center justify-between">
                 <span>Environmental State</span>
                 {tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0 ? (
-                  <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-[10px] uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
-                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                  <span className="text-emerald-700 bg-emerald-100 border border-emerald-300 font-bold text-xs uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-700" />
                     Compliant
                   </span>
                 ) : (
-                  <span className="text-rose-700 bg-rose-100 border border-rose-300 font-bold text-[10px] uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
-                    <AlertTriangle className="w-2.5 h-2.5 text-rose-600" />
+                  <span className="text-red-700 bg-red-100 border border-red-300 font-bold text-xs uppercase px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <AlertTriangle className="w-2.5 h-2.5 text-red-600" />
                     Non-Compliant
                   </span>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <span className="text-slate-500 block text-[10px] flex items-center gap-1">
-                    <Thermometer className="w-3 h-3 text-rose-500" />
+                  <span className="text-slate-500 block text-xs flex items-center gap-1">
+                    <Thermometer className="w-3 h-3 text-red-500" />
                     Temp (°C)
                   </span>
                   <input
@@ -586,13 +586,13 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     className={`w-full font-mono font-bold border rounded px-1.5 py-1 text-xs transition-colors ${
                       tempCelsius >= 20.0 && tempCelsius <= 28.0
                         ? 'bg-white text-slate-900 border-slate-300'
-                        : 'bg-rose-50 text-rose-900 border-rose-400 ring-1 ring-rose-300 font-black'
+                        : 'bg-red-50 text-red-900 border-red-400 ring-1 ring-red-300 font-black'
                     }`}
                   />
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px] flex items-center gap-1">
-                    <Droplets className="w-3 h-3 text-blue-500" />
+                  <span className="text-slate-500 block text-xs flex items-center gap-1">
+                    <Droplets className="w-3 h-3 text-gov-blue" />
                     RH (%)
                   </span>
                   <input
@@ -604,18 +604,18 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     className={`w-full font-mono font-bold border rounded px-1.5 py-1 text-xs transition-colors ${
                       humidityPercent >= 45.0 && humidityPercent <= 65.0
                         ? 'bg-white text-slate-900 border-slate-300'
-                        : 'bg-rose-50 text-rose-900 border-rose-400 ring-1 ring-rose-300 font-black'
+                        : 'bg-red-50 text-red-900 border-red-400 ring-1 ring-red-300 font-black'
                     }`}
                   />
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-between text-[10px]">
+            <div className="flex items-center justify-between text-xs">
               <span
                 className={
                   tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
                     ? 'text-slate-400'
-                    : 'text-rose-600 font-semibold'
+                    : 'text-red-600 font-semibold'
                 }
               >
                 {tempCelsius >= 20.0 && tempCelsius <= 28.0 && humidityPercent >= 45.0 && humidityPercent <= 65.0
@@ -635,7 +635,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
       </div>
 
       {/* Observations Worksheet */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-card space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
           <div className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-gov-blue" />
@@ -644,7 +644,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 <h3 className="text-sm font-bold text-slate-800">
                   Guided NAWI Test Procedure Execution
                 </h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
                   {accuracyClass === 'CLASS_I'
                     ? 'Class I (Special Accuracy — Analytical/Micro)'
                     : accuracyClass === 'CLASS_II'
@@ -654,7 +654,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                     : 'Class III (Medium Accuracy — Commercial Trade)'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 {accuracyClass === 'CLASS_I'
                   ? 'Stepped MPE: 0 < m ≤ 50,000e: ±1.0e; 50,000e < m ≤ 200,000e: ±2.0e; m > 200,000e: ±3.0e'
                   : accuracyClass === 'CLASS_II'
@@ -676,7 +676,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                   setObservations(autoSteps);
                   notify('info', 'Test Steps Auto-Aligned', `Procedure points auto-calculated for ${accuracyClass} (${scaleIntervalE} kg scale interval).`);
                 }}
-                className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] border border-slate-300 transition-colors cursor-pointer"
+                className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-300 transition-colors cursor-pointer"
                 title="Reset or auto-align test points with the loaded machine specifications"
               >
                 Auto-Align Steps
@@ -711,7 +711,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
               <button
                 onClick={handleSubmitObservations}
                 disabled={isSubmittingObservations}
-                className="px-6 py-2.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                className="px-6 py-2.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-2 shadow-card transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 <span>{isSubmittingObservations ? 'Evaluating Tolerance...' : 'Submit Observations & Run Evaluation'}</span>
@@ -744,7 +744,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsStampModalOpen(true)}
-                  className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-card cursor-pointer ${
                     recordedStamps.length > 0
                       ? 'bg-slate-800 text-white hover:bg-slate-900 border border-slate-700'
                       : 'bg-amber-600 text-white hover:bg-amber-700 ring-2 ring-amber-400/40'
@@ -771,7 +771,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
           ) : isFinalized ? (
             <>
               <div className="flex items-center gap-2 text-xs">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <ShieldCheck className="w-4 h-4 text-emerald-700" />
                 <span className="font-bold text-slate-800">
                   Verification Finalized — {session.outcome ? session.outcome.replace(/_/g, ' ') : 'Disposition Recorded'}
                 </span>

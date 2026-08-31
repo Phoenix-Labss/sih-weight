@@ -59,7 +59,7 @@ export const SupervisorDashboard: React.FC = () => {
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'overview' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'overview' ? 'bg-white text-gov-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             {t.tabOverview}
@@ -67,7 +67,7 @@ export const SupervisorDashboard: React.FC = () => {
           <button
             onClick={() => setActiveTab('pendency')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'pendency' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'pendency' ? 'bg-white text-gov-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             {t.pendencyAnalysisTitle}
@@ -75,7 +75,7 @@ export const SupervisorDashboard: React.FC = () => {
           <button
             onClick={() => setActiveTab('audit')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'audit' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              activeTab === 'audit' ? 'bg-white text-gov-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             {t.auditTrailTitle}
@@ -93,17 +93,17 @@ export const SupervisorDashboard: React.FC = () => {
               <div className="mt-2 text-xs text-green-600 font-medium">95 Finalized & Certified</div>
             </div>
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Pending Scrutiny</div>
-              <div className="mt-2 text-3xl font-bold text-amber-600">{data.pendingScrutiny}</div>
+              <div className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Pending Scrutiny</div>
+              <div className="mt-2 text-3xl font-bold text-amber-700">{data.pendingScrutiny}</div>
               <div className="mt-2 text-xs text-gray-500">Awaiting officer initial review</div>
             </div>
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Pending Verification</div>
-              <div className="mt-2 text-3xl font-bold text-blue-600">{data.pendingVerification}</div>
+              <div className="text-xs font-semibold text-gov-blue uppercase tracking-wider">Pending Verification</div>
+              <div className="mt-2 text-3xl font-bold text-gov-blue">{data.pendingVerification}</div>
               <div className="mt-2 text-xs text-gray-500">Scheduled / Test in progress</div>
             </div>
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Reconciled Revenue</div>
+              <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Reconciled Revenue</div>
               <div className="mt-2 text-3xl font-bold text-emerald-700">₹{data.totalRevenue.toLocaleString('en-IN')}</div>
               <div className="mt-2 text-xs text-gray-500">Schedule XII Treasury Receipts</div>
             </div>
@@ -116,7 +116,7 @@ export const SupervisorDashboard: React.FC = () => {
               {data.pendencyTiers.map((tier) => (
                 <div key={tier.tierLabel} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                   <div className="text-sm font-semibold text-gray-700">{tier.tierLabel}</div>
-                  <div className="text-2xl font-bold text-indigo-900 mt-1">{tier.count}</div>
+                  <div className="text-2xl font-bold text-blue-900 mt-1">{tier.count}</div>
                   <div className="text-xs text-gray-500 mt-1">{tier.percentage}% of active backlog</div>
                 </div>
               ))}
@@ -142,7 +142,7 @@ export const SupervisorDashboard: React.FC = () => {
                     <tr key={off.name} className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium text-gray-900">{off.name}</td>
                       <td className="px-4 py-3 text-gray-600">{off.jurisdiction}</td>
-                      <td className="px-4 py-3 font-semibold text-indigo-700">{off.completed}</td>
+                      <td className="px-4 py-3 font-semibold text-gov-blue">{off.completed}</td>
                       <td className="px-4 py-3 text-gray-700">{off.avgTurnaroundDays} days</td>
                       <td className="px-4 py-3 text-red-600">{off.rejections}</td>
                     </tr>

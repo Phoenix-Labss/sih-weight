@@ -44,7 +44,7 @@ export const ReceiptViewer: React.FC<ReceiptViewerProps> = ({ isOpen, onClose, a
     >
       <div className="space-y-6">
         {/* Printable Receipt Canvas */}
-        <div className="border-2 border-slate-300 rounded-xl p-6 bg-white shadow-xs space-y-6 text-slate-900 font-sans print:border-none print:p-0">
+        <div className="border-2 border-slate-300 rounded-xl p-6 bg-white shadow-card space-y-6 text-slate-900 font-sans print:border-none print:p-0">
           {/* Header */}
           <div className="text-center border-b-2 border-slate-300 pb-4 space-y-1">
             <div className="flex items-center justify-center gap-2 font-bold text-sm tracking-wide text-gov-navy uppercase">
@@ -62,27 +62,27 @@ export const ReceiptViewer: React.FC<ReceiptViewerProps> = ({ isOpen, onClose, a
           {/* Receipt Numbers Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs bg-slate-50 p-3.5 rounded-lg border border-slate-200">
             <div>
-              <span className="text-slate-500 block text-[11px]">Receipt Number:</span>
+              <span className="text-slate-500 block text-xs">Receipt Number:</span>
               <span className="font-mono font-bold text-slate-900">{fee.receipt_number || 'RCPT-2026-PENDING'}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Treasury Challan Ref:</span>
+              <span className="text-slate-500 block text-xs">Treasury Challan Ref:</span>
               <span className="font-mono font-bold text-slate-900">{fee.treasury_challan_number || 'CHL-DL-2026-88910'}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Payment Date:</span>
+              <span className="text-slate-500 block text-xs">Payment Date:</span>
               <span className="font-semibold text-slate-900">{formatDateTime(fee.paid_at || fee.created_at)}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Application No:</span>
+              <span className="text-slate-500 block text-xs">Application No:</span>
               <span className="font-mono font-bold text-slate-900">{application.application_number}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Gateway Ref:</span>
+              <span className="text-slate-500 block text-xs">Gateway Ref:</span>
               <span className="font-mono text-slate-700">{fee.payment_gateway_ref || 'SBIEPAY-DIRECT'}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Payment Status:</span>
+              <span className="text-slate-500 block text-xs">Payment Status:</span>
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>{fee.payment_status}</span>
@@ -93,7 +93,7 @@ export const ReceiptViewer: React.FC<ReceiptViewerProps> = ({ isOpen, onClose, a
           {/* Itemized Table */}
           <div>
             <table className="w-full text-xs text-left border border-slate-200">
-              <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10px]">
+              <thead className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase text-xs">
                 <tr>
                   <th className="py-2 px-3">Description of Statutory Fee</th>
                   <th className="py-2 px-3">Statutory Schedule</th>
@@ -117,9 +117,9 @@ export const ReceiptViewer: React.FC<ReceiptViewerProps> = ({ isOpen, onClose, a
                 </tr>
                 {fee.late_fee > 0 && (
                   <tr>
-                    <td className="py-2.5 px-3 text-rose-700">Statutory Late Verification Surcharge</td>
+                    <td className="py-2.5 px-3 text-red-700">Statutory Late Verification Surcharge</td>
                     <td className="py-2.5 px-3 text-slate-500">Rule 14(3) Overdue Tariff</td>
-                    <td className="py-2.5 px-3 text-right font-mono font-semibold text-rose-700">
+                    <td className="py-2.5 px-3 text-right font-mono font-semibold text-red-700">
                       {formatCurrency(fee.late_fee)}
                     </td>
                   </tr>
@@ -137,12 +137,12 @@ export const ReceiptViewer: React.FC<ReceiptViewerProps> = ({ isOpen, onClose, a
           </div>
 
           {/* Footer Seals & Verification */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
             <div>
               <p className="font-semibold text-slate-700">Computer Generated Statutory e-Challan</p>
               <p>No physical signature required. Verified via Government Cyber Treasury Portal.</p>
             </div>
-            <div className="text-right font-mono text-[10px]">
+            <div className="text-right font-mono text-xs">
               <span>SHA-256 Digest: 88f2...99a1</span>
             </div>
           </div>

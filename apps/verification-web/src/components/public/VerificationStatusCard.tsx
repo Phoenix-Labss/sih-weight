@@ -32,20 +32,21 @@ export const VerificationStatusCard: React.FC<VerificationStatusCardProps> = ({
     <div className="space-y-4">
       {/* High-Contrast Status Banner */}
       <div
-        className={`rounded-2xl p-6 border shadow-sm transition-all ${
+        role="status"
+        className={`rounded-lg p-6 border shadow-card transition-all ${
           isIssued
-            ? 'bg-emerald-600 text-white border-emerald-500 ring-4 ring-emerald-100'
+            ? 'bg-emerald-700 text-white border-emerald-600'
             : isExpired
-            ? 'bg-orange-600 text-white border-orange-500 ring-4 ring-orange-100'
+            ? 'bg-orange-700 text-white border-orange-600'
             : isSuspended
-            ? 'bg-amber-600 text-white border-amber-500 ring-4 ring-amber-100'
+            ? 'bg-amber-700 text-white border-amber-600'
             : isRevoked
-            ? 'bg-rose-700 text-white border-rose-600 ring-4 ring-rose-100'
-            : 'bg-blue-600 text-white border-blue-500 ring-4 ring-blue-100'
+            ? 'bg-red-800 text-white border-red-700'
+            : 'bg-gov-navy text-white border-slate-700'
         }`}
       >
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0 shadow-inner">
+          <div className="w-14 h-14 rounded-lg bg-white/15 border border-white/20 flex items-center justify-center flex-shrink-0">
             {isIssued ? (
               <ShieldCheck className="w-8 h-8 text-white" />
             ) : isExpired ? (
@@ -91,7 +92,7 @@ export const VerificationStatusCard: React.FC<VerificationStatusCardProps> = ({
           <div className="mt-4 pt-3 border-t border-white/20 flex justify-end">
             <button
               onClick={() => onNavigateToToken(supersededBy)}
-              className="px-4 py-1.5 rounded-lg bg-white text-blue-900 font-bold text-xs hover:bg-blue-50 transition-colors shadow-xs"
+              className="px-4 py-1.5 rounded-lg bg-white text-blue-900 font-bold text-xs hover:bg-blue-50 transition-colors shadow-card"
             >
               View Active Certificate ({supersededBy}) →
             </button>
@@ -100,13 +101,13 @@ export const VerificationStatusCard: React.FC<VerificationStatusCardProps> = ({
       </div>
 
       {/* Date Milestones Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-card text-xs">
         <div>
-          <span className="text-slate-500 block text-[11px]">Verification / Issuance Date:</span>
+          <span className="text-slate-500 block text-xs">Verification / Issuance Date:</span>
           <span className="font-bold text-slate-800 text-sm">{formatDate(verificationDate)}</span>
         </div>
         <div>
-          <span className="text-slate-500 block text-[11px]">
+          <span className="text-slate-500 block text-xs">
             {isExpired
               ? 'Statutory Expiry (Overdue):'
               : isRevoked
@@ -120,9 +121,9 @@ export const VerificationStatusCard: React.FC<VerificationStatusCardProps> = ({
           <span
             className={`font-bold text-sm ${
               isExpired
-                ? 'text-rose-700'
+                ? 'text-red-700'
                 : isRevoked
-                ? 'text-rose-800 line-through'
+                ? 'text-red-800 line-through'
                 : isSuspended
                 ? 'text-amber-800'
                 : isSuperseded

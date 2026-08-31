@@ -128,19 +128,19 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
       {/* 1. Floating Launcher Bubble (Static, Non-Bouncing Pill) */}
       {!isOpen && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900/95 text-white text-xs font-semibold px-3.5 py-2 rounded-full shadow-xl border border-slate-700/80 backdrop-blur-xs select-none">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <div className="hidden sm:flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-3.5 py-2 rounded-full shadow-lg border border-slate-700 select-none">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
             <span>Ask Nikks AI (Text &amp; Voice)</span>
           </div>
 
           <button
             onClick={() => setIsOpen(true)}
-            className="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-800 via-indigo-600 to-amber-500 text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-transform border-2 border-white/30 relative group cursor-pointer"
+            className="w-14 h-14 rounded-full bg-gov-navy text-white flex items-center justify-center shadow-lg hover:bg-gov-dark transition-colors border-2 border-white/30 relative group cursor-pointer"
             title="Open Nikks AI Assistant"
             aria-label="Open Nikks AI Assistant"
           >
             <NikksMascotIcon size={36} glow={false} />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -148,27 +148,29 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
       {/* 2. Floating Chat Modal */}
       {isOpen && (
         <div
-          className={`fixed z-50 transition-all duration-200 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden ${
+          role="dialog"
+          aria-label="Nikks AI Legal Metrology Assistant"
+          className={`fixed z-50 flex flex-col animate-modal-in bg-white border border-slate-200 shadow-overlay overflow-hidden ${
             isExpanded
-              ? 'inset-4 sm:inset-10 rounded-2xl'
-              : 'bottom-6 right-6 w-full max-w-[440px] h-[640px] rounded-2xl'
+              ? 'inset-4 sm:inset-10 rounded-lg'
+              : 'bottom-6 right-6 w-full max-w-[440px] h-[640px] rounded-lg'
           }`}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 flex items-center justify-between border-b border-indigo-900/50">
+          <div className="bg-gov-navy text-white p-4 flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-indigo-600/40 border border-indigo-400/40 flex items-center justify-center shadow-inner shrink-0 p-1">
+              <div className="w-10 h-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center shrink-0 p-1">
                 <NikksMascotIcon size={30} glow={false} />
               </div>
               <div>
                 <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
                   Nikks AI
-                  <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400/30 font-semibold">
+                  <span className="text-xs font-mono bg-white/10 text-amber-300 px-1.5 py-0.5 rounded border border-white/20 font-semibold">
                     Legal Metrology Assistant
                   </span>
                 </h3>
-                <p className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" aria-hidden="true" />
                   Grounded in Acts &amp; General Rules 2011 • Text &amp; Voice
                 </p>
               </div>
@@ -179,7 +181,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                  className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-bold text-amber-300 border border-slate-700 flex items-center gap-1 transition-colors"
+                  className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-bold text-amber-300 border border-slate-700 flex items-center gap-1 transition-colors"
                   title="Voice Speed (आवाज़ की गति)"
                 >
                   <Gauge className="w-3 h-3 text-amber-400" />
@@ -188,8 +190,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                 </button>
 
                 {showSpeedMenu && (
-                  <div className="absolute right-0 top-full mt-1.5 w-32 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl py-1 z-50 text-xs">
-                    <div className="px-2.5 py-1 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
+                  <div className="absolute right-0 top-full mt-1.5 w-32 bg-slate-900 border border-slate-700 rounded-lg shadow-lg py-1 z-50 text-xs">
+                    <div className="px-2.5 py-1 text-xs uppercase font-bold text-slate-400 border-b border-slate-800">
                       Voice Speed
                     </div>
                     {[
@@ -205,7 +207,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                           setSpeechRate(opt.rate);
                           setShowSpeedMenu(false);
                         }}
-                        className={`w-full text-left px-2.5 py-1.5 hover:bg-slate-800 flex items-center justify-between text-[11px] ${
+                        className={`w-full text-left px-2.5 py-1.5 hover:bg-slate-800 flex items-center justify-between text-xs ${
                           speechRate === opt.rate ? 'text-amber-400 font-bold bg-slate-800/80' : 'text-slate-300'
                         }`}
                       >
@@ -224,9 +226,9 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     stopSpeaking();
                     setLanguage('en');
                   }}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                  className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${
                     language === 'en'
-                      ? 'bg-indigo-600 text-white shadow'
+                      ? 'bg-gov-blue text-white shadow'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                   title="Switch to English"
@@ -238,7 +240,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     stopSpeaking();
                     setLanguage('hi');
                   }}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                  className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${
                     language === 'hi'
                       ? 'bg-amber-500 text-slate-950 shadow'
                       : 'text-slate-400 hover:text-slate-200'
@@ -287,7 +289,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
           {/* Voice Error Notice Banner */}
           {voiceError && (
-            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-[11px] flex items-center justify-between">
+            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-xs flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span>{voiceError}</span>
@@ -308,12 +310,12 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
                 <span>
-                  {language === 'hi' ? '🎤 बोलिए... (हिंदी आवाज़ सक्रिय)' : '🎤 Listening in English (India)...'}
+                  {language === 'hi' ? 'बोलिए... (हिंदी आवाज़ सक्रिय)' : 'Listening in English (India)...'}
                 </span>
               </div>
               <button
                 onClick={stopListening}
-                className="text-[11px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded font-semibold"
+                className="text-xs bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded font-semibold"
               >
                 Done
               </button>
@@ -321,7 +323,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
           )}
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/40 text-xs">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100 text-sm">
             {messages.map((msg) => {
               const isUser = msg.sender === 'user';
               const isCurrentSpeaking = isSpeaking && speakingMsgId === msg.id;
@@ -334,8 +336,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
                       isUser
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-indigo-950/40 border border-indigo-400/40 p-0.5 shadow-2xs'
+                        ? 'bg-gov-blue text-white'
+                        : 'bg-white border border-slate-300 p-0.5 shadow-card'
                     }`}
                   >
                     {isUser ? <User className="w-4 h-4" /> : <NikksMascotIcon size={22} glow={false} />}
@@ -343,10 +345,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
                   <div className={`space-y-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                     <div
-                      className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm relative group ${
+                      className={`p-3.5 rounded-lg text-sm leading-relaxed shadow-card relative group ${
                         isUser
-                          ? 'bg-indigo-600 text-white rounded-tr-none'
-                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
+                          ? 'bg-gov-blue text-white rounded-tr-none'
+                          : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
                       }`}
                     >
                       <FormattedMarkdown content={msg.text} isUser={isUser} />
@@ -356,7 +358,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                         <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                           <button
                             onClick={() => speak(msg.id, msg.text, language)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                               isCurrentSpeaking
                                 ? 'bg-amber-500 text-slate-950 font-bold animate-pulse shadow'
                                 : isPaused && speakingMsgId === msg.id
@@ -378,19 +380,19 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                               </>
                             ) : isPaused && speakingMsgId === msg.id ? (
                               <>
-                                <Play className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                                <Play className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                                 <span>Resume ({speechRate}x)</span>
                               </>
                             ) : (
                               <>
-                                <Volume2 className="w-3.5 h-3.5 text-indigo-500" />
+                                <Volume2 className="w-3.5 h-3.5 text-gov-blue" />
                                 <span>Listen ({speechRate}x)</span>
                               </>
                             )}
                           </button>
 
                           {msg.provider_used && (
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className="text-xs text-slate-400 font-mono">
                               {msg.provider_used === 'GEMINI_API' ? 'Gemini 1.5' : 'Statutory RAG'}
                             </span>
                           )}
@@ -401,8 +403,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     {/* Statutory Citations Accordion */}
                     {!isUser && msg.citations && msg.citations.length > 0 && (
                       <div className="space-y-1.5 pt-1">
-                        <div className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                          <BookOpen className="w-3 h-3 text-indigo-400" />
+                        <div className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                          <BookOpen className="w-3 h-3 text-blue-400" />
                           <span>Official Legal Citations:</span>
                         </div>
 
@@ -421,10 +423,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                                   className="w-full px-2.5 py-1.5 flex items-center justify-between text-left hover:bg-slate-200/60 dark:hover:bg-slate-800/80 transition-colors"
                                 >
                                   <div className="flex items-center gap-1.5 truncate">
-                                    <span className="px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono font-bold text-[10px] rounded">
+                                    <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-950 text-gov-blue dark:text-blue-300 font-mono font-bold text-xs rounded">
                                       {cit.section_rule_ref}
                                     </span>
-                                    <span className="font-medium text-[11px] text-slate-700 dark:text-slate-300 truncate">
+                                    <span className="font-medium text-xs text-slate-700 dark:text-slate-300 truncate">
                                       {cit.title}
                                     </span>
                                   </div>
@@ -436,7 +438,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                                 </button>
 
                                 {isCitExpanded && (
-                                  <div className="p-2.5 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                                  <div className="p-2.5 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
                                     <div className="font-semibold text-slate-900 dark:text-slate-200 mb-1">
                                       {cit.act_or_rule}
                                     </div>
@@ -457,7 +459,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                           <button
                             key={i}
                             onClick={() => handleActionClick(act)}
-                            className="px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all"
+                            className="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-gov-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all"
                           >
                             <ExternalLink className="w-3 h-3" />
                             {act.label}
@@ -473,7 +475,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                           <button
                             key={i}
                             onClick={() => handleSend(sug)}
-                            className="px-2 py-1 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-full text-[10px] font-medium transition-colors text-left"
+                            className="px-2 py-1 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-full text-xs font-medium transition-colors text-left"
                           >
                             💡 {sug}
                           </button>
@@ -481,7 +483,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                       </div>
                     )}
 
-                    <div className="text-[10px] text-slate-400 px-1">{msg.timestamp}</div>
+                    <div className="text-xs text-slate-400 px-1">{msg.timestamp}</div>
                   </div>
                 </div>
               );
@@ -489,11 +491,11 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
             {/* Loading / Analyzing indicator */}
             {loading && (
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs py-2 px-1">
-                <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center animate-spin">
-                  <Sparkles className="w-3 h-3" />
+              <div className="flex items-center gap-2 text-slate-600 text-sm py-2 px-1" role="status">
+                <div className="w-5 h-5 rounded-full bg-amber-100 text-gov-gold flex items-center justify-center animate-spin border border-amber-200">
+                  <Sparkles className="w-3 h-3" aria-hidden="true" />
                 </div>
-                <span>Analyzing Legal Metrology Acts, Rules & Schedules...</span>
+                <span>Analysing the Legal Metrology Act, Rules &amp; Schedules…</span>
               </div>
             )}
 
@@ -501,15 +503,15 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
           </div>
 
           {/* Quick Suggestion Chips Bar */}
-          <div className="p-2 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 px-1">
+          <div className="p-2 bg-white border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
+            <span className="text-xs font-semibold text-slate-500 shrink-0 px-1">
               Suggestions:
             </span>
             {suggestions.map((s, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(s)}
-                className="whitespace-nowrap px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 rounded-full text-[11px] font-medium transition-colors shrink-0"
+                className="whitespace-nowrap px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-gov-blue border border-slate-200 rounded-full text-xs font-medium transition-colors shrink-0"
               >
                 {s}
               </button>
@@ -517,7 +519,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
           </div>
 
           {/* Input Footer with Microphone (STT) & Send Buttons */}
-          <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+          <div className="p-3 bg-white border-t border-slate-200">
             <div className="relative flex items-center gap-1.5">
               <div className="relative flex-1 flex items-center">
                 <input
@@ -526,6 +528,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  aria-label="Ask the Legal Metrology assistant"
                   placeholder={
                     isListening
                       ? 'Listening to voice...'
@@ -533,10 +536,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                       ? 'निक्स एआई (Nikks AI) से विधिक मापविज्ञान, फीस या नियमों के बारे में पूछें...'
                       : 'Ask Nikks AI about scale registration, verification fees, Section 22, or packaging rules...'
                   }
-                  className={`w-full pl-3 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`w-full px-3 py-2.5 pr-10 text-sm bg-white border rounded-md text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue ${
                     isListening
                       ? 'border-red-500 ring-2 ring-red-400/50 animate-pulse'
-                      : 'border-slate-300 dark:border-slate-700'
+                      : 'border-slate-300'
                   }`}
                 />
 
@@ -547,7 +550,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                   className={`absolute right-1.5 p-1.5 rounded-lg transition-all ${
                     isListening
                       ? 'bg-red-500 text-white animate-bounce shadow-md'
-                      : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      : 'text-slate-400 hover:text-gov-blue hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                   title={isListening ? 'Stop listening' : 'Speak your question (बोलकर पूछें)'}
                 >
@@ -559,15 +562,15 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               <button
                 onClick={() => handleSend()}
                 disabled={!inputVal.trim() || loading}
-                className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white rounded-xl shadow-md transition-all shrink-0"
+                className="p-2.5 bg-gov-blue hover:bg-blue-800 disabled:opacity-40 disabled:hover:bg-gov-blue text-white rounded-xl shadow-md transition-all shrink-0"
                 title="Send Question"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-[10px] text-center text-slate-400 mt-1.5 flex items-center justify-center gap-1">
-              <span>⚖️ Voice & Text AI Guide</span>
-              <span>•</span>
+            <div className="text-xs text-center text-slate-400 mt-1.5 flex items-center justify-center gap-1">
+              <span>Voice &amp; Text AI Guide</span>
+              <span aria-hidden="true">•</span>
               <span>The Legal Metrology Act, 2009</span>
             </div>
           </div>

@@ -144,7 +144,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-6">
+    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-card space-y-6">
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
         <div>
@@ -163,7 +163,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
             <button
               onClick={handleSubmitDraft}
               disabled={isSubmitting}
-              className="px-4 py-1.5 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow border border-slate-700 disabled:opacity-50"
+              className="px-4 py-1.5 rounded-lg bg-gov-navy text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-card transition-all hover:shadow border border-slate-700 disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5 text-amber-400" />
               <span>{isSubmitting ? 'Submitting...' : 'Submit Application for Scrutiny'}</span>
@@ -173,7 +173,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isFeePending && (
             <button
               onClick={() => onOpenPaymentModal(application)}
-              className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all hover:shadow"
+              className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-card transition-all hover:shadow"
             >
               <CreditCard className="w-3.5 h-3.5" />
               <span>Pay Fees ({formatCurrency(application.fee_assessment?.total_assessed_amount || 750)})</span>
@@ -183,7 +183,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isNeedsScheduling && onOpenSchedulerModal && (
             <button
               onClick={() => onOpenSchedulerModal(application)}
-              className="px-3.5 py-1.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-gov-blue text-xs font-bold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-card transition-all hover:shadow cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5 text-amber-300" />
               <span>Schedule Inspection Slot</span>
@@ -193,7 +193,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isPaid && (
             <button
               onClick={() => onOpenReceiptModal(application)}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-all hover:shadow border border-slate-700 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-slate-900 text-xs font-bold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-card transition-all hover:shadow border border-slate-700 cursor-pointer"
             >
               <Receipt className="w-3.5 h-3.5 text-emerald-400" />
               <span>Payment Receipt</span>
@@ -203,7 +203,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {currentStatus === 'COMPLETED' && onViewCertificate && (
             <button
               onClick={() => onViewCertificate(application)}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all hover:shadow cursor-pointer"
+              className="px-4 py-1.5 rounded-lg bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-card transition-all hover:shadow cursor-pointer"
             >
               <Award className="w-3.5 h-3.5 text-amber-300" />
               <span>View Certificate</span>
@@ -233,9 +233,9 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       )}
 
       {(currentStatus === 'SUBMITTED' || currentStatus === 'UNDER_SCRUTINY') && !isQueryRaised && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-indigo-900">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-blue-900">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-indigo-600 shrink-0" />
+            <Clock className="w-4 h-4 text-gov-blue shrink-0" />
             <div>
               <span className="font-bold">Application Filed with Department:</span>{' '}
               {isOfficerRole ? (
@@ -248,7 +248,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isOfficerRole && (
             <button
               onClick={goToOfficerWorkspace}
-              className="px-3 py-1 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-gov-blue transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
             >
               <ArrowRight className="w-3 h-3" />
               <span>Go to Officer Workspace</span>
@@ -259,7 +259,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
 
       {isFeePending && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900 flex items-center gap-2">
-          <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />
+          <CreditCard className="w-4 h-4 text-amber-700 shrink-0" />
           <div>
             <span className="font-bold">Statutory Fee Assessed:</span> Statutory fee of{' '}
             <span className="font-bold text-slate-900">
@@ -273,7 +273,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       {(currentStatus === 'FEE_PAID' || currentStatus === 'PAYMENT_RECONCILED') && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-emerald-900">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
             <div>
               <span className="font-bold">Payment Reconciled:</span>{' '}
               {isOfficerRole ? (
@@ -294,7 +294,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           ) : onOpenSchedulerModal ? (
             <button
               onClick={() => onOpenSchedulerModal(application)}
-              className="px-3.5 py-1.5 bg-gov-navy text-white font-bold rounded-lg hover:bg-slate-800 transition-colors shrink-0 flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-3.5 py-1.5 bg-gov-navy text-white font-bold rounded-lg hover:bg-slate-800 transition-colors shrink-0 flex items-center gap-1.5 shadow-card cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5 text-amber-400" />
               <span>Choose Inspection Slot</span>
@@ -306,7 +306,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       {currentStatus === 'SCHEDULED' && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-blue-900">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+            <Calendar className="w-4 h-4 text-gov-blue shrink-0" />
             <div>
               <span className="font-bold">Verification Slot Scheduled:</span>{' '}
               {isOfficerRole ? (
@@ -329,9 +329,9 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       )}
 
       {currentStatus === 'VERIFICATION_IN_PROGRESS' && (
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-purple-900">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-blue-900">
           <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-purple-600 shrink-0" />
+            <Scale className="w-4 h-4 text-gov-blue shrink-0" />
             <div>
               <span className="font-bold">Verification Test In Progress:</span>{' '}
               {isOfficerRole ? (
@@ -344,7 +344,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           {isOfficerRole && (
             <button
               onClick={goToOfficerWorkspace}
-              className="px-3 py-1 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors shrink-0 flex items-center gap-1"
+              className="px-3 py-1 bg-gov-blue text-white font-semibold rounded-md hover:bg-blue-700 transition-colors shrink-0 flex items-center gap-1"
             >
               <ArrowRight className="w-3 h-3" />
               <span>Go to Officer Workspace</span>
@@ -356,7 +356,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
       {currentStatus === 'COMPLETED' && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-xs flex items-center justify-between gap-3 text-emerald-900">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
             <div>
               <span className="font-bold">Verification Completed & Certified:</span> Digital Certificate of Legal Metrology Verification issued with cryptographic seal.
             </div>
@@ -378,10 +378,10 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 font-bold text-amber-900">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <AlertTriangle className="w-4 h-4 text-amber-700" />
               <span>Action Required: Scrutiny Clarification Query</span>
             </div>
-            <span className="text-[10px] text-amber-700 font-mono">
+            <span className="text-xs text-amber-700 font-mono">
               Raised on {formatDateTime(application.query_raised_at)}
             </span>
           </div>
@@ -391,7 +391,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
           <div className="flex justify-end">
             <button
               onClick={() => onOpenQueryModal(application)}
-              className="px-4 py-1.5 rounded-lg bg-gov-blue text-xs font-semibold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-xs transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-gov-blue text-xs font-semibold text-white hover:bg-blue-800 flex items-center gap-1.5 shadow-card transition-colors"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Submit Clarification Response</span>
@@ -402,12 +402,12 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
 
       {/* Rejection Alert Banner */}
       {isRejected && (
-        <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-xs space-y-2">
-          <div className="flex items-center gap-2 font-bold text-rose-900">
-            <AlertTriangle className="w-4 h-4 text-rose-600" />
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-xs space-y-2">
+          <div className="flex items-center gap-2 font-bold text-red-900">
+            <AlertTriangle className="w-4 h-4 text-red-600" />
             <span>Application Rejected under Statutory Grounds</span>
           </div>
-          <p className="text-rose-800 bg-white p-3 rounded-lg border border-rose-200">
+          <p className="text-red-800 bg-white p-3 rounded-lg border border-red-200">
             {application.rejection_reason || 'Rejected after departmental scrutiny.'}
           </p>
         </div>
@@ -430,7 +430,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
             return (
               <div key={step.status} className="flex flex-col items-center text-center">
                 <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs ${
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-card ${
                     isCompleted
                       ? 'bg-emerald-600 text-white shadow-emerald-200'
                       : isCurrent
@@ -449,7 +449,7 @@ export const ApplicationTimeline: React.FC<ApplicationTimelineProps> = ({
                 <div className={`mt-2 text-xs font-bold ${isCurrent ? 'text-gov-navy' : isCompleted ? 'text-emerald-800' : 'text-slate-600'}`}>
                   {step.label}
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">{step.desc}</div>
+                <div className="text-xs text-slate-500 mt-0.5 leading-tight">{step.desc}</div>
               </div>
             );
           })}

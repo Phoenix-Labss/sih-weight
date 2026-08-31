@@ -124,7 +124,7 @@ export const ScrutinyActionModal: React.FC<ScrutinyActionModalProps> = ({
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-950 ring-1 ring-emerald-500'
                         : a.id === 'QUERY'
                         ? 'border-amber-500 bg-amber-50 text-amber-950 ring-1 ring-amber-500'
-                        : 'border-rose-500 bg-rose-50 text-rose-950 ring-1 ring-rose-500'
+                        : 'border-red-500 bg-red-50 text-red-950 ring-1 ring-red-500'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                   }`}
                 >
@@ -132,15 +132,15 @@ export const ScrutinyActionModal: React.FC<ScrutinyActionModalProps> = ({
                     className={`w-5 h-5 mb-1.5 ${
                       isSelected
                         ? a.id === 'ACCEPT'
-                          ? 'text-emerald-600'
+                          ? 'text-emerald-700'
                           : a.id === 'QUERY'
-                          ? 'text-amber-600'
-                          : 'text-rose-600'
+                          ? 'text-amber-700'
+                          : 'text-red-600'
                         : 'text-slate-400'
                     }`}
                   />
                   <div className="text-xs font-bold">{a.name}</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">{a.desc}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{a.desc}</div>
                 </div>
               );
             })}
@@ -167,7 +167,7 @@ export const ScrutinyActionModal: React.FC<ScrutinyActionModalProps> = ({
         {/* Rejection Input */}
         {actionType === 'REJECT' && (
           <div>
-            <label className="block text-xs font-bold text-rose-900 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-red-900 uppercase tracking-wider mb-1.5">
               Statutory Ground for Rejection *
             </label>
             <textarea
@@ -176,7 +176,7 @@ export const ScrutinyActionModal: React.FC<ScrutinyActionModalProps> = ({
               placeholder="e.g. Instrument model is not approved for commercial trade under Section 22..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full text-xs rounded-lg border border-rose-300 p-3 focus:ring-2 focus:ring-rose-500 bg-rose-50/40"
+              className="w-full text-xs rounded-lg border border-red-300 p-3 focus:ring-2 focus:ring-red-500 bg-red-50/40"
             />
           </div>
         )}
@@ -217,7 +217,7 @@ export const ScrutinyActionModal: React.FC<ScrutinyActionModalProps> = ({
                 ? 'bg-emerald-600 hover:bg-emerald-700'
                 : actionType === 'QUERY'
                 ? 'bg-amber-600 hover:bg-amber-700'
-                : 'bg-rose-600 hover:bg-rose-700'
+                : 'bg-red-600 hover:bg-red-700'
             }`}
           >
             {isSubmitting ? 'Recording...' : `Confirm ${actionType}`}

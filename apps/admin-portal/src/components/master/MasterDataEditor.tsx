@@ -67,7 +67,7 @@ export const MasterDataEditor: React.FC<Props> = ({ meta, existing, onClose, onS
   return (
     <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 p-4" onClick={onClose}>
       <div
-        className="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 max-h-[90vh] overflow-auto"
+        className="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 max-h-[90vh] overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -88,7 +88,7 @@ export const MasterDataEditor: React.FC<Props> = ({ meta, existing, onClose, onS
               <span className="text-xs font-medium text-slate-600">{f}</span>
               {f === 'is_active' ? (
                 <select
-                  className="mt-1 w-full rounded-lg border border-gov-border px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-md border border-gov-border px-3 py-2 text-sm"
                   value={values[f]}
                   onChange={(e) => setField(f, e.target.value)}
                 >
@@ -97,7 +97,7 @@ export const MasterDataEditor: React.FC<Props> = ({ meta, existing, onClose, onS
                 </select>
               ) : (
                 <input
-                  className="mt-1 w-full rounded-lg border border-gov-border px-3 py-2 text-sm font-mono"
+                  className="mt-1 w-full rounded-md border border-gov-border px-3 py-2 text-sm font-mono"
                   value={values[f]}
                   onChange={(e) => setField(f, e.target.value)}
                   placeholder={f.endsWith('_id') ? 'identifier' : 'value'}

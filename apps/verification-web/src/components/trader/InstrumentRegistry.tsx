@@ -36,7 +36,7 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
   return (
     <div className="space-y-4">
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-card">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-blue-50 text-gov-blue">
             <Scale className="w-5 h-5" />
@@ -52,14 +52,14 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenRegisterModal}
-            className="px-3.5 py-2 rounded-lg bg-gov-navy text-xs font-semibold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-colors"
+            className="px-3.5 py-2 rounded-lg bg-gov-navy text-xs font-semibold text-white hover:bg-slate-800 flex items-center gap-1.5 shadow-card transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Register Instrument</span>
           </button>
           <button
             onClick={onOpenApplyWizard}
-            className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-colors"
+            className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-card transition-colors"
           >
             <FileText className="w-4 h-4" />
             <span>Apply for Verification</span>
@@ -68,7 +68,7 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-card">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
           <input
@@ -98,10 +98,10 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs tracking-wider">
               <tr>
                 <th className="py-3 px-4">Instrument Unit</th>
                 <th className="py-3 px-4">Model & Pattern Ref</th>
@@ -124,17 +124,17 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
                   <tr key={inst.instrument_id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="font-bold text-slate-900 font-mono">{inst.serial_number}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">Token: {inst.public_instrument_token}</div>
+                      <div className="text-xs text-slate-400 font-mono">Token: {inst.public_instrument_token}</div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800">{inst.model?.model_name}</div>
-                      <div className="text-[10px] text-slate-500">{inst.model?.model_approval_number}</div>
+                      <div className="text-xs text-slate-500">{inst.model?.model_approval_number}</div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-medium text-slate-800">
                         {inst.model?.accuracy_class} | Max {inst.model?.max_capacity} {inst.model?.capacity_unit}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-mono">
+                      <div className="text-xs text-slate-500 font-mono">
                         e = {inst.model?.verification_scale_interval_e} {inst.model?.scale_interval_unit}
                       </div>
                     </td>

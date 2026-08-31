@@ -15,7 +15,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 function Distribution({ title, data }: { title: string; data: StatusCount[] }) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border border-gov-border bg-white p-4">
+      <div className="rounded-md border border-gov-border bg-white p-4">
         <p className="text-sm font-semibold text-gov-navy">{title}</p>
         <p className="mt-2 text-sm text-slate-400">No records</p>
       </div>
@@ -23,7 +23,7 @@ function Distribution({ title, data }: { title: string; data: StatusCount[] }) {
   }
   const total = data.reduce((acc, d) => acc + d.count, 0);
   return (
-    <div className="rounded-lg border border-gov-border bg-white p-4">
+    <div className="rounded-md border border-gov-border bg-white p-4">
       <p className="text-sm font-semibold text-gov-navy">{title}</p>
       <ul className="mt-3 space-y-2">
         {data.map((d) => (

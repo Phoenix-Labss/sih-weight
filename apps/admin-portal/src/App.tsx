@@ -26,9 +26,6 @@ function AppContent() {
       {view === 'database' && <EntityBrowser />}
       {view === 'audit' && <AuditLogViewer />}
       {view === 'health' && <HealthPanel />}
-      <footer className="mt-10 pt-4 border-t border-gov-border text-xs text-slate-400">
-        {env.APP_NAME} · {env.PORTAL_VERSION} · Access restricted to authorised system administrators. Every action is audited.
-      </footer>
     </AdminLayout>
   );
 }

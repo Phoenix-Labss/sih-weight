@@ -66,7 +66,7 @@ export const EntityBrowser: React.FC = () => {
         <p className="text-xs uppercase tracking-wide text-slate-500 mb-2">Entity</p>
         <div className="space-y-4">
           <div>
-            <p className="text-[11px] font-semibold text-slate-400 mb-1">LEGAL / READ-ONLY</p>
+            <p className="text-xs font-semibold text-slate-400 mb-1">LEGAL / READ-ONLY</p>
             {legalEntities.map((e) => (
               <button
                 key={e.slug}
@@ -80,7 +80,7 @@ export const EntityBrowser: React.FC = () => {
             ))}
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-emerald-600 mb-1">MASTER DATA</p>
+            <p className="text-xs font-semibold text-emerald-700 mb-1">MASTER DATA</p>
             {masterEntities.map((e) => (
               <button
                 key={e.slug}
@@ -115,7 +115,7 @@ export const EntityBrowser: React.FC = () => {
             )}
             <button
               onClick={() => load(data?.page ?? 1)}
-              className="inline-flex items-center gap-1 rounded-lg border border-gov-border bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+              className="inline-flex items-center gap-1 rounded-md border border-gov-border bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
             >
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
@@ -125,16 +125,16 @@ export const EntityBrowser: React.FC = () => {
         {error && <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
 
         <div className="overflow-hidden rounded-xl border border-gov-border bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-slate-100 text-sm">
-            <thead className="bg-slate-50">
+          <table className="gov-table">
+            <thead>
               <tr>
                 {samples.map((k) => (
-                  <th key={k} className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase">{k}</th>
+                  <th key={k} className="text-left">{k}</th>
                 ))}
                 {meta?.kind === 'master' && <th className="px-3 py-2" />}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="">
               {(data?.items ?? []).map((row, idx) => (
                 <tr key={idx} className="hover:bg-slate-50">
                   {samples.map((k) => (
@@ -149,7 +149,7 @@ export const EntityBrowser: React.FC = () => {
                     {meta?.kind === 'master' && (
                       <button
                         onClick={() => setEditorState({ existing: row })}
-                        className="ml-3 inline-flex items-center text-xs font-semibold text-emerald-600 hover:underline"
+                        className="ml-3 inline-flex items-center text-xs font-semibold text-emerald-700 hover:underline"
                       >
                         <Pencil className="h-3 w-3 mr-0.5" /> Edit
                       </button>

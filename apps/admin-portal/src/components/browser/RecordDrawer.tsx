@@ -23,7 +23,7 @@ export const RecordDrawer: React.FC<{
   return (
     <div className="fixed inset-0 bg-black/30 flex justify-end z-50" onClick={onClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full overflow-auto shadow-xl p-6"
+        className="w-full max-w-2xl bg-white h-full overflow-auto shadow-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -35,7 +35,7 @@ export const RecordDrawer: React.FC<{
           </button>
         </div>
         <span
-          className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+          className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
             meta.kind === 'legal' ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 text-emerald-700'
           }`}
         >

@@ -42,7 +42,7 @@ export const AuditLogViewer: React.FC = () => {
         <label className="block">
           <span className="text-xs text-slate-500">Actor ID</span>
           <input
-            className="mt-1 rounded-lg border border-gov-border px-3 py-2 text-sm w-52"
+            className="mt-1 rounded-md border border-gov-border px-3 py-2 text-sm w-52"
             value={filter.actor_id ?? ''}
             onChange={(e) => setFilter((f) => ({ ...f, actor_id: e.target.value }))}
           />
@@ -50,7 +50,7 @@ export const AuditLogViewer: React.FC = () => {
         <label className="block">
           <span className="text-xs text-slate-500">Entity Type</span>
           <input
-            className="mt-1 rounded-lg border border-gov-border px-3 py-2 text-sm w-44"
+            className="mt-1 rounded-md border border-gov-border px-3 py-2 text-sm w-44"
             value={filter.entity_type ?? ''}
             onChange={(e) => setFilter((f) => ({ ...f, entity_type: e.target.value }))}
           />
@@ -58,7 +58,7 @@ export const AuditLogViewer: React.FC = () => {
         <label className="block">
           <span className="text-xs text-slate-500">Action</span>
           <input
-            className="mt-1 rounded-lg border border-gov-border px-3 py-2 text-sm w-44"
+            className="mt-1 rounded-md border border-gov-border px-3 py-2 text-sm w-44"
             value={filter.action ?? ''}
             onChange={(e) => setFilter((f) => ({ ...f, action: e.target.value }))}
           />
@@ -71,7 +71,7 @@ export const AuditLogViewer: React.FC = () => {
         </button>
         <button
           onClick={() => { setFilter({ page: 1, page_size: PAGE_SIZE }); load({ page: 1, page_size: PAGE_SIZE }); }}
-          className="mt-5 inline-flex items-center gap-1 rounded-lg border border-gov-border bg-white px-3 py-1.5 text-xs text-slate-600"
+          className="mt-5 inline-flex items-center gap-1 rounded-md border border-gov-border bg-white px-3 py-1.5 text-xs text-slate-600"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Reset
         </button>
@@ -81,15 +81,15 @@ export const AuditLogViewer: React.FC = () => {
       {error && <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
 
       <div className="overflow-hidden rounded-xl border border-gov-border bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-slate-100 text-sm">
-          <thead className="bg-slate-50">
+        <table className="gov-table">
+          <thead>
             <tr>
               {['Action', 'Entity', 'Entity ID', 'Actor', 'Correlation ID', 'Recorded At'].map((h) => (
-                <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase">{h}</th>
+                <th key={h} className="text-left">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="">
             {(entries?.items ?? []).map((row) => (
               <tr key={row.audit_id} className="hover:bg-slate-50">
                 <td className="px-3 py-2 font-mono text-xs text-gov-blue">{row.action}</td>

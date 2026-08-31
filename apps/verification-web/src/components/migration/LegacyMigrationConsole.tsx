@@ -41,7 +41,7 @@ export const LegacyMigrationConsole: React.FC = () => {
           <h3 className="text-xl font-bold text-gray-900">Historical Legacy Migration Console</h3>
           <p className="text-xs text-gray-500">Ingest, reconcile, and confidence-tag paper registers with cryptographic checksum verification</p>
         </div>
-        <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors">
+        <button className="px-4 py-2 bg-gov-blue hover:bg-gov-blue text-white rounded-lg text-xs font-semibold shadow-sm transition-colors">
           + Ingest New Legacy Batch
         </button>
       </div>
@@ -63,11 +63,11 @@ export const LegacyMigrationConsole: React.FC = () => {
           <tbody className="divide-y divide-gray-100">
             {batches.map((b) => (
               <tr key={b.batchId} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-mono font-medium text-indigo-700">{b.batchId}</td>
+                <td className="px-4 py-3 font-mono font-medium text-gov-blue">{b.batchId}</td>
                 <td className="px-4 py-3 font-medium text-gray-900">{b.sourceRegister}</td>
                 <td className="px-4 py-3 text-gray-700">{b.totalRecords}</td>
-                <td className="px-4 py-3 font-semibold text-emerald-600">{b.importedRecords}</td>
-                <td className="px-4 py-3 font-semibold text-amber-600">{b.conflictedRecords}</td>
+                <td className="px-4 py-3 font-semibold text-emerald-700">{b.importedRecords}</td>
+                <td className="px-4 py-3 font-semibold text-amber-700">{b.conflictedRecords}</td>
                 <td className="px-4 py-3">
                   <span className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded text-xs font-medium">
                     {b.status}

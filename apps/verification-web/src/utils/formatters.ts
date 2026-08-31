@@ -110,10 +110,10 @@ export function getStatusColorClasses(status: string): {
     case 'SEALED_OUT_OF_SERVICE':
     case 'SIGNING_FAILED':
       return {
-        bg: 'bg-rose-50',
-        text: 'text-rose-800',
-        border: 'border-rose-200',
-        dot: 'bg-rose-500',
+        bg: 'bg-red-50',
+        text: 'text-red-800',
+        border: 'border-red-200',
+        dot: 'bg-red-500',
       };
 
     case 'SUSPENDED':

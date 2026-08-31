@@ -84,12 +84,12 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
               <Scale className="w-4 h-4 text-gov-blue" />
               <span>Registered Instrument Specifications</span>
             </span>
-            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono font-bold text-[10px]">
+            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono font-bold text-xs">
               Class {instrument?.model?.accuracy_class || 'CLASS_III'}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
               <span className="text-slate-500 block">Registered Model:</span>
               <strong className="text-slate-900">{instrument?.model?.model_name || 'Counter Scale'}</strong>
@@ -112,7 +112,7 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
             <button
               type="button"
               onClick={handleAutofill}
-              className="text-[10px] text-gov-blue hover:text-blue-800 font-semibold underline cursor-pointer"
+              className="text-xs text-gov-blue hover:text-blue-800 font-semibold underline cursor-pointer"
             >
               [ Autofill Registered SN ]
             </button>
@@ -130,7 +130,7 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
             }}
             className={`w-full text-xs font-mono font-bold rounded-lg border px-3 py-2.5 focus:ring-2 focus:ring-gov-blue bg-white ${
               errorMessage
-                ? 'border-rose-400 bg-rose-50/40 text-rose-900'
+                ? 'border-red-400 bg-red-50/40 text-red-900'
                 : enteredSerial.toLowerCase() === registeredSerial.toLowerCase() && enteredSerial.length > 0
                 ? 'border-emerald-500 bg-emerald-50/40 text-emerald-950'
                 : 'border-slate-300'
@@ -167,8 +167,8 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
 
         {/* Error message alert */}
         {errorMessage && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <div>{errorMessage}</div>
           </div>
         )}
@@ -185,7 +185,7 @@ export const PhysicalSerialMatchModal: React.FC<PhysicalSerialMatchModalProps> =
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+            className="px-5 py-2 rounded-lg bg-gov-navy text-xs font-bold text-white shadow-card hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>{isSubmitting ? 'Verifying...' : 'Confirm Physical Serial Match'}</span>

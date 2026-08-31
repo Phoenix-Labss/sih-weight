@@ -144,13 +144,13 @@ export const TraderDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Trader Header Welcome Banner (Clean Government Style) */}
-      <div className="bg-gov-navy text-white rounded-md p-5 sm:p-6 shadow-xs border border-slate-800">
+      <div className="bg-gov-navy text-white rounded-md p-5 sm:p-6 shadow-card border border-slate-800">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <Building className="w-5 h-5 text-amber-400" />
               <h2 className="text-xl font-bold tracking-tight text-white">{user.organizationName}</h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 Verified Stakeholder (Form LM-REG-01)
               </span>
             </div>
@@ -169,7 +169,7 @@ export const TraderDashboard: React.FC = () => {
             </button>
             <button
               onClick={() => setIsApplyWizardOpen(true)}
-              className="px-4 py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-xs font-bold text-slate-950 flex items-center gap-1.5 shadow-xs border border-amber-500 transition-all cursor-pointer"
+              className="px-4 py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-xs font-bold text-slate-950 flex items-center gap-1.5 shadow-card border border-amber-500 transition-all cursor-pointer"
             >
               <Scale className="w-4 h-4 text-slate-950" />
               <span>{t.btnApplyVerification}</span>
@@ -181,7 +181,7 @@ export const TraderDashboard: React.FC = () => {
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Instruments */}
-        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-card space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{t.statTotalRegistered}</span>
             <div className="p-1.5 rounded bg-blue-50 text-gov-blue">
@@ -189,52 +189,52 @@ export const TraderDashboard: React.FC = () => {
             </div>
           </div>
           <div className="text-2xl font-extrabold text-slate-900">{totalInstruments}</div>
-          <p className="text-[11px] text-slate-500 flex items-center gap-1">
-            <span className="font-semibold text-emerald-600">{instruments.filter(i => i.current_status === 'VERIFIED').length}</span>
+          <p className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="font-semibold text-emerald-700">{instruments.filter(i => i.current_status === 'VERIFIED').length}</span>
             <span>{t.statActiveValid}</span>
           </p>
         </div>
 
         {/* Active Applications */}
-        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-card space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{t.statPendingVerification}</span>
-            <div className="p-1.5 rounded bg-emerald-50 text-emerald-600">
+            <div className="p-1.5 rounded bg-emerald-50 text-emerald-700">
               <FileCheck2 className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-extrabold text-slate-900">{activeApplications}</div>
-          <p className="text-[11px] text-slate-500 flex items-center gap-1">
+          <p className="text-xs text-slate-500 flex items-center gap-1">
             <span>In scrutiny or testing queue</span>
           </p>
         </div>
 
         {/* Pending Statutory Fees */}
-        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-card space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{t.statFeesDue}</span>
-            <div className="p-1.5 rounded bg-amber-50 text-amber-600">
+            <div className="p-1.5 rounded bg-amber-50 text-amber-700">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-extrabold text-slate-900">{formatCurrency(pendingFees)}</div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-500">
             {pendingFees > 0 ? 'Assessed treasury challan due' : 'All assessments reconciled'}
           </p>
         </div>
 
         {/* Expiring / Due alert */}
-        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-4 sm:p-5 rounded-md border border-slate-200 shadow-card space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Re-Verification Due</span>
-            <div className={`p-1.5 rounded ${dueInstruments > 0 ? 'bg-orange-50 text-orange-600' : 'bg-slate-50 text-slate-400'}`}>
+            <div className={`p-1.5 rounded ${dueInstruments > 0 ? 'bg-orange-50 text-orange-700' : 'bg-slate-50 text-slate-400'}`}>
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className={`text-2xl font-extrabold ${dueInstruments > 0 ? 'text-orange-600' : 'text-slate-900'}`}>
+          <div className={`text-2xl font-extrabold ${dueInstruments > 0 ? 'text-orange-700' : 'text-slate-900'}`}>
             {dueInstruments}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-500">
             {dueInstruments > 0 ? 'Annual verification renewal pending' : 'All instruments up to date'}
           </p>
         </div>
@@ -244,9 +244,9 @@ export const TraderDashboard: React.FC = () => {
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
         <button
           onClick={() => setSelectedSubTab('overview')}
-          className={`px-4 py-2 rounded-xs text-xs font-bold transition-colors cursor-pointer ${
+          className={`px-4 py-2 rounded text-xs font-bold transition-colors cursor-pointer ${
             selectedSubTab === 'overview'
-              ? 'bg-gov-navy text-white shadow-2xs'
+              ? 'bg-gov-navy text-white shadow-card'
               : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
           }`}
         >
@@ -254,9 +254,9 @@ export const TraderDashboard: React.FC = () => {
         </button>
         <button
           onClick={() => setSelectedSubTab('instruments')}
-          className={`px-4 py-2 rounded-xs text-xs font-bold transition-colors cursor-pointer ${
+          className={`px-4 py-2 rounded text-xs font-bold transition-colors cursor-pointer ${
             selectedSubTab === 'instruments'
-              ? 'bg-gov-navy text-white shadow-2xs'
+              ? 'bg-gov-navy text-white shadow-card'
               : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
           }`}
         >
@@ -307,10 +307,10 @@ export const TraderDashboard: React.FC = () => {
 
           {/* Issued Certificates Quick Table, paginated 8/page */}
           {certificates.length > 0 && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-3 mt-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-card space-y-3 mt-6">
               <div className="flex items-center justify-between border-b pb-3">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
                   <h4 className="font-bold text-xs text-gov-navy uppercase tracking-wider">
                     Issued Legal Metrology Certificates
                   </h4>
@@ -323,7 +323,7 @@ export const TraderDashboard: React.FC = () => {
                   <div key={cert.certificate_id} className="py-3 flex items-center justify-between text-xs">
                     <div>
                       <div className="font-mono font-bold text-slate-900">{cert.certificate_number}</div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-xs text-slate-500">
                         Valid From: {cert.issue_date} to <span className="font-semibold text-slate-800">{cert.valid_until}</span>
                       </div>
                     </div>
@@ -345,7 +345,7 @@ export const TraderDashboard: React.FC = () => {
 
               {certTotalPages > 1 && (
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-xs text-slate-500">
                     Page {safeCertPage} of {certTotalPages} (showing {visibleCertificates.length} of {certificates.length})
                   </span>
                   <div className="flex items-center gap-1.5">

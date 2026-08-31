@@ -175,7 +175,7 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
           <Camera className="w-3.5 h-3.5 text-slate-500" />
           <span>{label}</span>
         </label>
-        <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">
+        <span className="text-xs text-slate-400 font-mono uppercase tracking-wider">
           Server-Verified Custody
         </span>
       </div>
@@ -197,7 +197,7 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="px-3 py-1.5 rounded-lg bg-gov-navy text-white text-xs font-semibold hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-gov-navy text-white text-xs font-semibold hover:bg-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer shadow-card disabled:opacity-50"
             >
               <Upload className="w-3.5 h-3.5 text-amber-300" />
               <span>{isProcessing ? 'Verifying on Server...' : 'Upload / Capture Photo'}</span>
@@ -215,7 +215,7 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
           </div>
 
           {fileMeta && (
-            <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
+            <div className="text-xs text-slate-500 font-mono flex items-center gap-1.5">
               <FileImage className="w-3.5 h-3.5 text-gov-blue" />
               <span className="font-semibold text-slate-800">{fileMeta.name}</span>
               <span>({fileMeta.size})</span>
@@ -225,8 +225,8 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
 
         {/* Error banner if server rejects */}
         {errorMsg && (
-          <div className="bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-xs text-rose-800 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 text-xs text-red-800 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <div>
               <strong className="font-bold">Security Violation / Validation Error:</strong> {errorMsg}
             </div>
@@ -245,23 +245,23 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
           ) : (
             <div className="w-16 h-16 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center flex-shrink-0 text-slate-400">
               <Camera className="w-5 h-5 mb-0.5" />
-              <span className="text-[9px]">No photo</span>
+              <span className="text-xs">No photo</span>
             </div>
           )}
 
           <div className="flex-1 w-full space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
+            <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-700 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Authoritative Server SHA-256 Digest (64 Hex):</span>
               </span>
               <button
                 type="button"
                 onClick={handleCopyHash}
                 disabled={!value}
-                className="text-[11px] text-gov-blue hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                className="text-xs text-gov-blue hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer disabled:opacity-40"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
@@ -272,14 +272,14 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
                 readOnly
                 value={value || ''}
                 placeholder="Upload or generate photo to compute & verify SHA-256 hash..."
-                className="w-full text-xs font-mono font-bold bg-slate-50 text-slate-800 rounded-md border border-slate-300 px-2.5 py-1.5 focus:ring-1 focus:ring-gov-blue truncate select-all"
+                className="w-full text-xs font-mono font-bold bg-slate-50 text-slate-800 rounded-md border border-slate-300 px-2.5 py-1.5 focus:ring-2 focus:ring-gov-blue truncate select-all"
               />
             </div>
 
             {serverVerification && (
-              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1">
+              <div className="flex items-center justify-between text-xs text-slate-500 font-mono pt-1">
                 <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <CheckCircle2 className="w-3 h-3 text-emerald-700" />
                   <span>Server-Sealed Proof: {serverVerification.digital_proof_signature.substring(0, 14)}...</span>
                 </span>
                 <span>ID: {serverVerification.evidence_id}</span>
@@ -288,7 +288,7 @@ export const PhotoEvidenceHasher: React.FC<PhotoEvidenceHasherProps> = ({
           </div>
         </div>
 
-        <p className="text-[10px] text-slate-500 italic">
+        <p className="text-xs text-slate-500 italic">
           * {helperText}
         </p>
       </div>

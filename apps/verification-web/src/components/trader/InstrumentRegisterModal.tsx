@@ -96,7 +96,7 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
             {/* Render Category Groups (Only render non-empty groups) */}
             {[
               {
-                label: '🛒 Commercial, Grocery & Retail Scales (Class III)',
+                label: 'Commercial, Grocery & Retail Scales (Class III)',
                 filter: (m: InstrumentModel) =>
                   m.subtype === 'COUNTER_SCALE_ELECTRONIC' ||
                   m.subtype === 'PRICE_COMPUTING_SCALE' ||
@@ -104,7 +104,7 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
                   m.subtype === 'COUNTER_MACHINE_ELECTRONIC',
               },
               {
-                label: '💎 Precious Jewelry & Bullion Balances (Class II High Accuracy)',
+                label: 'Precious Jewelry & Bullion Balances (Class II High Accuracy)',
                 filter: (m: InstrumentModel) =>
                   m.subtype === 'BULLION_BALANCE_HIGH_PRECISION' ||
                   m.subtype === 'JEWELRY_CARAT_BALANCE' ||
@@ -112,26 +112,26 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
                   (m.accuracy_class === 'CLASS_II' && m.category === 'NAWI'),
               },
               {
-                label: '🔬 Special Accuracy Analytical Balances (Class I)',
+                label: 'Special Accuracy Analytical Balances (Class I)',
                 filter: (m: InstrumentModel) => m.accuracy_class === 'CLASS_I',
               },
               {
-                label: '🌾 APMC Mandi, Wholesale & Platform Scales (Class III)',
+                label: 'APMC Mandi, Wholesale & Platform Scales (Class III)',
                 filter: (m: InstrumentModel) =>
                   m.subtype === 'INDUSTRIAL_PLATFORM_SCALE' ||
                   m.subtype === 'HEAVY_DUTY_PLATFORM_SCALE' ||
                   m.subtype === 'AGRICULTURAL_MANDI_SCALE',
               },
               {
-                label: '🥛 Dairy Automated Milk Collection Units (AMCU)',
+                label: 'Dairy Automated Milk Collection Units (AMCU)',
                 filter: (m: InstrumentModel) => m.subtype === 'AUTOMATED_MILK_COLLECTION_SCALE',
               },
               {
-                label: '🏗️ Heavy Crane & Hanging Scales',
+                label: 'Heavy Crane & Hanging Scales',
                 filter: (m: InstrumentModel) => m.subtype === 'WIRELESS_CRANE_SCALE',
               },
               {
-                label: '🚛 Highway Truck & Heavy Industrial Weighbridges (Class IIII)',
+                label: 'Highway Truck & Heavy Industrial Weighbridges (Class IIII)',
                 filter: (m: InstrumentModel) =>
                   m.subtype === 'HIGHWAY_TRUCK_WEIGHBRIDGE' ||
                   m.subtype === 'HEAVY_INDUSTRIAL_WEIGHBRIDGE' ||
@@ -139,19 +139,19 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
                   m.subtype === 'WEIGHBRIDGE_ELECTRONIC',
               },
               {
-                label: '📦 Automatic Gravimetric Catchweighers & Bagging (AWI)',
+                label: 'Automatic Gravimetric Catchweighers & Bagging (AWI)',
                 filter: (m: InstrumentModel) => m.category === 'AWI',
               },
               {
-                label: '🏥 Medical & Healthcare Scales',
+                label: 'Medical & Healthcare Scales',
                 filter: (m: InstrumentModel) => m.subtype === 'MEDICAL_PERSON_SCALE',
               },
               {
-                label: '⛽ Motor Fuel & Petroleum Flow Meters (OIML R117)',
+                label: 'Motor Fuel & Petroleum Flow Meters (OIML R117)',
                 filter: (m: InstrumentModel) => m.category === 'FLOW_METER',
               },
               {
-                label: '📏 Linear & Dimensional Measures',
+                label: 'Linear & Dimensional Measures',
                 filter: (m: InstrumentModel) => m.category === 'LINEAR_MEASURE',
               },
             ].map((cat) => {
@@ -175,37 +175,37 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
               <div>
-                <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider block">Manufacturer &amp; Model</span>
+                <span className="text-slate-500 text-xs uppercase font-bold tracking-wider block">Manufacturer &amp; Model</span>
                 <strong className="text-slate-900 text-sm">{selectedModel.model_name}</strong>
-                <p className="text-slate-600 text-[11px]">{selectedModel.manufacturer_name}</p>
+                <p className="text-slate-600 text-xs">{selectedModel.manufacturer_name}</p>
               </div>
               <div className="text-right">
-                <span className="font-mono text-[10px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold border border-amber-300">
+                <span className="font-mono text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold border border-amber-300">
                   {selectedModel.model_approval_number}
                 </span>
-                <span className="block text-[10px] text-slate-500 mt-0.5">Govt Model Approval</span>
+                <span className="block text-xs text-slate-500 mt-0.5">Govt Model Approval</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
               <div>
-                <span className="text-slate-500 block text-[10px]">Accuracy Class:</span>
+                <span className="text-slate-500 block text-xs">Accuracy Class:</span>
                 <span className="font-bold text-slate-800">{selectedModel.accuracy_class}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">Max Capacity:</span>
+                <span className="text-slate-500 block text-xs">Max Capacity:</span>
                 <span className="font-bold text-slate-800">
                   {selectedModel.max_capacity} {selectedModel.capacity_unit}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">Min Capacity:</span>
+                <span className="text-slate-500 block text-xs">Min Capacity:</span>
                 <span className="font-bold text-slate-800">
                   {selectedModel.min_capacity} {selectedModel.capacity_unit}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">Verification Scale Interval (e):</span>
+                <span className="text-slate-500 block text-xs">Verification Scale Interval (e):</span>
                 <span className="font-bold text-slate-800 font-mono">
                   {selectedModel.verification_scale_interval_e} {selectedModel.scale_interval_unit}
                 </span>
@@ -213,7 +213,7 @@ export const InstrumentRegisterModal: React.FC<InstrumentRegisterModalProps> = (
             </div>
 
             {selectedModel.specifications && (
-              <div className="text-[11px] bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700">
+              <div className="text-xs bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700">
                 <strong className="text-slate-900">Statutory Use: </strong>
                 {String(selectedModel.specifications.application || 'Commercial Trade & Legal Metrology Inspection')}
               </div>

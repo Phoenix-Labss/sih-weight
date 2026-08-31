@@ -18,6 +18,7 @@ import {
   Layers,
   Sparkles,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -280,17 +281,16 @@ export const AdminPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-indigo-900/30 to-transparent pointer-events-none" />
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+      <div className="bg-gov-navy text-white rounded-lg p-5 sm:p-6 shadow-card">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-indigo-600/30 border border-indigo-500/40 rounded-xl text-indigo-400">
-                <ShieldCheck className="w-6 h-6" />
+              <div className="p-2.5 bg-white/10 border border-white/20 rounded-md">
+                <ShieldCheck className="w-6 h-6 text-amber-400" aria-hidden="true" />
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">Government Administration & Metrological Governance</h1>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-300 mt-0.5">
                   Ministry of Consumer Affairs, Food & Public Distribution | Department of Legal Metrology Control Plane
                 </p>
               </div>
@@ -298,19 +298,20 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-2">
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-md flex items-center gap-2">
+              <Database className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
               <span className="text-xs font-semibold text-emerald-300">PostgreSQL 18 — emetrology_db</span>
             </div>
-            <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-lg flex items-center gap-2">
-              <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="text-xs font-semibold text-indigo-300">Dual-Control Maker-Checker ACTIVE</span>
+            <div className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-md flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+              <span className="text-xs font-semibold text-amber-300">Dual-Control Maker-Checker ACTIVE</span>
             </div>
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors border border-slate-700"
+              className="p-2 bg-white/10 hover:bg-white/20 text-slate-200 rounded-md transition-colors border border-white/20"
               title="Refresh Governance Data"
+              aria-label="Refresh Governance Data"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -349,7 +350,7 @@ export const AdminPortal: React.FC = () => {
           onClick={() => setActiveTab('approvals')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'approvals'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              ? 'border-gov-blue text-gov-blue dark:text-blue-400'
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -366,7 +367,7 @@ export const AdminPortal: React.FC = () => {
           onClick={() => setActiveTab('personnel')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'personnel'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              ? 'border-gov-blue text-gov-blue dark:text-blue-400'
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -378,7 +379,7 @@ export const AdminPortal: React.FC = () => {
           onClick={() => setActiveTab('gatc')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'gatc'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              ? 'border-gov-blue text-gov-blue dark:text-blue-400'
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -390,7 +391,7 @@ export const AdminPortal: React.FC = () => {
           onClick={() => setActiveTab('models')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'models'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              ? 'border-gov-blue text-gov-blue dark:text-blue-400'
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -402,7 +403,7 @@ export const AdminPortal: React.FC = () => {
           onClick={() => setActiveTab('audit')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
             activeTab === 'audit'
-              ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+              ? 'border-gov-blue text-gov-blue dark:text-blue-400'
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
@@ -423,7 +424,7 @@ export const AdminPortal: React.FC = () => {
                   onClick={() => setApprovalFilter(st)}
                   className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
                     approvalFilter === st
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-gov-blue text-white shadow-sm'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -451,7 +452,7 @@ export const AdminPortal: React.FC = () => {
                 return (
                   <div
                     key={item.request_id}
-                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm hover:border-indigo-500/50 transition-all"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm hover:border-blue-400/50 transition-all"
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="space-y-1.5 flex-1">
@@ -462,7 +463,7 @@ export const AdminPortal: React.FC = () => {
                                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
                                 : item.status === 'APPROVED'
                                 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                                : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
                             }`}
                           >
                             {item.status}
@@ -500,7 +501,7 @@ export const AdminPortal: React.FC = () => {
                               setReviewModalItem(item);
                               setReviewNotes('Approved after gazette order verification.');
                             }}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
+                            className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
                           >
                             <CheckCircle2 className="w-4 h-4" />
                             Review & Approve
@@ -535,14 +536,14 @@ export const AdminPortal: React.FC = () => {
                 placeholder="Search by name, email, posting order, or HSM key slot..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-gov-blue"
               />
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowUserModal(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
+                className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Provision Government Personnel
@@ -572,13 +573,13 @@ export const AdminPortal: React.FC = () => {
                     <tr key={u.user_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                       <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">
                         <div>{u.full_name}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">{u.email}</div>
+                        <div className="text-xs text-slate-400 font-mono">{u.email}</div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold rounded text-[11px]">
+                        <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-gov-blue dark:text-blue-300 font-bold rounded text-xs">
                           {u.role}
                         </span>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-xs text-slate-400 mt-0.5">
                           {u.lmo_profile?.designation || 'Statutory Official'}
                         </div>
                       </td>
@@ -586,18 +587,18 @@ export const AdminPortal: React.FC = () => {
                         <div className="font-medium text-slate-800 dark:text-slate-200">
                           {u.lmo_profile?.jurisdiction_id || 'DL-CENTRAL'}
                         </div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="text-xs text-slate-400">
                           {u.lmo_profile?.posting_order_number || 'DL/LM/POST/2026/041'}
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[11px] text-indigo-600 dark:text-indigo-300 font-bold rounded flex items-center gap-1.5 w-fit">
+                        <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-xs text-gov-blue dark:text-blue-300 font-bold rounded flex items-center gap-1.5 w-fit">
                           <KeyRound className="w-3 h-3 text-amber-500" />
                           {u.lmo_profile?.digital_signature_cert_id || 'HSM-DL-01'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold rounded text-[11px]">
+                        <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold rounded text-xs">
                           ACTIVE
                         </span>
                       </td>
@@ -620,14 +621,14 @@ export const AdminPortal: React.FC = () => {
                 placeholder="Search GATC test centres, approval orders, or districts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-gov-blue"
               />
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowGATCModal(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
+                className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Register GATC Test Centre
@@ -651,7 +652,7 @@ export const AdminPortal: React.FC = () => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold rounded text-[11px]">
+                      <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-gov-blue dark:text-blue-300 font-bold rounded text-xs">
                         GATC Section 19 Accredited
                       </span>
                       <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mt-1">
@@ -666,18 +667,18 @@ export const AdminPortal: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 text-xs space-y-1.5 text-slate-600 dark:text-slate-300">
+                  <div className="bg-slate-50 rounded-lg p-3 text-xs space-y-1.5 text-slate-600">
                     <div>
-                      📍 Location: {centre.facility?.address_line || 'Plot 45, Okhla Industrial Area Phase-III'}, {centre.facility?.district || 'South Delhi'} - {centre.facility?.pincode || '110020'}
+                      <span className="font-semibold">Location:</span> {centre.facility?.address_line || 'Plot 45, Okhla Industrial Area Phase-III'}, {centre.facility?.district || 'South Delhi'} - {centre.facility?.pincode || '110020'}
                     </div>
                     <div>
-                      ⚖️ Max Testing Capacity: <strong>{Number(scope.max_capacity_kg || 50000).toLocaleString()} kg</strong>
+                      <span className="font-semibold">Max Testing Capacity:</span> <strong>{Number(scope.max_capacity_kg || 50000).toLocaleString()} kg</strong>
                     </div>
                     <div>
-                      🎯 Approved Accuracy Classes: <strong>{(scope.approved_classes || ['Class II', 'Class III']).join(', ')}</strong>
+                      <span className="font-semibold">Approved Accuracy Classes:</span> <strong>{(scope.approved_classes || ['Class II', 'Class III']).join(', ')}</strong>
                     </div>
                     <div>
-                      📅 Accreditation Validity: Valid Until <strong>{new Date(centre.valid_to).toLocaleDateString()}</strong>
+                      <span className="font-semibold">Accreditation Validity:</span> Valid Until <strong>{new Date(centre.valid_to).toLocaleDateString()}</strong>
                     </div>
                   </div>
                 </div>
@@ -698,14 +699,14 @@ export const AdminPortal: React.FC = () => {
                 placeholder="Search models, approval certificates, or manufacturers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-gov-blue"
               />
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowModelModal(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
+                className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Register Model Approval Certificate
@@ -728,10 +729,10 @@ export const AdminPortal: React.FC = () => {
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded text-[10px]">
+                      <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-gov-blue dark:text-blue-300 font-bold rounded text-xs">
                         {m.accuracy_class}
                       </span>
-                      <span className="text-[11px] font-mono text-indigo-500 font-semibold">
+                      <span className="text-xs font-mono text-gov-blue font-semibold">
                         {m.model_approval_number}
                       </span>
                     </div>
@@ -785,9 +786,9 @@ export const AdminPortal: React.FC = () => {
                   <td className="py-3 px-4 text-slate-900 dark:text-slate-100 font-sans">
                     <strong>{log.actor_id}</strong> ({log.actor_role})
                   </td>
-                  <td className="py-3 px-4 text-indigo-600 dark:text-indigo-400 font-bold">{log.action}</td>
+                  <td className="py-3 px-4 text-gov-blue dark:text-blue-400 font-bold">{log.action}</td>
                   <td className="py-3 px-4">{log.entity_type} / {log.entity_id}</td>
-                  <td className="py-3 px-4 text-slate-400 text-[11px]">{log.correlation_id}</td>
+                  <td className="py-3 px-4 text-slate-400 text-xs">{log.correlation_id}</td>
                 </tr>
               ))}
             </tbody>
@@ -797,20 +798,20 @@ export const AdminPortal: React.FC = () => {
 
       {/* MODAL 1: PROVISION GOVERNMENT PERSONNEL */}
       {showUserModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg w-full max-w-lg shadow-lg overflow-hidden">
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40">
               <div className="flex items-center gap-2.5">
-                <Users className="w-5 h-5 text-indigo-500" />
+                <Users className="w-5 h-5 text-gov-blue" />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   Provision Government Personnel
                 </h3>
               </div>
               <button
                 onClick={() => setShowUserModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                aria-label="Close dialog" className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
-                ✕
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -825,7 +826,7 @@ export const AdminPortal: React.FC = () => {
                   placeholder="e.g. Inspector Surendra Verma"
                   value={userForm.full_name}
                   onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-gov-blue"
                 />
               </div>
 
@@ -840,7 +841,7 @@ export const AdminPortal: React.FC = () => {
                     placeholder="officer.verma@gov.in"
                     value={userForm.email}
                     onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-gov-blue"
                   />
                 </div>
                 <div>
@@ -850,7 +851,7 @@ export const AdminPortal: React.FC = () => {
                   <select
                     value={userForm.role}
                     onChange={(e) => setUserForm({ ...userForm, role: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-gov-blue"
                   >
                     <option value="LMO">LMO (Legal Metrology Officer)</option>
                     <option value="GATC_VERIFIER">GATC Verifier / Assessor</option>
@@ -901,15 +902,15 @@ export const AdminPortal: React.FC = () => {
                 />
               </div>
 
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 rounded-lg flex items-center gap-2">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-lg flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="requireUserAppr"
                   checked={requireUserApproval}
                   onChange={(e) => setRequireUserApproval(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  className="rounded text-gov-blue"
                 />
-                <label htmlFor="requireUserAppr" className="text-xs text-indigo-900 dark:text-indigo-200 font-medium">
+                <label htmlFor="requireUserAppr" className="text-xs text-blue-900 dark:text-blue-200 font-medium">
                   Enforce Controller Maker-Checker Dual-Control Approval before activating account
                 </label>
               </div>
@@ -924,7 +925,7 @@ export const AdminPortal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold"
+                  className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg font-semibold"
                 >
                   {requireUserApproval ? 'Submit for Controller Approval' : 'Provision User Live'}
                 </button>
@@ -936,20 +937,20 @@ export const AdminPortal: React.FC = () => {
 
       {/* MODAL 2: REGISTER GATC TEST CENTRE */}
       {showGATCModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg w-full max-w-lg shadow-lg overflow-hidden">
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40">
               <div className="flex items-center gap-2.5">
-                <Building2 className="w-5 h-5 text-indigo-500" />
+                <Building2 className="w-5 h-5 text-gov-blue" />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   Register GATC Testing Centre (Section 19)
                 </h3>
               </div>
               <button
                 onClick={() => setShowGATCModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                aria-label="Close dialog" className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
-                ✕
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -964,7 +965,7 @@ export const AdminPortal: React.FC = () => {
                   placeholder="e.g. North-West Calibration & Metrology Lab"
                   value={gatcForm.facility_name}
                   onChange={(e) => setGatcForm({ ...gatcForm, facility_name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-gov-blue"
                 />
               </div>
 
@@ -1035,15 +1036,15 @@ export const AdminPortal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 rounded-lg flex items-center gap-2">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-lg flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="requireGATCAppr"
                   checked={requireGATCApproval}
                   onChange={(e) => setRequireGATCApproval(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  className="rounded text-gov-blue"
                 />
-                <label htmlFor="requireGATCAppr" className="text-xs text-indigo-900 dark:text-indigo-200 font-medium">
+                <label htmlFor="requireGATCAppr" className="text-xs text-blue-900 dark:text-blue-200 font-medium">
                   Enforce Controller Maker-Checker Dual-Control Approval before publishing GATC scope
                 </label>
               </div>
@@ -1058,7 +1059,7 @@ export const AdminPortal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold"
+                  className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg font-semibold"
                 >
                   {requireGATCApproval ? 'Submit for Controller Approval' : 'Register GATC Live'}
                 </button>
@@ -1070,20 +1071,20 @@ export const AdminPortal: React.FC = () => {
 
       {/* MODAL 3: REGISTER MODEL APPROVAL */}
       {showModelModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg w-full max-w-lg shadow-lg overflow-hidden">
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40">
               <div className="flex items-center gap-2.5">
-                <Cpu className="w-5 h-5 text-indigo-500" />
+                <Cpu className="w-5 h-5 text-gov-blue" />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   Register Model Approval Certificate (Section 22)
                 </h3>
               </div>
               <button
                 onClick={() => setShowModelModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                aria-label="Close dialog" className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
-                ✕
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -1183,15 +1184,15 @@ export const AdminPortal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 rounded-lg flex items-center gap-2">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-lg flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="requireModelAppr"
                   checked={requireModelApproval}
                   onChange={(e) => setRequireModelApproval(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  className="rounded text-gov-blue"
                 />
-                <label htmlFor="requireModelAppr" className="text-xs text-indigo-900 dark:text-indigo-200 font-medium">
+                <label htmlFor="requireModelAppr" className="text-xs text-blue-900 dark:text-blue-200 font-medium">
                   Enforce Controller Maker-Checker Dual-Control Approval before adding to national model catalog
                 </label>
               </div>
@@ -1206,7 +1207,7 @@ export const AdminPortal: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold"
+                  className="px-4 py-2 bg-gov-blue hover:bg-blue-800 text-white rounded-lg font-semibold"
                 >
                   {requireModelApproval ? 'Submit for Controller Approval' : 'Register Model Live'}
                 </button>
@@ -1218,20 +1219,20 @@ export const AdminPortal: React.FC = () => {
 
       {/* MODAL 4: MAKER-CHECKER CONTROLLER SIGN-OFF */}
       {reviewModalItem && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg w-full max-w-lg shadow-lg overflow-hidden">
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40">
               <div className="flex items-center gap-2.5">
-                <ShieldCheck className="w-5 h-5 text-indigo-500" />
+                <ShieldCheck className="w-5 h-5 text-gov-blue" />
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   Controller Statutory Sign-Off & Activation
                 </h3>
               </div>
               <button
                 onClick={() => setReviewModalItem(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                aria-label="Close dialog" className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
               >
-                ✕
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
@@ -1252,13 +1253,13 @@ export const AdminPortal: React.FC = () => {
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Enter statutory inspection remarks or approval gazette reference..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-gov-blue"
                 />
               </div>
 
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-lg flex items-center gap-2">
-                <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                <span className="text-[11px] text-emerald-900 dark:text-emerald-200">
+                <Lock className="w-4 h-4 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
+                <span className="text-xs text-emerald-900 dark:text-emerald-200">
                   Approving this request will immediately write changes to PostgreSQL and project the entity live on the national portal.
                 </span>
               </div>
@@ -1267,7 +1268,7 @@ export const AdminPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleReview('REJECT')}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-semibold flex items-center gap-1"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold flex items-center gap-1"
                 >
                   <XCircle className="w-4 h-4" />
                   Reject Request

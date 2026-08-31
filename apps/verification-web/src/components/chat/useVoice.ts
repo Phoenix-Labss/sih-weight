@@ -15,6 +15,25 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
   const [isSupported, setIsSupported] = useState(true);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
+  // User-configurable speech rate with localStorage persistence
+  const [speechRate, setSpeechRateState] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('emetrology_tts_speed');
+      return saved ? parseFloat(saved) : 1.2;
+    } catch {
+      return 1.2;
+    }
+  });
+
+  const setSpeechRate = useCallback((rate: number) => {
+    setSpeechRateState(rate);
+    try {
+      localStorage.setItem('emetrology_tts_speed', String(rate));
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -86,7 +105,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
           if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
             setVoiceError('Microphone access was blocked. Please enable microphone permission in your browser address bar.');
           } else if (event.error === 'no-speech') {
-            // Normal timeout when quiet, do not show scary red error
+            // Normal timeout when quiet
           } else if (event.error === 'network') {
             setVoiceError('Voice recognition network timeout. Please check your internet connection.');
           } else if (event.error !== 'aborted') {
@@ -137,7 +156,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
   };
 
   const speak = useCallback(
-    (msgId: string, text: string, lang: 'en' | 'hi' = language) => {
+    (msgId: string, text: string, lang: 'en' | 'hi' = language, customRate?: number) => {
       if (!window.speechSynthesis) return;
 
       // If already speaking this message, toggle off
@@ -153,8 +172,9 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
       const cleaned = cleanMarkdownForSpeech(text);
       const utterance = new SpeechSynthesisUtterance(cleaned);
       utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-      // Brisk, crisp conversational speed (1.18x for English, 1.12x for Hindi)
-      utterance.rate = lang === 'hi' ? 1.12 : 1.18;
+      
+      const effectiveRate = customRate ?? speechRate;
+      utterance.rate = effectiveRate;
       utterance.pitch = 1.0;
 
       // Pick best voice if available
@@ -185,7 +205,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
 
       window.speechSynthesis.speak(utterance);
     },
-    [isSpeaking, speakingMsgId, language]
+    [isSpeaking, speakingMsgId, language, speechRate]
   );
 
   const stopSpeaking = useCallback(() => {
@@ -216,6 +236,8 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
     isListening,
     isSpeaking,
     speakingMsgId,
+    speechRate,
+    setSpeechRate,
     isSupported,
     voiceError,
     setVoiceError,

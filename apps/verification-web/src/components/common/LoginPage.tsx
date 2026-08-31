@@ -1514,8 +1514,49 @@ export const LoginPage: React.FC = () => {
                   </button>
                 </form>
 
-                {/* Secondary Registration Section (Clean, Structured, NOT an Ad Card) */}
-                <div className="pt-3 border-t border-slate-200">
+                {/* 1-Click Quick Demo Sign-In Buttons */}
+                <div className="pt-2 border-t border-slate-200">
+                  <span className="text-[11px] font-bold text-gov-navy uppercase tracking-wider block mb-1.5">
+                    Quick Demo User Access (1-Click Entry)
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleDemoSelect(DEMO_ROLES[0])}
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-amber-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <UserCheck className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>Trader Portal</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoSelect(DEMO_ROLES[1])}
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-blue-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Shield className="w-3 h-3 text-gov-blue shrink-0" />
+                      <span>LMO Officer</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoSelect(DEMO_ROLES[2])}
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-emerald-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Building2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span>Supervisor</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoSelect(DEMO_ROLES[3])}
+                      className="py-1.5 px-2 rounded bg-slate-100 hover:bg-purple-100 text-slate-800 font-semibold text-[11px] transition-colors border border-slate-200 flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Lock className="w-3 h-3 text-purple-600 shrink-0" />
+                      <span>Admin Portal</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Secondary Registration Section */}
+                <div className="pt-2 border-t border-slate-200">
                   <div className="bg-slate-50 border border-slate-200 rounded p-3 text-center space-y-2">
                     <div>
                       <span className="text-xs font-bold text-slate-800 block">
@@ -1566,7 +1607,6 @@ export const LoginPage: React.FC = () => {
         </div>
       </footer>
 
-      {/* 5. Establishment Registration Modal */}
       {/* 5. Establishment Registration Modal */}
       <RegisterModal
         isOpen={isRegisterOpen}

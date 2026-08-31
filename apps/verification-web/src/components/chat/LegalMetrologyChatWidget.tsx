@@ -14,10 +14,14 @@ import {
   ExternalLink,
   Bot,
   User,
-  HelpCircle,
   Scale,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useMetrologyChat } from './useMetrologyChat';
+import { useVoice } from './useVoice';
 import { ChatMessage, StatutoryCitation, PortalActionLink } from './chatTypes';
 
 interface ChatWidgetProps {
@@ -44,6 +48,16 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     clearChat,
   } = useMetrologyChat(portalContext);
 
+  const {
+    isListening,
+    isSpeaking,
+    speakingMsgId,
+    startListening,
+    stopListening,
+    speak,
+    stopSpeaking,
+  } = useVoice(language);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -61,6 +75,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
   const handleSend = (textToSend?: string) => {
     const query = textToSend || inputVal;
     if (!query.trim() || loading) return;
+    stopSpeaking();
     sendMessage(query);
     setInputVal('');
   };
@@ -69,6 +84,17 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const toggleVoiceInput = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      stopSpeaking();
+      startListening((transcript) => {
+        setInputVal(transcript);
+      });
     }
   };
 
@@ -92,7 +118,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-slate-700 animate-bounce">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Ask Legal Metrology AI</span>
+            <span>Ask Legal Metrology AI (Text & Voice)</span>
           </div>
 
           <button
@@ -112,7 +138,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
           className={`fixed z-50 transition-all duration-200 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden ${
             isExpanded
               ? 'inset-4 sm:inset-10 rounded-2xl'
-              : 'bottom-6 right-6 w-full max-w-[420px] h-[620px] rounded-2xl'
+              : 'bottom-6 right-6 w-full max-w-[440px] h-[640px] rounded-2xl'
           }`}
         >
           {/* Header */}
@@ -123,9 +149,9 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               </div>
               <div>
                 <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
-                  Legal Metrology AI Assistant
+                  Legal Metrology AI
                   <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400/30">
-                    RAG
+                    Voice & RAG
                   </span>
                 </h3>
                 <p className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
@@ -138,7 +164,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             <div className="flex items-center gap-1.5 text-slate-300">
               {/* Language Switcher */}
               <button
-                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+                onClick={() => {
+                  stopSpeaking();
+                  setLanguage(language === 'en' ? 'hi' : 'en');
+                }}
                 className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-bold text-amber-400 border border-slate-700 transition-colors"
                 title="Toggle Language"
               >
@@ -147,7 +176,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
               {/* Reset Thread */}
               <button
-                onClick={clearChat}
+                onClick={() => {
+                  stopSpeaking();
+                  clearChat();
+                }}
                 className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
                 title="Clear Chat History"
               >
@@ -165,7 +197,11 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
               {/* Close Button */}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  stopSpeaking();
+                  stopListening();
+                  setIsOpen(false);
+                }}
                 className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
                 title="Close"
               >
@@ -174,10 +210,29 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             </div>
           </div>
 
+          {/* Listening Live Banner */}
+          {isListening && (
+            <div className="bg-red-500 text-white px-3 py-1.5 text-xs font-semibold flex items-center justify-between animate-pulse">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
+                <span>
+                  {language === 'hi' ? '🎤 बोलिए... (हिंदी आवाज़ सक्रिय)' : '🎤 Listening in English (India)...'}
+                </span>
+              </div>
+              <button
+                onClick={stopListening}
+                className="text-[11px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded"
+              >
+                Done
+              </button>
+            </div>
+          )}
+
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 dark:bg-slate-950/40 text-xs">
             {messages.map((msg) => {
               const isUser = msg.sender === 'user';
+              const isCurrentSpeaking = isSpeaking && speakingMsgId === msg.id;
 
               return (
                 <div
@@ -196,13 +251,46 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
                   <div className={`space-y-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                     <div
-                      className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm whitespace-pre-wrap ${
+                      className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm whitespace-pre-wrap relative group ${
                         isUser
                           ? 'bg-indigo-600 text-white rounded-tr-none'
                           : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
                       }`}
                     >
                       {msg.text}
+
+                      {/* Text-to-Speech Voice Playback Button for Assistant */}
+                      {!isUser && (
+                        <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <button
+                            onClick={() => speak(msg.id, msg.text, language)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                              isCurrentSpeaking
+                                ? 'bg-amber-500 text-slate-950 font-bold animate-pulse'
+                                : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                            }`}
+                            title={isCurrentSpeaking ? 'Stop voice readout' : 'Listen to this answer'}
+                          >
+                            {isCurrentSpeaking ? (
+                              <>
+                                <VolumeX className="w-3.5 h-3.5" />
+                                <span>Stop Voice</span>
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 className="w-3.5 h-3.5 text-indigo-500" />
+                                <span>Listen (बोलकर सुनें)</span>
+                              </>
+                            )}
+                          </button>
+
+                          {msg.provider_used && (
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {msg.provider_used === 'GEMINI_API' ? 'Gemini 1.5' : 'Statutory RAG'}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Statutory Citations Accordion */}
@@ -323,33 +411,59 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             ))}
           </div>
 
-          {/* Input Footer */}
+          {/* Input Footer with Microphone (STT) & Send Buttons */}
           <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-            <div className="relative flex items-center">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={
-                  language === 'hi'
-                    ? 'विधिक मापविज्ञान, शुल्क या पैकेजिंग नियमों के बारे में पूछें...'
-                    : 'Ask about scale registration, verification fees, Section 22, or packaging rules...'
-                }
-                className="w-full pl-3 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+            <div className="relative flex items-center gap-1.5">
+              <div className="relative flex-1 flex items-center">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    isListening
+                      ? 'Listening to voice...'
+                      : language === 'hi'
+                      ? 'विधिक मापविज्ञान, शुल्क या पैकेजिंग नियमों के बारे में पूछें...'
+                      : 'Ask about scale registration, verification fees, Section 22, or packaging rules...'
+                  }
+                  className={`w-full pl-3 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    isListening
+                      ? 'border-red-500 ring-2 ring-red-400/50 animate-pulse'
+                      : 'border-slate-300 dark:border-slate-700'
+                  }`}
+                />
+
+                {/* Voice Input Microphone Button */}
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  className={`absolute right-1.5 p-1.5 rounded-lg transition-all ${
+                    isListening
+                      ? 'bg-red-500 text-white animate-bounce shadow-md'
+                      : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                  title={isListening ? 'Stop listening' : 'Speak your question (बोलकर पूछें)'}
+                >
+                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Send Button */}
               <button
                 onClick={() => handleSend()}
                 disabled={!inputVal.trim() || loading}
-                className="absolute right-1.5 p-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white rounded-lg transition-all"
+                className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white rounded-xl shadow-md transition-all shrink-0"
                 title="Send Question"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-[10px] text-center text-slate-400 mt-1.5">
-              ⚖️ Official AI Guide under The Legal Metrology Act, 2009 & General Rules, 2011.
+            <div className="text-[10px] text-center text-slate-400 mt-1.5 flex items-center justify-center gap-1">
+              <span>⚖️ Voice & Text AI Guide</span>
+              <span>•</span>
+              <span>The Legal Metrology Act, 2009</span>
             </div>
           </div>
         </div>

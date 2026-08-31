@@ -65,31 +65,29 @@ export class LLMService {
   private async callGeminiAPI(params: LLMGenerateParams, model: string): Promise<string> {
     const isHindi = params.language === 'hi';
     const systemPrompt = isHindi
-      ? `You are the Official Indian Legal Metrology AI Assistant (विधिक मापविज्ञान प्रभाग, उपभोक्ता मामले मंत्रालय, भारत सरकार).
-MANDATORY LANGUAGE INSTRUCTION:
-- The user has actively selected HINDI mode (हिन्दी).
-- You MUST generate your entire response in clear, polite, natural, and accurate Hindi (हिन्दी) using Devanagari script.
-- Even if the user asked their question in English, Hinglish, or mixed words, your entire answer MUST be in Hindi.
-- Ground your answer in The Legal Metrology Act, 2009 & General Rules, 2011.
-- Use clear bullet points, clean formatting, and bold section references (e.g. धारा 22, नियम 6, बारहवीं अनुसूची).`
-      : `You are the Official Indian Legal Metrology AI Assistant (Ministry of Consumer Affairs, Food and Public Distribution, Government of India).
-Your duty is to provide strictly accurate, conversational, friendly, and practical guidance to traders, shopkeepers, manufacturers, packagers, and citizens.
+      ? `आप भारत सरकार के विधिक मापविज्ञान (नाप-तौल) विभाग के सबसे प्यारे, मददगार और सरल AI दोस्त हैं।
 
-Core Knowledge Foundation:
-1. The Legal Metrology Act, 2009 (Sections 1-57)
-2. Legal Metrology (General) Rules, 2011 (Verification, NAWI/AWI classes, MPE error tolerances, Stamping, Fees)
-3. Legal Metrology (Packaged Commodities) Rules, 2011 (Mandatory declarations, Net weight MPE, MRP rules)
-4. Model Approval (Section 22), GATC Lab Testing (Section 19), and Portal Procedures.
+🌟 सबसे महत्वपूर्ण निर्देश (टोन एवं भाषा):
+1. **भाषा को बहुत ही सरल, आसान और मीठी हिन्दी में रखें:** ऐसी भाषा जिसे 10 साल का बच्चा या कोई भी आम दुकानदार बिना किसी परेशानी के एकदम आसानी से समझ जाए!
+2. **भारी-भरकम सरकारी/संस्कृत शब्दों से बचें:** कठिन शब्दों (जैसे 'अधिदेश', 'अध्यारोपित', 'दंडात्मक प्रावधान', 'प्रत्यभिज्ञान') की जगह आसान शब्द (जैसे 'जरूरी नियम', 'चिंता मत कीजिए', 'आसान तरीका', 'मुफ़्त में डाउनलोड') का उपयोग करें।
+3. **दोस्ताना और मददगार अंदाज़:** शुरुआत प्यार से करें (जैसे: "अरे, बिल्कुल चिंता मत कीजिए!...", "नमस्ते दोस्त!...")।
+4. **आसान उदाहरण/एनालॉजी दें:** जैसे कि "सत्यापन प्रमाण पत्र आपके तराजू का रिपोर्ट कार्ड है", "सील आपके तराजू का सुरक्षा धागा है"।
+5. **स्टेप-बाय-स्टेप बुलेट पॉइंट्स:** 1, 2, 3 करके साफ-साफ समझाएं।
+6. **नियमों का आसान संदर्भ:** अंत में ब्रैकेट में छोटा सा नोट लिख दें (जैसे: *(विधिक मापविज्ञान नियम 2011 के अनुसार)*)।
+7. **पोर्टल की सुविधा बताएं:** बताएं कि इस पोर्टल पर लॉगिन करके सब कुछ 1 मिनट में ऑनलाइन और मुफ़्त में हो जाता है!`
+      : `You are the friendly, helpful Legal Metrology AI assistant from the Ministry of Consumer Affairs, Government of India.
 
-CRITICAL INSTRUCTIONS:
-- Directly and clearly answer the user's specific question or scenario (e.g. lost certificate, broken seal, verification fees, renewal deadlines, scale accuracy, inspection rules).
-- Speak naturally and conversationally in Markdown with clean formatting (bullet points, bold text).
-- If the question relates to a statutory rule, cite the relevant Section/Rule.
-- Answer in clear, professional, natural English.
-- Mention that this portal allows online application filing, tracking, and instant digital certificate downloads with QR code verification.`;
+🌟 CRITICAL TONE & LANGUAGE INSTRUCTIONS:
+1. **Explain Like I'm 5 (Super Simple & Friendly):** Explain things so simply and clearly that even a 10-year-old child or a friendly local shopkeeper can understand instantly!
+2. **Avoid Heavy Legal Jargon:** Do NOT use complex bureaucratic legalese like "statutory mandate", "imposition of liability", "indemnification", or "procedural scrutiny". Instead use everyday words like "rules", "report card", "easy steps", "free download", "no worries!".
+3. **Warm & Conversational Tone:** Start cheerfully (e.g. "Don't worry at all! Here is the easy way to fix this...", "Hi friend! Great question...").
+4. **Use Simple Analogies:** e.g. "Think of a verification certificate like an official digital report card showing your scale is 100% honest and accurate!"
+5. **Clear Step-by-Step Bullet Points:** Use numbered lists with friendly emojis (1️⃣, 2️⃣, 3️⃣).
+6. **Mention Rules Gently:** Mention statutory sections gently in a short friendly footer note (e.g. *(Under Section 24 of the Legal Metrology Act, 2009)*).
+7. **Highlight Online Ease:** Remind the user that they can do everything easily online from their dashboard without paperwork!`;
 
     const contextText = params.contextChunks
-      .map((c, i) => `[Statutory Reference ${i + 1}: ${c.act_or_rule} - ${c.section_rule_ref}] (${c.title})\n${c.snippet}`)
+      .map((c, i) => `[Reference ${i + 1}: ${c.act_or_rule} - ${c.section_rule_ref}] (${c.title})\n${c.snippet}`)
       .join('\n\n');
 
     const conversationHistory = (params.history || [])
@@ -100,8 +98,8 @@ CRITICAL INSTRUCTIONS:
       }));
 
     const userPrompt = isHindi
-      ? `प्रासंगिक वैधानिक संदर्भ (Context):\n${contextText}\n\nउपयोगकर्ता का प्रश्न (कृपया पूर्णतः शुद्ध एवं सरल हिन्दी में उत्तर दें):\n${params.query}`
-      : `Retrieved Official Legal Context:\n${contextText}\n\nUser Question:\n${params.query}`;
+      ? `सरकारी नियम संदर्भ (Context):\n${contextText}\n\nउपयोगकर्ता का सवाल (कृपया बहुत ही आसान, मीठी और सरल हिन्दी में उत्तर दें):\n${params.query}`
+      : `Official Legal Context:\n${contextText}\n\nUser Question (Please answer in super simple, friendly, child-like easy words):\n${params.query}`;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
 
@@ -115,7 +113,7 @@ CRITICAL INSTRUCTIONS:
           { role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] },
         ],
         generationConfig: {
-          temperature: 0.3,
+          temperature: 0.4,
           maxOutputTokens: 1024,
         },
       }),
@@ -141,42 +139,42 @@ CRITICAL INSTRUCTIONS:
 
     if (!primary || params.contextChunks.length === 0) {
       if (isHindi) {
-        return `**विधिक मापविज्ञान सहायता डेस्क**
+        return `### नमस्ते दोस्त! 👋
 
-आपके प्रश्न के संबंध में सटीक वैधानिक प्रावधान प्राप्त नहीं हो सका। कृपया अपने निकटतम विधिक मापविज्ञान कार्यालय (LMO) से संपर्क करें अथवा पोर्टल पर अपने उपकरण के विवरण की जांच करें।
+मुझे आपके इस सवाल की पूरी जानकारी नहीं मिल पाई। पर चिंता मत कीजिए! आप अपने नज़दीकी नाप-तौल अधिकारी (LMO) से पूछ सकते हैं या अपने पोर्टल पर मशीन की जानकारी देख सकते हैं।
 
-> ⚠️ **नोट:** विधिक मापविज्ञान अधिनियम, 2009 के तहत व्यापार में केवल सत्यापित एवं मुहरबंद उपकरणों का उपयोग अनिवार्य है।`;
+> 💡 **याद रखें:** दुकान में हमेशा सरकार द्वारा जांचा और मुहर लगा तराजू ही इस्तेमाल करना चाहिए।`;
       }
-      return `**Legal Metrology Guidance**
+      return `### Hi friend! 👋
 
-No exact statutory section matched your specific query. Please consult your jurisdictional Legal Metrology Officer (LMO) or check your machine details on the Trader Portal.
+I couldn't find the exact details for this specific question. But don't worry! You can check your machine details on your dashboard or ask your local weights & measures inspector.
 
-> ⚠️ **Statutory Notice:** Under Section 19 of The Legal Metrology Act, 2009, all commercial weighing instruments must be verified and stamped before use in trade.`;
+> 💡 **Quick Tip:** Always use an approved and checked scale in your shop to keep your customers happy!`;
     }
 
     if (isHindi) {
-      return `### ${primary.title} (${primary.section_rule_ref})
+      return `### ${primary.title}
 
 ${primary.snippet}
 
 ${
   secondary && secondary.section_rule_ref !== primary.section_rule_ref
-    ? `\n📌 **अतिरिक्त वैधानिक संदर्भ (${secondary.section_rule_ref} — ${secondary.title}):**\n${secondary.snippet}\n`
+    ? `\n📌 **एक और काम की बात (${secondary.title}):**\n${secondary.snippet}\n`
     : ''
 }
-> ⚖️ *यह आधिकारिक मार्गदर्शन विधिक मापविज्ञान अधिनियम, 2009 एवं सामान्य नियम, 2011 पर आधारित है।*`;
+> ⚖️ *सरकारी नियम संदर्भ: ${primary.act_or_rule} (${primary.section_rule_ref})*`;
     }
 
-    return `### ${primary.title} (${primary.section_rule_ref})
+    return `### ${primary.title}
 
 ${primary.snippet}
 
 ${
   secondary && secondary.section_rule_ref !== primary.section_rule_ref
-    ? `\n📌 **Related Legal Provision (${secondary.section_rule_ref} — ${secondary.title}):**\n${secondary.snippet}\n`
+    ? `\n📌 **Helpful Related Info (${secondary.title}):**\n${secondary.snippet}\n`
     : ''
 }
-> ⚖️ *Statutory Guidance under The Legal Metrology Act, 2009 & General Rules, 2011.*`;
+> ⚖️ *Official Rule Reference: ${primary.act_or_rule} (${primary.section_rule_ref})*`;
   }
 }
 

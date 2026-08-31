@@ -16,13 +16,13 @@ export function useMetrologyChat(portalContext = 'trader') {
       {
         id: 'msg-welcome',
         sender: 'assistant',
-        text: `नमस्ते! I am the **Official Legal Metrology AI Assistant** for the Government of India.\n\nI can help you with:\n- **Weighing machine registration & Model Approvals** (Section 22)\n- **Statutory verification & re-verification fee calculation** (Schedule XII)\n- **Periodic renewal due dates & validity periods** (Section 24)\n- **Mandatory Packaged Commodities declarations** (Rule 6)\n- **Public digital certificate & QR authenticity checks**`,
+        text: `👋 **Hi friend! Welcome to your Legal Metrology AI Assistant.**\n\nAsk me anything about your weighing scales, verification fees, renewal deadlines, or package label rules! I will explain everything in **super simple and easy words** so you can get things done without any confusion. 😊\n\nTry clicking any of the helpful questions below:`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         suggested_followups: [
-          'How to calculate statutory verification fees?',
-          'What is Section 22 Central Model Approval?',
-          'What are mandatory declarations on packaged goods under Rule 6?',
-          'How to verify digital certificate using QR code?',
+          'What to do if my certificate is lost?',
+          'What to do if my physical seal is broken?',
+          'How much time does it typically take to test?',
+          'What documents are required for verification?',
         ],
       },
     ];

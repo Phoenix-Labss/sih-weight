@@ -15,6 +15,7 @@ import { evidenceRoutes } from './routes/evidence.routes.js';
 import { publicRoutes } from './routes/public.routes.js';
 import { adminRoutes } from './routes/admin.routes.js';
 import { authRoutes } from './auth/auth.routes.js';
+import { chatRoutes } from './routes/chat.routes.js';
 
 /**
  * Builds and configures the Fastify Application instance
@@ -121,6 +122,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       await v1.register(publicRoutes);
       await v1.register(adminRoutes);
       await v1.register(authRoutes);
+      await v1.register(chatRoutes);
     },
     { prefix: '/api/v1' }
   );

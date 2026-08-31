@@ -12,6 +12,7 @@ import { SupervisorDashboard } from './components/supervisor/SupervisorDashboard
 import { GATCManagement } from './components/gatc/GATCManagement';
 import { LegacyMigrationConsole } from './components/migration/LegacyMigrationConsole';
 import { AdminPortal } from './components/admin/AdminPortal';
+import { LegalMetrologyChatWidget } from './components/chat';
 import { RoleType } from './types/api';
 import { I18nProvider } from './i18n';
 import { ApiModeProvider } from './context/ApiModeContext';
@@ -180,6 +181,7 @@ const AppContent: React.FC = () => {
           <PublicVerificationPage initialToken={publicToken} />
         </main>
         <Footer />
+        <LegalMetrologyChatWidget portalContext='public' onNavigateTab={handleTabChange} />
         <ToastContainer />
       </div>
     );
@@ -206,6 +208,7 @@ const AppContent: React.FC = () => {
         {activeTab === 'public' && <PublicVerificationPage initialToken={publicToken} />}
       </main>
       <Footer />
+      <LegalMetrologyChatWidget portalContext={activeTab} onNavigateTab={handleTabChange} />
       <ToastContainer />
     </div>
   );

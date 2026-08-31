@@ -153,7 +153,7 @@ I couldn't find the exact details for this specific question. But don't worry! Y
     }
 
     if (isHindi) {
-      return `### ${primary.title}
+      return `### विधिक मापविज्ञान: ${primary.title}
 
 ${primary.snippet}
 
@@ -162,7 +162,7 @@ ${
     ? `\n📌 **एक और काम की बात (${secondary.title}):**\n${secondary.snippet}\n`
     : ''
 }
-> ⚖️ *सरकारी नियम संदर्भ: ${primary.act_or_rule} (${primary.section_rule_ref})*`;
+> ⚖️ *विधिक मापविज्ञान नियम संदर्भ: ${primary.act_or_rule} (${primary.section_rule_ref})*`;
     }
 
     return `### ${primary.title}

@@ -28,6 +28,7 @@ import { useMetrologyChat } from './useMetrologyChat';
 import { useVoice } from './useVoice';
 import { FormattedMarkdown } from './FormattedMarkdown';
 import { ChatMessage, StatutoryCitation, PortalActionLink } from './chatTypes';
+import { NikksMascotIcon } from './NikksMascotIcon';
 
 interface ChatWidgetProps {
   portalContext?: string;
@@ -124,20 +125,21 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
   return (
     <>
-      {/* 1. Floating Launcher Bubble */}
+      {/* 1. Floating Launcher Bubble (Static, Non-Bouncing Pill) */}
       {!isOpen && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-slate-700 animate-bounce">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Ask Legal Metrology AI (Text & Voice)</span>
+          <div className="hidden sm:flex items-center gap-2 bg-slate-900/95 text-white text-xs font-semibold px-3.5 py-2 rounded-full shadow-xl border border-slate-700/80 backdrop-blur-xs select-none">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span>Ask Nikks AI (Text &amp; Voice)</span>
           </div>
 
           <button
             onClick={() => setIsOpen(true)}
-            className="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-700 via-indigo-600 to-amber-500 text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-transform border-2 border-white/20 relative group"
-            title="Open Legal Metrology AI Assistant"
+            className="w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-800 via-indigo-600 to-amber-500 text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-transform border-2 border-white/30 relative group cursor-pointer"
+            title="Open Nikks AI Assistant"
+            aria-label="Open Nikks AI Assistant"
           >
-            <Bot className="w-7 h-7" />
+            <NikksMascotIcon size={36} glow={false} />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse" />
           </button>
         </div>
@@ -155,19 +157,19 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
           {/* Header */}
           <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 flex items-center justify-between border-b border-indigo-900/50">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600/40 border border-indigo-400/40 flex items-center justify-center text-amber-400 shadow-inner">
-                <Scale className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-600/40 border border-indigo-400/40 flex items-center justify-center shadow-inner shrink-0 p-1">
+                <NikksMascotIcon size={30} glow={false} />
               </div>
               <div>
                 <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
-                  Legal Metrology AI
-                  <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400/30">
-                    Voice & RAG
+                  Nikks AI
+                  <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400/30 font-semibold">
+                    Legal Metrology Assistant
                   </span>
                 </h3>
                 <p className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  Grounded in Acts & General Rules 2011
+                  Grounded in Acts &amp; General Rules 2011 • Text &amp; Voice
                 </p>
               </div>
             </div>
@@ -333,10 +335,10 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
                       isUser
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-amber-500/20 border border-amber-500/40 text-amber-500 dark:text-amber-400'
+                        : 'bg-indigo-950/40 border border-indigo-400/40 p-0.5 shadow-2xs'
                     }`}
                   >
-                    {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                    {isUser ? <User className="w-4 h-4" /> : <NikksMascotIcon size={22} glow={false} />}
                   </div>
 
                   <div className={`space-y-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
@@ -528,8 +530,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     isListening
                       ? 'Listening to voice...'
                       : language === 'hi'
-                      ? 'विधिक मापविज्ञान, शुल्क या पैकेजिंग नियमों के बारे में पूछें...'
-                      : 'Ask about scale registration, verification fees, Section 22, or packaging rules...'
+                      ? 'निक्स एआई (Nikks AI) से विधिक मापविज्ञान, फीस या नियमों के बारे में पूछें...'
+                      : 'Ask Nikks AI about scale registration, verification fees, Section 22, or packaging rules...'
                   }
                   className={`w-full pl-3 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     isListening

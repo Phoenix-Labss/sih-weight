@@ -16,7 +16,7 @@ export function useMetrologyChat(portalContext = 'trader') {
       {
         id: 'msg-welcome',
         sender: 'assistant',
-        text: `👋 **Hi friend! Welcome to your Legal Metrology AI Assistant.**\n\nAsk me anything about your weighing scales, verification fees, renewal deadlines, or package label rules! I will explain everything in **super simple and easy words** so you can get things done without any confusion. 😊\n\nTry clicking any of the helpful questions below:`,
+        text: `👋 **Hi friend! I'm Nikks AI, your friendly Legal Metrology Guide.**\n\nAsk me anything about your weighing scales, verification fees, renewal deadlines, or package label rules! I will explain everything in **super simple and easy words** so you can get things done without any confusion. 😊\n\nTry clicking any of the helpful questions below:`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         suggested_followups: [
           'What to do if my certificate is lost?',

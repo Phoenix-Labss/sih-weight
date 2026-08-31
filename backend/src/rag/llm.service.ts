@@ -14,10 +14,14 @@ export interface LLMResponse {
 
 export class LLMService {
   private geminiApiKey: string | null = null;
-  private modelName: string = 'gemini-1.5-flash-latest';
+  private modelName: string = 'gemini-1.5-flash';
 
   constructor() {
-    this.geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
+    const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
+    // Only use if real key (not dummy placeholder)
+    if (rawKey && !rawKey.includes('your-key') && rawKey.startsWith('AIza')) {
+      this.geminiApiKey = rawKey;
+    }
   }
 
   public setApiKey(key: string) {
@@ -25,7 +29,11 @@ export class LLMService {
   }
 
   public hasApiKey(): boolean {
-    return Boolean(this.geminiApiKey && this.geminiApiKey.trim().length > 10);
+    return Boolean(
+      this.geminiApiKey &&
+        this.geminiApiKey.trim().length > 10 &&
+        this.geminiApiKey.startsWith('AIza')
+    );
   }
 
   public async generateAnswer(params: LLMGenerateParams): Promise<LLMResponse> {
@@ -38,12 +46,12 @@ export class LLMService {
             provider: 'GEMINI_API',
           };
         }
-      } catch (err) {
-        console.warn('[LLMService] Gemini API call failed, falling back to local statutory engine:', err);
+      } catch (err: any) {
+        // Silent graceful fallback
       }
     }
 
-    // Local deterministic synthesis fallback
+    // Local deterministic statutory synthesis
     return {
       answer: this.synthesizeLocalAnswer(params),
       provider: 'LOCAL_STATUTORY_RAG',

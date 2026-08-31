@@ -13,6 +13,12 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:8000',
+      '/v': 'http://127.0.0.1:8000',
+      '/health': 'http://127.0.0.1:8000',
+      '/certificates': 'http://127.0.0.1:8000',
+    },
   },
   preview: {
     port: 5173,

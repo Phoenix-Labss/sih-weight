@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useMetrologyChat } from './useMetrologyChat';
 import { useVoice } from './useVoice';
+import { FormattedMarkdown } from './FormattedMarkdown';
 import { ChatMessage, StatutoryCitation, PortalActionLink } from './chatTypes';
 
 interface ChatWidgetProps {
@@ -251,13 +252,13 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
                   <div className={`space-y-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                     <div
-                      className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm whitespace-pre-wrap relative group ${
+                      className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm relative group ${
                         isUser
                           ? 'bg-indigo-600 text-white rounded-tr-none'
                           : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
                       }`}
                     >
-                      {msg.text}
+                      <FormattedMarkdown content={msg.text} isUser={isUser} />
 
                       {/* Text-to-Speech Voice Playback Button for Assistant */}
                       {!isUser && (

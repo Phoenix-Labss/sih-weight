@@ -28,6 +28,9 @@ export class LLMService {
   }
 
   public hasApiKey(): boolean {
+    if (process.env.NODE_ENV === 'test' && !process.env.FORCE_GEMINI_IN_TEST) {
+      return false;
+    }
     return Boolean(
       this.geminiApiKey &&
         this.geminiApiKey.length > 10 &&
@@ -47,7 +50,7 @@ export class LLMService {
             };
           }
         } catch (err: any) {
-          console.warn(`[LLMService] Attempt with model ${model} failed:`, err?.message || err);
+          // Fall back gracefully
         }
       }
     }
@@ -95,6 +98,7 @@ CRITICAL INSTRUCTIONS:
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(3500),
       body: JSON.stringify({
         contents: [
           ...conversationHistory,

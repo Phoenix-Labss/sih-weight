@@ -830,12 +830,14 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         onClose={() => setIsSignModalOpen(false)}
         session={{ ...session, status: currentStatus, outcome: currentOutcome }}
         onCertificateIssued={(cert) => {
-          setIsSignModalOpen(false);
           setCurrentStatus('FINALIZED');
           onCertificateIssued?.(cert);
           onSessionUpdated({ ...session, status: 'FINALIZED' });
         }}
-        onNavigateToLedger={onNavigateToLedger}
+        onNavigateToLedger={() => {
+          setIsSignModalOpen(false);
+          onNavigateToLedger?.();
+        }}
       />
 
       <CertificateModal

@@ -19,6 +19,7 @@ import {
   MicOff,
   Volume2,
   VolumeX,
+  AlertTriangle,
 } from 'lucide-react';
 import { useMetrologyChat } from './useMetrologyChat';
 import { useVoice } from './useVoice';
@@ -53,6 +54,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     isListening,
     isSpeaking,
     speakingMsgId,
+    voiceError,
+    setVoiceError,
     startListening,
     stopListening,
     speak,
@@ -211,6 +214,23 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             </div>
           </div>
 
+          {/* Voice Error Notice Banner */}
+          {voiceError && (
+            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-[11px] flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>{voiceError}</span>
+              </div>
+              <button
+                onClick={() => setVoiceError(null)}
+                className="text-amber-700 dark:text-amber-300 hover:text-amber-900 p-0.5"
+                title="Dismiss"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {/* Listening Live Banner */}
           {isListening && (
             <div className="bg-red-500 text-white px-3 py-1.5 text-xs font-semibold flex items-center justify-between animate-pulse">
@@ -222,7 +242,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               </div>
               <button
                 onClick={stopListening}
-                className="text-[11px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded"
+                className="text-[11px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded font-semibold"
               >
                 Done
               </button>

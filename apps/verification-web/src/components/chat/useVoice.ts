@@ -153,7 +153,8 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
       const cleaned = cleanMarkdownForSpeech(text);
       const utterance = new SpeechSynthesisUtterance(cleaned);
       utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-      utterance.rate = 0.95;
+      // Brisk, crisp conversational speed (1.18x for English, 1.12x for Hindi)
+      utterance.rate = lang === 'hi' ? 1.12 : 1.18;
       utterance.pitch = 1.0;
 
       // Pick best voice if available

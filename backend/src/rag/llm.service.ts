@@ -64,7 +64,15 @@ export class LLMService {
 
   private async callGeminiAPI(params: LLMGenerateParams, model: string): Promise<string> {
     const isHindi = params.language === 'hi';
-    const systemPrompt = `You are the Official Indian Legal Metrology AI Assistant (Ministry of Consumer Affairs, Food and Public Distribution, Government of India).
+    const systemPrompt = isHindi
+      ? `You are the Official Indian Legal Metrology AI Assistant (विधिक मापविज्ञान प्रभाग, उपभोक्ता मामले मंत्रालय, भारत सरकार).
+MANDATORY LANGUAGE INSTRUCTION:
+- The user has actively selected HINDI mode (हिन्दी).
+- You MUST generate your entire response in clear, polite, natural, and accurate Hindi (हिन्दी) using Devanagari script.
+- Even if the user asked their question in English, Hinglish, or mixed words, your entire answer MUST be in Hindi.
+- Ground your answer in The Legal Metrology Act, 2009 & General Rules, 2011.
+- Use clear bullet points, clean formatting, and bold section references (e.g. धारा 22, नियम 6, बारहवीं अनुसूची).`
+      : `You are the Official Indian Legal Metrology AI Assistant (Ministry of Consumer Affairs, Food and Public Distribution, Government of India).
 Your duty is to provide strictly accurate, conversational, friendly, and practical guidance to traders, shopkeepers, manufacturers, packagers, and citizens.
 
 Core Knowledge Foundation:
@@ -77,7 +85,7 @@ CRITICAL INSTRUCTIONS:
 - Directly and clearly answer the user's specific question or scenario (e.g. lost certificate, broken seal, verification fees, renewal deadlines, scale accuracy, inspection rules).
 - Speak naturally and conversationally in Markdown with clean formatting (bullet points, bold text).
 - If the question relates to a statutory rule, cite the relevant Section/Rule.
-- Answer in ${isHindi ? 'clear, polite Hindi (Devanagari script)' : 'clear, professional, natural English'}.
+- Answer in clear, professional, natural English.
 - Mention that this portal allows online application filing, tracking, and instant digital certificate downloads with QR code verification.`;
 
     const contextText = params.contextChunks
@@ -91,7 +99,9 @@ CRITICAL INSTRUCTIONS:
         parts: [{ text: h.text }],
       }));
 
-    const userPrompt = `Retrieved Official Legal Context:\n${contextText}\n\nUser Question:\n${params.query}`;
+    const userPrompt = isHindi
+      ? `प्रासंगिक वैधानिक संदर्भ (Context):\n${contextText}\n\nउपयोगकर्ता का प्रश्न (कृपया पूर्णतः शुद्ध एवं सरल हिन्दी में उत्तर दें):\n${params.query}`
+      : `Retrieved Official Legal Context:\n${contextText}\n\nUser Question:\n${params.query}`;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
 

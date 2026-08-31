@@ -215,17 +215,37 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                 )}
               </div>
 
-              {/* Language Switcher */}
-              <button
-                onClick={() => {
-                  stopSpeaking();
-                  setLanguage(language === 'en' ? 'hi' : 'en');
-                }}
-                className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-bold text-amber-400 border border-slate-700 transition-colors"
-                title="Toggle Language"
-              >
-                {language === 'en' ? 'हिंदी' : 'EN'}
-              </button>
+              {/* Explicit Segmented Language Switcher */}
+              <div className="flex items-center bg-slate-800 p-0.5 rounded-md border border-slate-700">
+                <button
+                  onClick={() => {
+                    stopSpeaking();
+                    setLanguage('en');
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                    language === 'en'
+                      ? 'bg-indigo-600 text-white shadow'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Switch to English"
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => {
+                    stopSpeaking();
+                    setLanguage('hi');
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                    language === 'hi'
+                      ? 'bg-amber-500 text-slate-950 shadow'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Switch to Hindi (हिन्दी भाषा)"
+                >
+                  हिंदी
+                </button>
+              </div>
 
               {/* Reset Thread */}
               <button

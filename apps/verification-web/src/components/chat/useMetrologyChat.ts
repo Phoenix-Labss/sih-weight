@@ -41,8 +41,18 @@ export function useMetrologyChat(portalContext = 'trader') {
   }, [messages]);
 
   useEffect(() => {
-    chatApi.getSuggestions(portalContext).then(setSuggestions);
-  }, [portalContext]);
+    if (language === 'hi') {
+      setSuggestions([
+        'प्रमाण पत्र खो जाने पर क्या करें?',
+        'यदि मशीन की सील टूट जाए तो क्या करें?',
+        'सत्यापन परीक्षण में कितना समय लगता है?',
+        'सत्यापन हेतु आवश्यक दस्तावेज कौन से हैं?',
+        'काउंटर स्केल का वैधानिक सत्यापन शुल्क कितना है?',
+      ]);
+    } else {
+      chatApi.getSuggestions(portalContext).then(setSuggestions);
+    }
+  }, [portalContext, language]);
 
   const sendMessage = useCallback(
     async (queryText: string) => {

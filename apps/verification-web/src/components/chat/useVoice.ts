@@ -11,6 +11,7 @@ declare global {
 export function useVoice(language: 'en' | 'hi' = 'en') {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -25,16 +26,15 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
     }
   });
 
-  const setSpeechRate = useCallback((rate: number) => {
-    setSpeechRateState(rate);
-    try {
-      localStorage.setItem('emetrology_tts_speed', String(rate));
-    } catch {
-      // ignore
-    }
-  }, []);
-
   const recognitionRef = useRef<any>(null);
+
+  // Position and context refs for live speed switching & resume
+  const currentMsgIdRef = useRef<string | null>(null);
+  const currentFullTextRef = useRef<string>('');
+  const currentLangRef = useRef<'en' | 'hi'>(language);
+  const charOffsetRef = useRef<number>(0);
+  const lastCharIndexRef = useRef<number>(0);
+  const isSwitchingRateRef = useRef<boolean>(false);
 
   useEffect(() => {
     const SpeechRecognition =
@@ -105,7 +105,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
           if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
             setVoiceError('Microphone access was blocked. Please enable microphone permission in your browser address bar.');
           } else if (event.error === 'no-speech') {
-            // Normal timeout when quiet
+            // Normal quiet timeout
           } else if (event.error === 'network') {
             setVoiceError('Voice recognition network timeout. Please check your internet connection.');
           } else if (event.error !== 'aborted') {
@@ -140,7 +140,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
     }
   }, []);
 
-  // 2. Text-to-Speech (TTS) - Voice Output
+  // 2. Text-to-Speech (TTS) Helpers
   const cleanMarkdownForSpeech = (text: string): string => {
     return text
       .replace(/#+\s/g, '') // remove headings
@@ -155,29 +155,33 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
       .trim();
   };
 
-  const speak = useCallback(
-    (msgId: string, text: string, lang: 'en' | 'hi' = language, customRate?: number) => {
+  // Internal utterance spawner from a specified character offset
+  const playUtteranceFromOffset = useCallback(
+    (msgId: string, fullCleanedText: string, offset: number, rate: number, lang: 'en' | 'hi') => {
       if (!window.speechSynthesis) return;
 
-      // If already speaking this message, toggle off
-      if (isSpeaking && speakingMsgId === msgId) {
-        window.speechSynthesis.cancel();
+      const remainingText = offset > 0 ? fullCleanedText.slice(offset).trim() : fullCleanedText;
+      if (!remainingText) {
         setIsSpeaking(false);
+        setIsPaused(false);
         setSpeakingMsgId(null);
+        charOffsetRef.current = 0;
+        lastCharIndexRef.current = 0;
         return;
       }
 
-      window.speechSynthesis.cancel();
+      charOffsetRef.current = offset;
+      lastCharIndexRef.current = offset;
+      currentMsgIdRef.current = msgId;
+      currentFullTextRef.current = fullCleanedText;
+      currentLangRef.current = lang;
 
-      const cleaned = cleanMarkdownForSpeech(text);
-      const utterance = new SpeechSynthesisUtterance(cleaned);
+      const utterance = new SpeechSynthesisUtterance(remainingText);
       utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-      
-      const effectiveRate = customRate ?? speechRate;
-      utterance.rate = effectiveRate;
+      utterance.rate = rate;
       utterance.pitch = 1.0;
 
-      // Pick best voice if available
+      // Pick voice
       const voices = window.speechSynthesis.getVoices();
       const matchedVoice = voices.find(
         (v) =>
@@ -188,31 +192,118 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
         utterance.voice = matchedVoice;
       }
 
+      utterance.onboundary = (event: any) => {
+        if (typeof event.charIndex === 'number') {
+          lastCharIndexRef.current = charOffsetRef.current + event.charIndex;
+        }
+      };
+
       utterance.onstart = () => {
         setIsSpeaking(true);
+        setIsPaused(false);
         setSpeakingMsgId(msgId);
       };
 
       utterance.onend = () => {
+        if (isSwitchingRateRef.current) {
+          // Ignore synthetic onend triggered by rate switch cancel
+          return;
+        }
         setIsSpeaking(false);
+        setIsPaused(false);
         setSpeakingMsgId(null);
+        charOffsetRef.current = 0;
+        lastCharIndexRef.current = 0;
       };
 
-      utterance.onerror = () => {
+      utterance.onerror = (e: any) => {
+        if (isSwitchingRateRef.current || e.error === 'interrupted' || e.error === 'canceled') {
+          return;
+        }
         setIsSpeaking(false);
+        setIsPaused(false);
         setSpeakingMsgId(null);
+        charOffsetRef.current = 0;
+        lastCharIndexRef.current = 0;
       };
 
       window.speechSynthesis.speak(utterance);
     },
-    [isSpeaking, speakingMsgId, language, speechRate]
+    []
+  );
+
+  // Speak / Pause / Resume with exact position memory
+  const speak = useCallback(
+    (msgId: string, text: string, lang: 'en' | 'hi' = language) => {
+      if (!window.speechSynthesis) return;
+
+      const cleaned = cleanMarkdownForSpeech(text);
+
+      // If already speaking this message, pause / stop it at current position
+      if (isSpeaking && speakingMsgId === msgId) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        setIsPaused(true);
+        // lastCharIndexRef retains the exact character where we stopped
+        return;
+      }
+
+      // If resuming previously paused message
+      if (isPaused && speakingMsgId === msgId && currentMsgIdRef.current === msgId) {
+        const resumeIndex = lastCharIndexRef.current;
+        playUtteranceFromOffset(msgId, cleaned, resumeIndex, speechRate, lang);
+        return;
+      }
+
+      // New playback or different message: start fresh
+      window.speechSynthesis.cancel();
+      lastCharIndexRef.current = 0;
+      charOffsetRef.current = 0;
+      playUtteranceFromOffset(msgId, cleaned, 0, speechRate, lang);
+    },
+    [isSpeaking, isPaused, speakingMsgId, language, speechRate, playUtteranceFromOffset]
+  );
+
+  // Live on-the-fly speech rate changer without starting over
+  const setSpeechRate = useCallback(
+    (newRate: number) => {
+      setSpeechRateState(newRate);
+      try {
+        localStorage.setItem('emetrology_tts_speed', String(newRate));
+      } catch {
+        // ignore
+      }
+
+      // If currently speaking, seamlessly continue at new speed from exact current character!
+      if (window.speechSynthesis && (isSpeaking || isPaused) && currentMsgIdRef.current) {
+        const activeMsgId = currentMsgIdRef.current;
+        const fullText = currentFullTextRef.current;
+        const currentPos = lastCharIndexRef.current;
+        const activeLang = currentLangRef.current;
+
+        if (isSpeaking) {
+          isSwitchingRateRef.current = true;
+          window.speechSynthesis.cancel();
+
+          // Small microtask to let browser cleanup cancel before re-dispatching
+          setTimeout(() => {
+            isSwitchingRateRef.current = false;
+            playUtteranceFromOffset(activeMsgId, fullText, currentPos, newRate, activeLang);
+          }, 40);
+        }
+      }
+    },
+    [isSpeaking, isPaused, playUtteranceFromOffset]
   );
 
   const stopSpeaking = useCallback(() => {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
+      setIsPaused(false);
       setSpeakingMsgId(null);
+      charOffsetRef.current = 0;
+      lastCharIndexRef.current = 0;
     }
   }, []);
 
@@ -235,6 +326,7 @@ export function useVoice(language: 'en' | 'hi' = 'en') {
   return {
     isListening,
     isSpeaking,
+    isPaused,
     speakingMsgId,
     speechRate,
     setSpeechRate,

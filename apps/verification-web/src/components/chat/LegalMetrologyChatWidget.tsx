@@ -19,6 +19,8 @@ import {
   MicOff,
   Volume2,
   VolumeX,
+  Play,
+  Pause,
   AlertTriangle,
   Gauge,
 } from 'lucide-react';
@@ -55,6 +57,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
   const {
     isListening,
     isSpeaking,
+    isPaused,
     speakingMsgId,
     speechRate,
     setSpeechRate,
@@ -333,15 +336,28 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                             onClick={() => speak(msg.id, msg.text, language)}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
                               isCurrentSpeaking
-                                ? 'bg-amber-500 text-slate-950 font-bold animate-pulse'
+                                ? 'bg-amber-500 text-slate-950 font-bold animate-pulse shadow'
+                                : isPaused && speakingMsgId === msg.id
+                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-400/40'
                                 : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                             }`}
-                            title={isCurrentSpeaking ? 'Stop voice readout' : 'Listen to this answer'}
+                            title={
+                              isCurrentSpeaking
+                                ? 'Pause voice (रोकें)'
+                                : isPaused && speakingMsgId === msg.id
+                                ? `Resume voice from stopped point at ${speechRate}x`
+                                : `Listen to answer at ${speechRate}x`
+                            }
                           >
                             {isCurrentSpeaking ? (
                               <>
-                                <VolumeX className="w-3.5 h-3.5" />
-                                <span>Stop Voice</span>
+                                <Pause className="w-3.5 h-3.5" />
+                                <span>Pause</span>
+                              </>
+                            ) : isPaused && speakingMsgId === msg.id ? (
+                              <>
+                                <Play className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                                <span>Resume ({speechRate}x)</span>
                               </>
                             ) : (
                               <>

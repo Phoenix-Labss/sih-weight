@@ -14,67 +14,71 @@ export interface LLMResponse {
 
 export class LLMService {
   private geminiApiKey: string | null = null;
-  private modelName: string = 'gemini-1.5-flash';
+  private candidateModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 
   constructor() {
     const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;
-    if (rawKey && !rawKey.includes('your-key') && rawKey.startsWith('AIza')) {
-      this.geminiApiKey = rawKey;
+    if (rawKey && rawKey.trim().length > 10 && !rawKey.includes('your-key-here')) {
+      this.geminiApiKey = rawKey.trim();
     }
   }
 
   public setApiKey(key: string) {
-    this.geminiApiKey = key;
+    this.geminiApiKey = key.trim();
   }
 
   public hasApiKey(): boolean {
     return Boolean(
       this.geminiApiKey &&
-        this.geminiApiKey.trim().length > 10 &&
-        this.geminiApiKey.startsWith('AIza')
+        this.geminiApiKey.length > 10 &&
+        !this.geminiApiKey.includes('your-key-here')
     );
   }
 
   public async generateAnswer(params: LLMGenerateParams): Promise<LLMResponse> {
     if (this.hasApiKey()) {
-      try {
-        const geminiAnswer = await this.callGeminiAPI(params);
-        if (geminiAnswer && geminiAnswer.trim().length > 20) {
-          return {
-            answer: geminiAnswer,
-            provider: 'GEMINI_API',
-          };
+      for (const model of this.candidateModels) {
+        try {
+          const geminiAnswer = await this.callGeminiAPI(params, model);
+          if (geminiAnswer && geminiAnswer.trim().length > 15) {
+            return {
+              answer: geminiAnswer.trim(),
+              provider: 'GEMINI_API',
+            };
+          }
+        } catch (err: any) {
+          console.warn(`[LLMService] Attempt with model ${model} failed:`, err?.message || err);
         }
-      } catch (err: any) {
-        // Fall back gracefully
       }
     }
 
-    // Local deterministic statutory synthesis
+    // Local deterministic statutory fallback if all cloud models are unavailable
     return {
       answer: this.synthesizeLocalAnswer(params),
       provider: 'LOCAL_STATUTORY_RAG',
     };
   }
 
-  private async callGeminiAPI(params: LLMGenerateParams): Promise<string> {
+  private async callGeminiAPI(params: LLMGenerateParams, model: string): Promise<string> {
     const isHindi = params.language === 'hi';
-    const systemPrompt = `You are the Official Indian Legal Metrology AI Assistant (Government of India).
-Your duty is to provide strictly accurate, professional, conversational, and direct guidance to traders, manufacturers, packagers, and citizens regarding:
+    const systemPrompt = `You are the Official Indian Legal Metrology AI Assistant (Ministry of Consumer Affairs, Food and Public Distribution, Government of India).
+Your duty is to provide strictly accurate, conversational, friendly, and practical guidance to traders, shopkeepers, manufacturers, packagers, and citizens.
+
+Core Knowledge Foundation:
 1. The Legal Metrology Act, 2009 (Sections 1-57)
 2. Legal Metrology (General) Rules, 2011 (Verification, NAWI/AWI classes, MPE error tolerances, Stamping, Fees)
 3. Legal Metrology (Packaged Commodities) Rules, 2011 (Mandatory declarations, Net weight MPE, MRP rules)
 4. Model Approval (Section 22), GATC Lab Testing (Section 19), and Portal Procedures.
 
-CRITICAL RULES:
-- Directly and clearly answer the user's specific scenario or question.
-- Base your answers strictly on the provided Context Chunks.
-- Explicitly cite the statutory Sections and Rules (e.g. "Under Section 24 of the Legal Metrology Act, 2009...").
-- Answer in ${isHindi ? 'clear, polite Hindi (Devanagari script)' : 'clear, concise, natural English'}.
-- Format with clean Markdown (bullet points, bold text).`;
+CRITICAL INSTRUCTIONS:
+- Directly and clearly answer the user's specific question or scenario (e.g. lost certificate, broken seal, verification fees, renewal deadlines, scale accuracy, inspection rules).
+- Speak naturally and conversationally in Markdown with clean formatting (bullet points, bold text).
+- If the question relates to a statutory rule, cite the relevant Section/Rule.
+- Answer in ${isHindi ? 'clear, polite Hindi (Devanagari script)' : 'clear, professional, natural English'}.
+- Mention that this portal allows online application filing, tracking, and instant digital certificate downloads with QR code verification.`;
 
     const contextText = params.contextChunks
-      .map((c, i) => `[Source ${i + 1}: ${c.act_or_rule} - ${c.section_rule_ref}] (${c.title})\n${c.snippet}`)
+      .map((c, i) => `[Statutory Reference ${i + 1}: ${c.act_or_rule} - ${c.section_rule_ref}] (${c.title})\n${c.snippet}`)
       .join('\n\n');
 
     const conversationHistory = (params.history || [])
@@ -84,9 +88,9 @@ CRITICAL RULES:
         parts: [{ text: h.text }],
       }));
 
-    const userPrompt = `Context Chunks from Official Acts & Rules:\n${contextText}\n\nUser Question: ${params.query}`;
+    const userPrompt = `Retrieved Official Legal Context:\n${contextText}\n\nUser Question:\n${params.query}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelName}:generateContent?key=${this.geminiApiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -97,20 +101,21 @@ CRITICAL RULES:
           { role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] },
         ],
         generationConfig: {
-          temperature: 0.2,
+          temperature: 0.3,
           maxOutputTokens: 1024,
         },
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini API HTTP Error ${response.status}: ${await response.text()}`);
+      const errText = await response.text();
+      throw new Error(`HTTP ${response.status} from ${model}: ${errText}`);
     }
 
     const data: any = await response.json();
     const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!candidate) {
-      throw new Error('Empty response part from Gemini API');
+      throw new Error('No candidate text received from Gemini');
     }
     return candidate;
   }

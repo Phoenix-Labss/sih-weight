@@ -598,8 +598,8 @@ export async function seedDatabase() {
   for (const m of models) {
     await prisma.instrumentModel.upsert({
       where: { model_id: m.model_id },
-      update: m,
-      create: m,
+      update: m as any,
+      create: m as any,
     });
   }
   console.log(`✓ Seeded ${models.length} Government-Approved Models`);

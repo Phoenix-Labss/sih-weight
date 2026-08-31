@@ -362,7 +362,7 @@ export class AdminService {
 
     if (payload.role === 'LMO' || payload.role === 'SUPERVISOR' || payload.role === 'CONTROLLER') {
       const jurId = payload.jurisdiction_id || 'jur-dl-01';
-      await prisma.lmoProfile.create({
+      await prisma.lMOProfile.create({
         data: {
           user_id: user.user_id,
           tenant_id: tenantId,
@@ -446,7 +446,7 @@ export class AdminService {
     const validFrom = payload.valid_from ? new Date(payload.valid_from) : new Date();
     const validTo = payload.valid_to ? new Date(payload.valid_to) : new Date(Date.now() + 3 * 365 * 24 * 3600 * 1000);
 
-    const gatc = await prisma.gatcProfile.create({
+    const gatc = await prisma.gATCProfile.create({
       data: {
         tenant_id: tenantId,
         facility_id: facility.facility_id,
@@ -620,7 +620,7 @@ export class AdminService {
   }
 
   async listGATCCentres(tenantId = 'tenant-delhi-central') {
-    return prisma.gatcProfile.findMany({
+    return prisma.gATCProfile.findMany({
       where: { tenant_id: tenantId },
       include: { facility: true },
       orderBy: { created_at: 'desc' },

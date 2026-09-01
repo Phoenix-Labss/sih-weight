@@ -27,8 +27,8 @@ const ROLE_TABS: Record<string, TabId[]> = {
   APPLICANT: ['trader', 'public'],
   LMO: ['officer', 'public'],
   GATC_VERIFIER: ['gatc', 'public'],
-  SUPERVISOR: ['supervisor', 'admin', 'gatc', 'public'],
-  CONTROLLER: ['admin', 'supervisor', 'gatc', 'public'],
+  SUPERVISOR: ['supervisor', 'admin', 'public'],
+  CONTROLLER: ['admin', 'supervisor', 'public'],
   ADMIN: ['admin', 'trader', 'officer', 'supervisor', 'gatc', 'migration', 'public'],
 };
 
@@ -61,7 +61,7 @@ function defaultTab(role: RoleType): TabId {
 const AppContent: React.FC = () => {
   const { session, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('trader');
-  const [publicToken, setPublicToken] = useState<string>('TOKEN_VALID_2026');
+  const [publicToken, setPublicToken] = useState<string>('');
 
   // When session loads, set default tab for the role
   useEffect(() => {
@@ -100,21 +100,31 @@ const AppContent: React.FC = () => {
         if (token) {
           setPublicToken(decodeURIComponent(token));
           setActiveTab('public');
+          return;
         }
-      } else if (cleanHash === '#officer') {
-        setActiveTab('officer');
-      } else if (cleanHash === '#trader') {
-        setActiveTab('trader');
-      } else if (cleanHash === '#supervisor') {
-        setActiveTab('supervisor');
-      } else if (cleanHash === '#gatc') {
-        setActiveTab('gatc');
-      } else if (cleanHash === '#migration') {
-        setActiveTab('migration');
-      } else if (cleanHash === '#public' || cleanHash === '#/public') {
-        setActiveTab('public');
-      } else if (cleanHash === '#login' || cleanHash === '#home' || cleanHash === '') {
-        setActiveTab('trader');
+      }
+
+      let targetTab: TabId | null = null;
+      if (cleanHash === '#officer') targetTab = 'officer';
+      else if (cleanHash === '#trader') targetTab = 'trader';
+      else if (cleanHash === '#supervisor') targetTab = 'supervisor';
+      else if (cleanHash === '#gatc') targetTab = 'gatc';
+      else if (cleanHash === '#migration') targetTab = 'migration';
+      else if (cleanHash === '#admin') targetTab = 'admin';
+      else if (cleanHash === '#public' || cleanHash === '#/public') targetTab = 'public';
+      else if (cleanHash === '#login' || cleanHash === '#home' || cleanHash === '') targetTab = 'trader';
+
+      if (targetTab) {
+        if (session) {
+          const allowed = allowedTabs(session.user.actorRole);
+          if (allowed.includes(targetTab) || targetTab === 'public') {
+            setActiveTab(targetTab);
+          } else {
+            setActiveTab(defaultTab(session.user.actorRole));
+          }
+        } else {
+          setActiveTab(targetTab);
+        }
       }
     };
 
@@ -125,12 +135,18 @@ const AppContent: React.FC = () => {
       window.removeEventListener('hashchange', handleNavigation);
       window.removeEventListener('popstate', handleNavigation);
     };
-  }, []);
+  }, [session]);
 
   const handleTabChange = (tab: TabId) => {
+    if (session) {
+      const allowed = allowedTabs(session.user.actorRole);
+      if (!allowed.includes(tab) && tab !== 'public') {
+        tab = defaultTab(session.user.actorRole);
+      }
+    }
     setActiveTab(tab);
     if (tab === 'public') {
-      window.location.hash = '#public?token=' + encodeURIComponent(publicToken);
+      window.location.hash = publicToken ? '#public?token=' + encodeURIComponent(publicToken) : '#public';
     } else {
       window.location.hash = '#' + tab;
     }

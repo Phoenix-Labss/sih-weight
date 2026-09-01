@@ -122,4 +122,21 @@ export interface Application {
   fee_assessment?: FeeAssessment;
   created_at?: string;
   updated_at?: string;
+  applicant?: {
+    legal_name?: string;
+    trade_name?: string;
+    phone?: string;
+    email?: string;
+  };
+  instrument?: {
+    instrument_id?: string;
+    serial_number?: string;
+    model?: {
+      category?: string;
+      model_name?: string;
+      accuracy_class?: string;
+      max_capacity?: number | string;
+      capacity_unit?: string;
+    };
+  };
 }

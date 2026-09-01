@@ -8,14 +8,12 @@ import {
   LogOut,
   Menu,
   X,
-  RotateCcw,
   Shield,
   User,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../i18n';
 import { TabId } from '../../App';
-import { api } from '../../api/client';
 
 interface NavbarProps {
   activeTab: TabId;
@@ -131,21 +129,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, allowed
               </div>
             </div>
 
-            {/* Reset Data Button */}
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm('Reset all demo & verification data back to a completely clean slate?')) {
-                  api.system.resetAllData();
-                }
-              }}
-              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-300 transition-colors cursor-pointer"
-              title="Wipe mock database and reset to clean state"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-              <span>Reset Data</span>
-            </button>
-
             {/* Sign Out Button */}
             <button
               type="button"
@@ -239,17 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, allowed
           ))}
           <div className="pt-2 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
             <span>{user?.actorName} ({user?.actorRole})</span>
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm('Reset all demo & verification data back to a clean slate?')) {
-                  api.system.resetAllData();
-                }
-              }}
-              className="text-amber-400 hover:underline"
-            >
-              Reset Data
-            </button>
+            <span className="text-slate-500 font-mono text-[11px]">Official Session</span>
           </div>
         </div>
       )}

@@ -469,7 +469,16 @@ export const TraderDashboard: React.FC = () => {
         isOpen={isSchedulerModalOpen}
         onClose={() => setIsSchedulerModalOpen(false)}
         application={selectedAppForSchedule}
-        onScheduled={() => {
+        onScheduled={(updated) => {
+          if (updated) {
+            setApplications((prev) =>
+              prev.map((a) =>
+                a.application_id === updated.application_id || a.application_number === updated.application_number
+                  ? { ...a, ...updated }
+                  : a
+              )
+            );
+          }
           loadData();
         }}
       />

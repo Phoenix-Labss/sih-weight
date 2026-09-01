@@ -313,6 +313,22 @@ describe('Auth Suite', () => {
         payload: {},
       });
       expect(resOtpRoot.statusCode).toBe(422);
+
+      // 5. //api/v1/auth/register (double leading slash) returns 422 validation rather than 404
+      const resDoubleSlash = await app.inject({
+        method: 'POST',
+        url: '//api/v1/auth/register',
+        payload: {},
+      });
+      expect(resDoubleSlash.statusCode).toBe(422);
+
+      // 6. //api/v1/auth/verify-otp (double leading slash) returns 422 validation rather than 404
+      const resOtpDoubleSlash = await app.inject({
+        method: 'POST',
+        url: '//api/v1/auth/verify-otp',
+        payload: {},
+      });
+      expect(resOtpDoubleSlash.statusCode).toBe(422);
     });
   });
 });

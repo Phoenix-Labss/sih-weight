@@ -7,8 +7,16 @@ export interface AppConfig {
   PORTAL_VERSION: string;
 }
 
+function normalizeApiBaseUrl(raw?: string): string {
+  if (!raw) return 'http://localhost:8000/api/v1';
+  let url = raw.trim();
+  url = url.replace(/([^:])\/{2,}/g, '$1/');
+  url = url.replace(/\/+$/, '');
+  return url;
+}
+
 export const env: AppConfig = {
-  API_BASE_URL: (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:8000/api/v1',
+  API_BASE_URL: normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL as string),
   API_MODE: (import.meta.env.VITE_API_MODE as 'mock' | 'api' | 'auto') || 'auto',
   DEFAULT_TENANT_ID: (import.meta.env.VITE_DEFAULT_TENANT_ID as string) || 'tenant-delhi-central',
   DEFAULT_JURISDICTION_ID: (import.meta.env.VITE_DEFAULT_JURISDICTION_ID as string) || 'jur-dl-01',

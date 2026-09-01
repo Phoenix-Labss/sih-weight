@@ -23,6 +23,10 @@ import { chatRoutes } from './routes/chat.routes.js';
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: false,
+    rewriteUrl(req) {
+      if (!req.url) return '/';
+      return req.url.replace(/\/{2,}/g, '/');
+    },
     routerOptions: {
       ignoreTrailingSlash: true,
     },

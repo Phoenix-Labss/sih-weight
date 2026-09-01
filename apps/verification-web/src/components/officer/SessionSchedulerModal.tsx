@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal } from '../common/Modal';
 import { Application, ApplicationScheduleRequest } from '../../types/application';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { api } from '../../api/client';
 import { mockApplicationService } from '../../api/mock/mockService';
 import { DynamicSlotPicker } from '../common/DynamicSlotPicker';
-import { Calendar, UserCheck, ShieldCheck, MapPin, Building } from 'lucide-react';
+import { Calendar, UserCheck, ShieldCheck, Building, X } from 'lucide-react';
 
 interface SessionSchedulerModalProps {
   isOpen: boolean;
@@ -36,6 +35,9 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlotCounts, setBookedSlotCounts] = useState<Record<string, number>>({});
   const [jurisdictionName, setJurisdictionName] = useState<string>('Central Delhi Zone (JUR-DL-01)');
+
+  const titleId = React.useId();
+  const subtitleId = React.useId();
 
   const isOfficer =
     user.actorRole === 'LMO' ||
@@ -73,7 +75,7 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
     fetchAvailability();
   }, [isOpen, application, scheduledDate, user.tenantId]);
 
-  if (!application) return null;
+  if (!isOpen || !application) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,108 +127,161 @@ export const SessionSchedulerModal: React.FC<SessionSchedulerModalProps> = ({
   const minDateStr = minDate.toISOString().split('T')[0];
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isOfficer ? "Allocate Departmental Inspection Slot" : "Schedule Inspection & Verification Slot"}
-      subtitle={`Application: ${application.application_number} • ${application.service_mode.replace(/_/g, ' ')}`}
-      maxWidth="2xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Jurisdiction & Service Mode Card */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5">
-            <Building className="w-4 h-4 text-gov-navy shrink-0" />
-            <div>
-              <div className="font-bold text-gov-navy">{jurisdictionName}</div>
-              <div className="text-xs text-slate-500">Service Mode: {application.service_mode.replace(/_/g, ' ')}</div>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#0B192C]/60 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in">
+      <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={subtitleId}
+        className="animate-modal-in relative z-10 w-full sm:max-w-2xl max-h-[94vh] sm:max-h-[88vh] flex flex-col bg-white border border-[#CBD5E1] shadow-overlay rounded-t-xl sm:rounded-lg overflow-hidden"
+      >
+        {/* ── Header ── */}
+        <div className="shrink-0 border-b border-[#CBD5E1] bg-white px-5 pt-4 pb-3.5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 id={titleId} className="text-[22px] leading-snug font-bold text-[#12324A]">
+                {isOfficer
+                  ? 'Allocate Departmental Inspection Slot'
+                  : 'Schedule Inspection & Verification Slot'}
+              </h2>
+              <p id={subtitleId} className="mt-0.5 text-[13px] text-[#172B4D]/60">
+                Application:{' '}
+                <span className="font-semibold text-[#172B4D]/85">
+                  {application.application_number}
+                </span>
+                <span className="mx-1.5 text-[#94A3B8]">•</span>
+                {application.service_mode.replace(/_/g, ' ')}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="shrink-0 rounded p-1.5 text-[#172B4D]/40 transition-colors hover:bg-[#F5F7FA] hover:text-[#172B4D] cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="mt-3 h-0.5 w-10 bg-[#F4B41A]" aria-hidden="true" />
+        </div>
+
+        {/* ── Body (scrollable) ── */}
+        <form
+          id="slot-allocation-form"
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto px-5 py-4 space-y-5"
+        >
+          {/* Jurisdiction & Service Mode — compact information strip */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-y border-[#CBD5E1] bg-[#F5F7FA] px-3.5 py-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Building className="w-4 h-4 text-[#1E4FA3] shrink-0" />
+              <div className="min-w-0">
+                <div className="text-[14px] font-semibold text-[#12324A] leading-snug truncate">
+                  {jurisdictionName}
+                </div>
+                <div className="text-[12px] text-[#172B4D]/60 leading-snug">
+                  Service Mode: {application.service_mode.replace(/_/g, ' ')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 self-start sm:self-center px-2 py-0.5 rounded border border-emerald-200 bg-emerald-50 text-[12px] font-semibold text-[#15803D] shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Statutory Fee Reconciled</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold shrink-0">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Statutory Fee Reconciled</span>
-          </div>
-        </div>
 
-        {/* Date Selection */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            1. Select Inspection Date *
-          </label>
-          <div className="relative">
-            <input
-              type="date"
-              required
-              min={minDateStr}
-              value={scheduledDate}
-              onChange={(e) => setScheduledDate(e.target.value)}
-              className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 pl-9 focus:ring-2 focus:ring-gov-blue bg-white font-medium"
-            />
-            <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Dynamic Slot Selection (09:00 - 19:00, 2 hr windows) */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            2. Choose 2-Hour Time Window (Live Area Fleet Capacity) *
-          </label>
-          <DynamicSlotPicker
-            selectedSlot={selectedSlot}
-            onSelectSlot={(slot) => setSelectedSlot(slot)}
-            selectedDate={scheduledDate}
-            jurisdictionName={jurisdictionName}
-            totalFleetSize={10}
-            bookedSlotCounts={bookedSlotCounts}
-          />
-        </div>
-
-        {/* Officer Assignment (For LMO/Officer view) */}
-        {isOfficer ? (
+          {/* Step 1 — Inspection Date */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              3. Assign Inspecting Officer / Verifier *
+            <label
+              htmlFor="inspection-date"
+              className="block text-sm font-semibold uppercase tracking-wide text-[#12324A] mb-1.5"
+            >
+              1. Select Inspection Date <span className="text-[#B91C1C]">*</span>
             </label>
             <div className="relative">
-              <select
-                value={assignedOfficer}
-                onChange={(e) => setAssignedOfficer(e.target.value)}
-                className="w-full text-xs rounded-lg border border-slate-300 px-3 py-2 pl-9 bg-white focus:ring-2 focus:ring-gov-blue"
-              >
-                <option value="lmo-officer-01">Inspector Amit Sharma (LMO Central Zone)</option>
-                <option value="lmo-officer-02">Inspector Rajesh Verma (LMO North Zone)</option>
-                <option value="gatc-verifier-01">Dr. Priya Nair (GATC Technical Lead)</option>
-              </select>
-              <UserCheck className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+              <input
+                id="inspection-date"
+                type="date"
+                required
+                min={minDateStr}
+                value={scheduledDate}
+                onChange={(e) => setScheduledDate(e.target.value)}
+                className="w-full h-10 rounded-md border border-[#CBD5E1] bg-white px-3 pl-9 text-sm font-medium text-[#172B4D] focus:outline-none focus:border-[#1E4FA3] focus:ring-2 focus:ring-[#1E4FA3]/15 transition-colors"
+              />
+              <Calendar className="w-4 h-4 text-[#172B4D]/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
-        ) : (
-          <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-gov-blue shrink-0" />
-            <span>
-              An authorized Legal Metrology Officer from <strong>{jurisdictionName}</strong> will be automatically allocated for this time window.
-            </span>
-          </div>
-        )}
 
-        {/* Actions */}
-        <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
+          {/* Step 2 — Time Window (dynamic slot picker) */}
+          <div>
+            <div className="block text-sm font-semibold uppercase tracking-wide text-[#12324A] mb-1.5">
+              2. Choose 2-Hour Time Window (Live Area Fleet Capacity){' '}
+              <span className="text-[#B91C1C]">*</span>
+            </div>
+            <DynamicSlotPicker
+              selectedSlot={selectedSlot}
+              onSelectSlot={(slot) => setSelectedSlot(slot)}
+              selectedDate={scheduledDate}
+              jurisdictionName={jurisdictionName}
+              totalFleetSize={10}
+              bookedSlotCounts={bookedSlotCounts}
+            />
+          </div>
+
+          {/* Step 3 — Officer Assignment (For LMO/Officer view) */}
+          {isOfficer ? (
+            <div>
+              <label
+                htmlFor="inspecting-officer"
+                className="block text-sm font-semibold uppercase tracking-wide text-[#12324A] mb-1.5"
+              >
+                3. Assign Inspecting Officer / Verifier <span className="text-[#B91C1C]">*</span>
+              </label>
+              <div className="relative">
+                <select
+                  id="inspecting-officer"
+                  value={assignedOfficer}
+                  onChange={(e) => setAssignedOfficer(e.target.value)}
+                  className="w-full h-10 rounded-md border border-[#CBD5E1] bg-white px-3 pl-9 text-sm font-medium text-[#172B4D] focus:outline-none focus:border-[#1E4FA3] focus:ring-2 focus:ring-[#1E4FA3]/15 transition-colors"
+                >
+                  <option value="lmo-officer-01">Inspector Amit Sharma (LMO Central Zone)</option>
+                  <option value="lmo-officer-02">Inspector Rajesh Verma (LMO North Zone)</option>
+                  <option value="gatc-verifier-01">Dr. Priya Nair (GATC Technical Lead)</option>
+                </select>
+                <UserCheck className="w-4 h-4 text-[#172B4D]/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2.5 border border-[#CBD5E1] bg-[#F5F7FA] rounded-md p-3 text-[13px] text-[#172B4D]">
+              <ShieldCheck className="w-4 h-4 text-[#1E4FA3] shrink-0 mt-0.5" />
+              <span>
+                An authorized Legal Metrology Officer from{' '}
+                <strong className="font-semibold text-[#12324A]">{jurisdictionName}</strong> will
+                be automatically allocated for this time window.
+              </span>
+            </div>
+          )}
+        </form>
+
+        {/* ── Footer (fixed action bar) ── */}
+        <div className="shrink-0 border-t border-[#CBD5E1] bg-[#F5F7FA] px-5 py-3 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            className="h-9 px-4 rounded-md border border-[#CBD5E1] bg-white text-[13px] font-semibold text-[#172B4D]/80 hover:border-[#94A3B8] transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
+            form="slot-allocation-form"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-lg bg-gov-blue text-xs font-bold text-white shadow-card hover:bg-blue-800 transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-9 px-5 rounded-md bg-[#1E4FA3] text-[13px] font-bold text-white hover:bg-[#12324A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? 'Confirming Slot...' : 'Confirm & Schedule Appointment'}
           </button>
         </div>
-      </form>
-    </Modal>
+      </div>
+    </div>
   );
 };

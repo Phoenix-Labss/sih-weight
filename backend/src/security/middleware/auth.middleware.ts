@@ -53,7 +53,9 @@ export async function authMiddleware(request: FastifyRequest, _reply: FastifyRep
 
   // 1. Bearer JWT
   const token = bearerToken(request);
-  const secret = process.env.JWT_SECRET_KEY;
+  const secret =
+    process.env.JWT_SECRET_KEY ||
+    (process.env.NODE_ENV !== 'production' ? 'dev-fallback-jwt-secret-for-testing-only' : undefined);
   if (token && secret) {
     try {
       const claims = verifyAccessToken(token, secret);
@@ -73,7 +75,9 @@ export async function authMiddleware(request: FastifyRequest, _reply: FastifyRep
     }
   }
 
-  const allowDevHeaders = process.env.ALLOW_DEV_HEADERS !== 'false' && process.env.NODE_ENV !== 'production';
+  // In production, developer headers are strictly forbidden under all circumstances
+  const isProduction = process.env.NODE_ENV === 'production';
+  const allowDevHeaders = !isProduction && process.env.ALLOW_DEV_HEADERS !== 'false';
   if (!allowDevHeaders) {
     request.securityContext = { ...ANONYMOUS };
     return;

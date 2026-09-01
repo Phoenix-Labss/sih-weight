@@ -23,6 +23,13 @@ import { chatRoutes } from './routes/chat.routes.js';
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: false,
+    rewriteUrl(req) {
+      if (!req.url) return '/';
+      return req.url.replace(/\/{2,}/g, '/');
+    },
+    routerOptions: {
+      ignoreTrailingSlash: true,
+    },
     ...opts,
   });
 
@@ -33,8 +40,37 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   });
 
   // 2. Cross-Origin Resource Sharing (CORS)
+  const isProduction = process.env.NODE_ENV === 'production';
+  const configuredOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.ADMIN_URL,
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
+  ]
+    .filter(Boolean)
+    .flatMap((url) => (url as string).split(','))
+    .map((url) => url.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
   await app.register(cors, {
-    origin: true,
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server, health checks)
+      if (!origin) {
+        return cb(null, true);
+      }
+      // In development/testing, allow all local origins
+      if (!isProduction) {
+        return cb(null, true);
+      }
+      // In production, enforce configured frontend origins
+      const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+      if (configuredOrigins.length === 0) {
+        return cb(null, true);
+      }
+      if (configuredOrigins.includes(normalizedOrigin)) {
+        return cb(null, true);
+      }
+      return cb(new Error(`Origin '${origin}' not allowed by CORS policy.`), false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: [
@@ -117,7 +153,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     { prefix: '/api/v1' }
   );
 
-  // 8. Register Root Scanner & Certificate Aliases
+  // 8. Register Root Scanner, Auth & Certificate Aliases
+  await app.register(authRoutes);
   await app.register(publicRoutes);
   await app.register(certificateRoutes);
 

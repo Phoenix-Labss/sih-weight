@@ -1,3 +1,4 @@
+import { PhysicalStampAction } from '@prisma/client';
 import { prisma } from '../db/prisma.js';
 import { NotFoundError, ValidationError } from '../core/errors.js';
 import { SecurityContext, PhysicalSealActionEnum, SealTypeEnum } from '../core/types.js';
@@ -85,10 +86,10 @@ export class StampService {
       orderBy: { action_timestamp: 'desc' },
     });
 
-    return raw.map((s) => this.formatStamp(s));
+    return (raw as PhysicalStampAction[]).map((s: PhysicalStampAction) => this.formatStamp(s));
   }
 
-  public formatStamp(s: any): any {
+  public formatStamp(s: PhysicalStampAction | any): any {
     return {
       stamp_action_id: s.stamp_action_id,
       tenant_id: s.tenant_id,

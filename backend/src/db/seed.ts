@@ -880,7 +880,7 @@ export async function seedDatabase() {
   console.log('Legal Metrology DB seeding complete.');
 }
 
-if (import.meta.url.endsWith(process.argv[1])) {
+if (process.argv[1]?.includes('seed')) {
   seedDatabase()
     .catch((e) => {
       console.error(e);

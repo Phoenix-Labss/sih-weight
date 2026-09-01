@@ -175,7 +175,10 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const token = bearerToken(request);
     if (!token) throw new ValidationError('Access token missing');
     const { verifyAccessToken } = await import('./token.js');
-    const claims = verifyAccessToken(token, process.env.JWT_SECRET_KEY || '');
+    const secret =
+      process.env.JWT_SECRET_KEY ||
+      (process.env.NODE_ENV !== 'production' ? 'dev-fallback-jwt-secret-for-testing-only' : '');
+    const claims = verifyAccessToken(token, secret);
     return { user: await authService.me(claims.sub) };
   });
 
@@ -184,7 +187,10 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const token = bearerToken(request);
     if (!token) throw new ValidationError('Access token missing');
     const { verifyAccessToken } = await import('./token.js');
-    const claims = verifyAccessToken(token, process.env.JWT_SECRET_KEY || '');
+    const secret =
+      process.env.JWT_SECRET_KEY ||
+      (process.env.NODE_ENV !== 'production' ? 'dev-fallback-jwt-secret-for-testing-only' : '');
+    const claims = verifyAccessToken(token, secret);
     await authService.changePassword(claims.sub, request.body?.current_password || '', request.body?.new_password || '');
     return { ok: true };
   });

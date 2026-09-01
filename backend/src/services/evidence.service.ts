@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { Buffer } from 'node:buffer';
 import { ValidationError, SecurityViolationError, NotFoundError } from '../core/errors.js';
 import { SecurityContext } from '../core/types.js';
 

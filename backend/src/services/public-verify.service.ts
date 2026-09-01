@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { prisma } from '../db/prisma.js';
 import { NotFoundError } from '../core/errors.js';
 import { hsmDscProvider } from '../security/hsm-dsc.provider.js';

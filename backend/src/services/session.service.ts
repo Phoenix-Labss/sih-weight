@@ -1,9 +1,18 @@
+import { Prisma, ReferenceStandard } from '@prisma/client';
 import { prisma } from '../db/prisma.js';
 import { NotFoundError, ValidationError, GuardConditionFailedError } from '../core/errors.js';
 import { SessionStateMachine } from '../core/state-machines/session.machine.js';
 import { evaluateNawiSession } from '../metrology/nawi.evaluator.js';
 import { validateReferenceStandards } from '../metrology/standards.validator.js';
 import { PaginatedResult, SecurityContext, VerificationOutcomeEnum, SessionStatusEnum } from '../core/types.js';
+
+type SessionWithRelations = Prisma.VerificationSessionGetPayload<{
+  include: {
+    observations: true;
+    reference_standards: { include: { standard: true } };
+    instrument: { include: { model: true } };
+  };
+}>;
 
 export interface SessionCreateInput {
   application_id: string;
@@ -76,7 +85,7 @@ export class SessionService {
       }),
     ]);
 
-    const items = rawItems.map((s) => this.formatSession(s));
+    const items = (rawItems as SessionWithRelations[]).map((s: SessionWithRelations) => this.formatSession(s));
     const totalPages = Math.ceil(total / pageSize) || 1;
 
     return {
@@ -265,7 +274,7 @@ export class SessionService {
       });
 
       const stdValidation = validateReferenceStandards(
-        standards.map((s) => ({
+        (standards as ReferenceStandard[]).map((s: ReferenceStandard) => ({
           standard_id: s.standard_id,
           accuracy_class: s.accuracy_class,
           denomination_mass: s.denomination_mass,
@@ -462,7 +471,7 @@ export class SessionService {
     return session;
   }
 
-  public formatSession(s: any): any {
+  public formatSession(s: SessionWithRelations | any): any {
     return {
       session_id: s.session_id,
       tenant_id: s.tenant_id,

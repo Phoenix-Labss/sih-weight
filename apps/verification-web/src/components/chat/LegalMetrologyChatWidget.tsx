@@ -15,6 +15,7 @@ import {
   ExternalLink,
   BookOpen,
   AlertTriangle,
+  Lightbulb,
 } from 'lucide-react';
 import { useMetrologyChat } from './useMetrologyChat';
 import { useVoice } from './useVoice';
@@ -35,7 +36,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
-  const [expandedCitations, setExpandedCitations] = useState<Record<string, boolean>>({});
+  const [showSuggestionsBar, setShowSuggestionsBar] = useState(false);
+  const [openCitationMsgs, setOpenCitationMsgs] = useState<Record<string, boolean>>({});
 
   const {
     messages,
@@ -82,6 +84,7 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     stopSpeaking();
     sendMessage(query);
     setInputVal('');
+    setShowSuggestionsBar(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -102,9 +105,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     }
   };
 
-  const toggleCitation = (msgId: string, citIndex: number) => {
-    const key = `${msgId}-${citIndex}`;
-    setExpandedCitations((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggleCitation = (msgId: string) => {
+    setOpenCitationMsgs((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
   };
 
   const handleActionClick = (action: PortalActionLink) => {
@@ -121,34 +123,30 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     year: 'numeric',
   });
 
-  // Determine if the last message in the thread is an assistant message with suggestions
-  const latestMessageIndex = messages.length - 1;
-  const latestMessage = messages[latestMessageIndex];
-  const hasInlineSuggestions =
-    latestMessage &&
-    latestMessage.sender === 'assistant' &&
-    !loading &&
-    Array.isArray(latestMessage.suggested_followups) &&
-    latestMessage.suggested_followups.length > 0;
+  // Initial / empty state: only the welcome message exists, no user turn yet.
+  // Suggestions are shown ONLY here (max 3 compact chips) and never again
+  // after the first real user message.
+  const isInitialEmptyState = !messages.some((m) => m.sender === 'user');
+  const initialSuggestions = (suggestions || []).slice(0, 3);
 
   return (
     <>
-      {/* 1. Floating Launcher Button */}
+      {/* 1. Minimized State: compact floating launcher (does not affect the page) */}
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 animate-fade-in">
-          <div className="hidden sm:flex items-center gap-2 bg-white text-[#0F2D46] text-xs font-bold px-3.5 py-2 rounded-full shadow-lg border border-[#CBD5E1] select-none">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Ask Nikks AI</span>
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 animate-fade-in">
+          <div className="hidden sm:flex items-center gap-2 bg-white text-[#0F2D46] text-xs font-semibold px-3.5 py-2 rounded-full shadow-lg border border-[#CBD5E1] select-none">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Ask Nikks</span>
           </div>
 
           <button
             onClick={() => setIsOpen(true)}
-            className="w-14 h-14 rounded-full bg-[#0F2D46] text-white flex items-center justify-center shadow-2xl hover:bg-[#1E4FA3] hover:scale-105 active:scale-95 transition-all border-2 border-white ring-2 ring-[#0F2D46]/20 relative cursor-pointer"
+            className="w-14 h-14 rounded-full bg-[#0F2D46] text-white flex items-center justify-center shadow-[0_10px_30px_-6px_rgba(15,45,70,0.5)] hover:bg-[#1E4FA3] hover:scale-105 active:scale-95 transition-all border-2 border-white relative cursor-pointer"
             title="Open Nikks Chatbot"
             aria-label="Open Nikks Chatbot"
           >
             <NikksMascotIcon size={34} glow={false} />
-            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white ring-1 ring-[#0F2D46]" />
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
           </button>
         </div>
       )}
@@ -158,24 +156,24 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
         <div
           role="dialog"
           aria-label="Nikks Support Chat"
-          className={`fixed z-50 flex flex-col bg-white border border-[#CBD5E1] shadow-[0_12px_45px_-8px_rgba(15,45,70,0.25)] overflow-hidden transition-all duration-200 animate-modal-in ${
+          className={`fixed z-50 flex flex-col bg-white border border-[#CBD5E1] shadow-[0_12px_45px_-8px_rgba(15,45,70,0.3)] overflow-hidden transition-all duration-200 animate-modal-in ${
             isExpanded
-              ? 'inset-3 sm:inset-8 w-auto h-auto rounded-2xl'
-              : 'bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[420px] h-full sm:h-[620px] sm:max-h-[85vh] rounded-none sm:rounded-2xl'
+              ? 'inset-2 sm:inset-6 lg:inset-10 w-auto h-auto rounded-2xl'
+              : 'bottom-0 right-0 w-full h-[100dvh] sm:bottom-6 sm:right-6 sm:w-[400px] sm:h-[600px] sm:max-h-[88vh] rounded-none sm:rounded-2xl'
           }`}
         >
           {/* Header */}
-          <div className="bg-white border-b border-[#CBD5E1] px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between shrink-0">
+          <div className="bg-white border-b border-[#CBD5E1] px-3.5 py-2.5 flex items-center justify-between shrink-0">
             {/* Left: Identity */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#0F2D46] border border-[#1E4FA3] ring-1 ring-[#D97706]/40 flex items-center justify-center p-1 shrink-0 shadow-sm">
-                <NikksMascotIcon size={24} glow={false} />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-[#0F2D46] border border-[#1E4FA3] flex items-center justify-center p-1 shrink-0">
+                <NikksMascotIcon size={26} glow={false} />
               </div>
-              <div>
-                <h3 className="font-bold text-base text-[#0F2D46] leading-tight tracking-tight">
+              <div className="min-w-0">
+                <h3 className="font-bold text-[16px] text-[#0F2D46] leading-tight tracking-tight">
                   Nikks
                 </h3>
-                <p className="text-xs text-[#475569] font-medium leading-none mt-0.5">
+                <p className="text-[11px] text-[#475569] font-medium leading-none mt-0.5">
                   Legal Metrology Guide
                 </p>
               </div>
@@ -332,12 +330,12 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             </div>
           )}
 
-          {/* Conversation Area (Maximum Vertical Space for Real Chat) */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-white text-sm">
+          {/* Conversation Area (scrolls independently, composer stays fixed) */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-white text-sm">
             {/* Centered Date Separator */}
-            <div className="flex items-center my-2 select-none">
+            <div className="flex items-center my-1 select-none">
               <div className="flex-1 border-t border-[#CBD5E1]" />
-              <span className="px-3 text-xs text-[#475569] font-semibold">
+              <span className="px-3 text-[11px] text-[#475569] font-semibold">
                 {currentDateFormatted}
               </span>
               <div className="flex-1 border-t border-[#CBD5E1]" />
@@ -347,37 +345,27 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             {messages.map((msg, idx) => {
               const isUser = msg.sender === 'user';
               const isCurrentSpeaking = isSpeaking && speakingMsgId === msg.id;
-              const isLatestMessage = idx === latestMessageIndex;
-              const showFollowupsHere =
-                !isUser &&
-                isLatestMessage &&
-                !loading &&
-                Array.isArray(msg.suggested_followups) &&
-                msg.suggested_followups.length > 0;
+              // Compact metadata: timestamp only on the last message of a consecutive group
+              const showTimestamp =
+                idx === messages.length - 1 ||
+                messages[idx + 1].sender !== msg.sender;
 
               return (
-                <div key={msg.id} className="space-y-2">
-                  {/* Sender Name above Assistant messages */}
-                  {!isUser && (
-                    <div className="text-xs font-bold text-[#475569] ml-9 select-none">
-                      Nikks
-                    </div>
-                  )}
-
+                <div key={msg.id}>
                   <div
-                    className={`flex items-end gap-2.5 ${
+                    className={`flex items-end gap-2 ${
                       isUser ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     {/* Assistant Avatar */}
                     {!isUser && (
-                      <div className="w-7 h-7 rounded-full bg-[#0F2D46] border border-[#1E4FA3] ring-1 ring-[#D97706]/30 flex items-center justify-center shrink-0 p-0.5 shadow-xs">
-                        <NikksMascotIcon size={20} glow={false} />
+                      <div className="w-7 h-7 rounded-full bg-[#0F2D46] border border-[#1E4FA3] flex items-center justify-center shrink-0 p-0.5">
+                        <NikksMascotIcon size={18} glow={false} />
                       </div>
                     )}
 
                     {/* Timestamp for User message */}
-                    {isUser && (
+                    {isUser && showTimestamp && (
                       <span className="text-[11px] text-[#64748B] font-medium select-none shrink-0 mb-1">
                         {msg.timestamp}
                       </span>
@@ -385,31 +373,33 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
 
                     {/* Message Bubble Container */}
                     <div
-                      className={`max-w-[85%] sm:max-w-[80%] ${
-                        isUser ? 'items-end' : 'items-start'
-                      }`}
+                      className={`${
+                        isUser
+                          ? 'max-w-[75%] sm:max-w-[70%]'
+                          : 'max-w-[85%] sm:max-w-[80%]'
+                      } ${isUser ? 'items-end' : 'items-start'}`}
                     >
                       <div
-                        className={`p-3.5 text-[14px] leading-relaxed shadow-xs ${
+                        className={`px-3.5 py-2.5 text-[14px] leading-relaxed ${
                           isUser
-                            ? 'bg-[#0F3554] text-white rounded-2xl rounded-tr-sm font-normal'
-                            : 'bg-[#EEF4F8] border border-[#CBD5E1]/70 text-[#0F2742] rounded-2xl rounded-tl-sm font-normal'
+                            ? 'bg-[#0F2D46] text-white rounded-2xl rounded-br-md'
+                            : 'bg-[#EEF4F8] text-[#0F2742] rounded-2xl rounded-bl-md'
                         }`}
                       >
                         <FormattedMarkdown content={msg.text} isUser={isUser} />
 
-                        {/* Compact Contextual Action Row: Listen + Portal Links + Citations */}
+                        {/* Compact secondary actions that belong to this specific response */}
                         {!isUser && (
-                          <div className="mt-2.5 pt-2 border-t border-[#CBD5E1]/70 flex flex-wrap items-center gap-1.5 text-xs">
-                            {/* Audio TTS Listen Button */}
+                          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                            {/* Listen (TTS) */}
                             <button
                               onClick={() => speak(msg.id, msg.text, language)}
-                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
                                 isCurrentSpeaking
-                                  ? 'bg-[#D97706] text-white border border-[#B45309] shadow-xs animate-pulse'
+                                  ? 'bg-[#D97706] text-white border border-[#B45309] animate-pulse'
                                   : isPaused && speakingMsgId === msg.id
                                   ? 'bg-amber-100 text-amber-900 border border-amber-400'
-                                  : 'bg-white hover:bg-[#EEF4F8] text-[#0F2D46] border border-[#CBD5E1]'
+                                  : 'bg-white/80 hover:bg-white text-[#334155] border border-[#CBD5E1]'
                               }`}
                               title={
                                 isCurrentSpeaking
@@ -421,119 +411,110 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                             >
                               {isCurrentSpeaking ? (
                                 <>
-                                  <Pause className="w-3 h-3 text-white" />
+                                  <Pause className="w-3 h-3" />
                                   <span>Pause</span>
                                 </>
                               ) : isPaused && speakingMsgId === msg.id ? (
                                 <>
-                                  <Play className="w-3 h-3 text-amber-800" />
+                                  <Play className="w-3 h-3" />
                                   <span>Resume</span>
                                 </>
                               ) : (
                                 <>
-                                  <Volume2 className="w-3 h-3 text-[#0F2D46]" />
+                                  <Volume2 className="w-3 h-3" />
                                   <span>Listen</span>
                                 </>
                               )}
                             </button>
 
-                            {/* Compact Portal Action Links (e.g. Go to My Certificates) */}
+                            {/* Portal navigation actions (only when this response includes them) */}
                             {msg.portal_actions &&
                               msg.portal_actions.map((act, i) => (
                                 <button
                                   key={i}
                                   onClick={() => handleActionClick(act)}
-                                  className="px-2.5 py-0.5 bg-white hover:bg-[#EEF4F8] text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-[11px] font-bold shadow-xs flex items-center gap-1 transition-all cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/80 hover:bg-white text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-[11px] font-semibold transition-all cursor-pointer"
+                                  title={act.description}
                                 >
                                   <ExternalLink className="w-3 h-3 text-[#1E4FA3]" />
                                   <span>{act.label}</span>
                                 </button>
                               ))}
 
-                            {/* Compact Citation Buttons */}
-                            {msg.citations &&
-                              msg.citations.map((cit, cIdx) => {
-                                const citKey = `${msg.id}-${cIdx}`;
-                                const isCitExpanded = expandedCitations[citKey];
-                                return (
-                                  <button
-                                    key={citKey}
-                                    onClick={() => toggleCitation(msg.id, cIdx)}
-                                    className="px-2.5 py-0.5 bg-white hover:bg-[#EEF4F8] text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-[11px] font-medium shadow-xs flex items-center gap-1 transition-all cursor-pointer"
-                                    title={cit.title}
-                                  >
-                                    <BookOpen className="w-3 h-3 text-[#1E4FA3]" />
-                                    <span className="truncate max-w-[140px]">
-                                      {cit.section_rule_ref}
-                                    </span>
-                                    <ChevronDown
-                                      className={`w-3 h-3 transition-transform ${
-                                        isCitExpanded ? 'rotate-180' : ''
-                                      }`}
-                                    />
-                                  </button>
-                                );
-                              })}
+                            {/* Single compact Citations toggle (opens snippet drawer) */}
+                            {msg.citations && msg.citations.length > 0 && (
+                              <button
+                                onClick={() => toggleCitation(msg.id)}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/80 hover:bg-white text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-[11px] font-semibold transition-all cursor-pointer"
+                                title="View statutory citations"
+                              >
+                                <BookOpen className="w-3 h-3 text-[#1E4FA3]" />
+                                <span>
+                                  Citations ({msg.citations.length})
+                                </span>
+                                <ChevronDown
+                                  className={`w-3 h-3 transition-transform ${
+                                    openCitationMsgs[msg.id] ? 'rotate-180' : ''
+                                  }`}
+                                />
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
 
-                      {/* Expandable Citation Snippets Drawer */}
+                      {/* Citation snippet drawer (toggled by the compact Citations control) */}
                       {!isUser &&
                         msg.citations &&
-                        msg.citations.some(
-                          (_, cIdx) => expandedCitations[`${msg.id}-${cIdx}`]
-                        ) && (
-                          <div className="mt-1.5 space-y-1">
-                            {msg.citations.map((cit, cIdx) => {
-                              const citKey = `${msg.id}-${cIdx}`;
-                              if (!expandedCitations[citKey]) return null;
-                              return (
-                                <div
-                                  key={citKey}
-                                  className="p-2.5 bg-white border border-[#CBD5E1] rounded-xl text-xs text-[#0F2742] leading-relaxed shadow-xs"
-                                >
-                                  <div className="font-bold text-[#0F2D46] mb-0.5">
-                                    {cit.act_or_rule} &bull; {cit.section_rule_ref}
-                                  </div>
-                                  <p className="text-[#334155]">{cit.snippet}</p>
+                        msg.citations.length > 0 &&
+                        openCitationMsgs[msg.id] && (
+                          <div className="mt-1.5 space-y-1.5">
+                            {msg.citations.map((cit, cIdx) => (
+                              <div
+                                key={cit.citation_id || cIdx}
+                                className="p-2.5 bg-white border border-[#CBD5E1] rounded-lg text-xs text-[#0F2742] leading-relaxed"
+                              >
+                                <div className="font-bold text-[#0F2D46] mb-0.5">
+                                  {cit.act_or_rule} &bull; {cit.section_rule_ref}
                                 </div>
-                              );
-                            })}
+                                <p className="text-[#334155]">{cit.snippet}</p>
+                              </div>
+                            ))}
                           </div>
                         )}
                     </div>
 
                     {/* Timestamp for Assistant message */}
-                    {!isUser && (
+                    {!isUser && showTimestamp && (
                       <span className="text-[11px] text-[#64748B] font-medium select-none shrink-0 mb-1">
                         {msg.timestamp}
                       </span>
                     )}
                   </div>
-
-                  {/* ONLY on the LATEST assistant message: show max 3 compact, left-aligned suggestion chips */}
-                  {showFollowupsHere && (
-                    <div className="ml-9 mt-2 space-y-1.5 animate-fade-in">
-                      <div className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none">
-                        Suggested questions
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 items-start">
-                        {msg.suggested_followups!.slice(0, 3).map((sug, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSend(sug)}
-                            className="px-3.5 py-1.5 rounded-full border border-[#CBD5E1] bg-white hover:border-[#0F2D46] hover:bg-[#EEF4F8] text-[#0F2D46] text-xs sm:text-[13px] font-medium transition-all shadow-xs text-left cursor-pointer flex items-center gap-1.5"
-                          >
-                            <span>{sug}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
+
+            {/* Initial / welcome state: up to 3 compact optional suggestion chips.
+                These disappear permanently once the user sends their first message. */}
+            {isInitialEmptyState && !loading && initialSuggestions.length > 0 && (
+              <div className="ml-9 mt-1">
+                <div className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider select-none mb-1.5">
+                  Suggested questions
+                </div>
+                <div className="flex flex-wrap gap-1.5 items-start">
+                  {initialSuggestions.map((sug, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(sug)}
+                      className="px-3 py-1.5 rounded-full border border-[#CBD5E1] bg-white hover:border-[#0F2D46] hover:bg-[#EEF4F8] text-[#0F2D46] text-xs font-medium transition-all text-left cursor-pointer"
+                    >
+                      {sug}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Restrained Loading / Typing Indicator */}
             {loading && (
@@ -552,21 +533,16 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Bottom Suggestion Bar: ONLY shown if NO inline suggestions, NOT typing, NOT loading, and MAX 3 non-duplicate chips */}
-          {!hasInlineSuggestions &&
-            !loading &&
-            !inputVal.trim() &&
-            suggestions &&
-            suggestions.length > 0 && (
-              <div className="px-4 py-2 bg-white border-t border-[#CBD5E1] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 animate-fade-in">
-                <span className="text-[11px] font-bold text-[#64748B] shrink-0 mr-1 select-none">
-                  Suggested:
-                </span>
+          {/* Chat Composer / Input Area (permanently anchored at the bottom) */}
+          <div className="bg-white border-t border-[#CBD5E1] shrink-0">
+            {/* Optional context-aware suggestions — shown only via the lightbulb toggle */}
+            {showSuggestionsBar && suggestions && suggestions.length > 0 && (
+              <div className="px-3 pt-2.5 flex flex-wrap gap-1.5 animate-fade-in">
                 {suggestions.slice(0, 3).map((s, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(s)}
-                    className="whitespace-nowrap px-3 py-1 bg-white hover:bg-[#EEF4F8] text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-xs font-medium transition-all shadow-xs shrink-0 cursor-pointer"
+                    className="whitespace-nowrap px-3 py-1 bg-white hover:bg-[#EEF4F8] text-[#0F2D46] hover:border-[#0F2D46] border border-[#CBD5E1] rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer"
                   >
                     {s}
                   </button>
@@ -574,60 +550,76 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
               </div>
             )}
 
-          {/* Chat Composer / Input Area */}
-          <div className="p-3.5 bg-white border-t border-[#CBD5E1] shrink-0">
-            <div className="flex items-center gap-2 bg-white border-2 border-[#CBD5E1] focus-within:border-[#0F2D46] focus-within:ring-2 focus-within:ring-[#0F2D46]/20 rounded-full px-4 py-1 transition-all shadow-xs">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-                onKeyDown={handleKeyDown}
-                aria-label="Ask Nikks"
-                placeholder={
-                  isListening
-                    ? 'Listening...'
-                    : language === 'hi'
-                    ? 'निक्स से सवाल पूछें...'
-                    : 'Ask Nikks a question...'
-                }
-                className="flex-1 bg-transparent py-2 text-[14px] font-medium text-[#0F2742] placeholder:text-[#64748B] focus:outline-none"
-              />
+            <div className="p-3">
+              <div className="flex items-center gap-1.5 bg-white border border-[#CBD5E1] focus-within:border-[#0F2D46] focus-within:ring-2 focus-within:ring-[#0F2D46]/15 rounded-2xl pl-3 pr-1.5 py-1 transition-all">
+                {/* Suggestions toggle (optional menu, replaces permanent suggestion bars) */}
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestionsBar(!showSuggestionsBar)}
+                  className={`p-1.5 rounded-full transition-colors cursor-pointer shrink-0 ${
+                    showSuggestionsBar
+                      ? 'bg-[#EEF4F8] text-[#0F2D46]'
+                      : 'text-[#64748B] hover:text-[#0F2D46] hover:bg-[#EEF4F8]'
+                  }`}
+                  title="Suggestions"
+                  aria-label="Toggle suggestions"
+                >
+                  <Lightbulb className="w-4 h-4" />
+                </button>
 
-              {/* Microphone Voice Button */}
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                  isListening
-                    ? 'bg-red-600 text-white animate-pulse'
-                    : 'text-[#0F2D46] hover:bg-[#EEF4F8]'
-                }`}
-                title={isListening ? 'Stop listening' : 'Voice input'}
-              >
-                {isListening ? (
-                  <MicOff className="w-4 h-4" />
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
-              </button>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputVal}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  aria-label="Ask Nikks"
+                  placeholder={
+                    isListening
+                      ? 'Listening...'
+                      : language === 'hi'
+                      ? 'निक्स से सवाल पूछें...'
+                      : 'Ask Nikks a question...'
+                  }
+                  className="flex-1 min-w-0 bg-transparent py-2 text-[14px] text-[#0F2742] placeholder:text-[#64748B] focus:outline-none"
+                />
 
-              {/* Send Button */}
-              <button
-                onClick={() => handleSend()}
-                disabled={!inputVal.trim() || loading}
-                className="w-8 h-8 rounded-full bg-[#0F2D46] hover:bg-[#1E4FA3] text-white flex items-center justify-center shrink-0 transition-all shadow-sm active:scale-95 disabled:bg-[#94A3B8] disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
-                title="Send message"
-                aria-label="Send message"
-              >
-                <Send className="w-3.5 h-3.5 text-white" />
-              </button>
-            </div>
+                {/* Microphone Voice Button */}
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  className={`p-1.5 rounded-full transition-colors cursor-pointer shrink-0 ${
+                    isListening
+                      ? 'bg-red-600 text-white animate-pulse'
+                      : 'text-[#0F2D46] hover:bg-[#EEF4F8]'
+                  }`}
+                  title={isListening ? 'Stop listening' : 'Voice input'}
+                  aria-label={isListening ? 'Stop listening' : 'Voice input'}
+                >
+                  {isListening ? (
+                    <MicOff className="w-4 h-4" />
+                  ) : (
+                    <Mic className="w-4 h-4" />
+                  )}
+                </button>
 
-            {/* Clean, readable footer watermark */}
-            <div className="text-xs text-center text-[#64748B] mt-2 font-medium flex items-center justify-center gap-1 select-none">
-              <span>Powered by</span>
-              <span className="font-bold text-[#0F2D46]">Legal Metrology</span>
+                {/* Send Button (disabled when empty or while loading) */}
+                <button
+                  onClick={() => handleSend()}
+                  disabled={!inputVal.trim() || loading}
+                  className="w-8 h-8 rounded-full bg-[#0F2D46] hover:bg-[#1E4FA3] text-white flex items-center justify-center shrink-0 transition-all active:scale-95 disabled:bg-[#94A3B8] disabled:cursor-not-allowed cursor-pointer"
+                  title="Send message"
+                  aria-label="Send message"
+                >
+                  <Send className="w-3.5 h-3.5 text-white" />
+                </button>
+              </div>
+
+              {/* Subtle footer */}
+              <div className="text-[11px] text-center text-[#64748B] mt-1.5 font-medium flex items-center justify-center gap-1 select-none">
+                <span>Powered by</span>
+                <span className="font-semibold text-[#0F2D46]">Legal Metrology</span>
+              </div>
             </div>
           </div>
         </div>

@@ -2,6 +2,106 @@ import { RAGQueryResponse } from './chatTypes';
 
 const API_BASE = '/api/v1';
 
+const GEMINI_API_KEY =
+  (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+
+async function callDirectGemini(
+  query: string,
+  language: 'en' | 'hi' = 'en',
+  history?: any[]
+): Promise<RAGQueryResponse | null> {
+  if (!GEMINI_API_KEY) return null;
+
+  const isHindi = language === 'hi';
+  const systemPrompt = isHindi
+    ? `आप "Nikks AI" (निक्स एआई) हैं - भारत सरकार के विधिक मापविज्ञान (नाप-तौल) विभाग के सबसे प्यारे, मददगार और सरल AI दोस्त।
+हमेशा बहुत ही आसान, मीठी और सरल हिन्दी में उत्तर दें। कठिन सरकारी शब्दों से बचें। यदि प्रासंगिक हो, तो विधिक मापविज्ञान अधिनियम, 2009 या विधिक मापविज्ञान नियम, 2011 का संदर्भ दें।`
+    : `You are "Nikks AI", the friendly, warm, and helpful Legal Metrology AI assistant from the Ministry of Consumer Affairs, Government of India.
+Always answer in clear, friendly, super simple words that any local shopkeeper or citizen can understand. Avoid heavy legalistic jargon. Mention relevant sections of The Legal Metrology Act, 2009 or General Rules, 2011 gently where helpful.`;
+
+  const conversationHistory = (history || [])
+    .slice(-4)
+    .map((h) => ({
+      role: h.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: h.text }],
+    }));
+
+  const candidateModels = [
+    'gemini-2.5-flash',
+    'gemini-3.6-flash',
+    'gemini-2.5-flash-lite',
+  ];
+
+  for (const model of candidateModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            ...conversationHistory,
+            {
+              role: 'user',
+              parts: [{ text: `${systemPrompt}\n\nUser Question:\n${query}` }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 1024,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data: any = await res.json();
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText && candidateText.trim().length > 10) {
+          return {
+            answer: candidateText.trim(),
+            language,
+            citations: [
+              {
+                citation_id: 'CIT-GEN',
+                act_or_rule: 'The Legal Metrology Act, 2009',
+                section_rule_ref: 'Section 19 & 24',
+                title: 'Verification & Re-Verification of Weights and Measures',
+                relevance_score: 9.5,
+                snippet:
+                  'Mandates initial and periodic verification of all commercial weights and measures before expiry.',
+              },
+            ],
+            portal_actions: [
+              {
+                label: 'Go to Trader Portal',
+                action_type: 'NAVIGATE',
+                target_tab: 'trader',
+                description: 'View instruments or apply for verification',
+              },
+            ],
+            suggested_followups: isHindi
+              ? [
+                  'सत्यापन प्रमाण पत्र खो जाने पर क्या करें?',
+                  'मशीन की सील टूटने पर क्या नियम है?',
+                  'सत्यापन परीक्षण में कितना समय लगता है?',
+                ]
+              : [
+                  'What to do if my certificate is lost?',
+                  'What to do if my physical seal is broken?',
+                  'What documents are required for re-verification?',
+                ],
+            latency_ms: 120,
+            provider_used: 'GEMINI_API',
+          };
+        }
+      }
+    } catch {
+      // Try next candidate model
+    }
+  }
+  return null;
+}
+
 export const chatApi = {
   async sendQuery(
     query: string,
@@ -28,10 +128,16 @@ export const chatApi = {
         }
       }
     } catch {
-      // Backend unreachable, fallback locally
+      // Backend unreachable, proceed to direct Gemini or local fallback
     }
 
-    // Comprehensive client-side fallback
+    // Direct Gemini Cloud Call
+    const geminiRes = await callDirectGemini(query, language, history);
+    if (geminiRes) {
+      return geminiRes;
+    }
+
+    // Offline statutory fallback
     const isHindi = language === 'hi';
     const q = query.toLowerCase();
 

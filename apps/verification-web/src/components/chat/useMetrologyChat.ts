@@ -16,7 +16,7 @@ export function useMetrologyChat(portalContext = 'trader') {
       {
         id: 'msg-welcome',
         sender: 'assistant',
-        text: `👋 **Hi friend! I'm Nikks AI, your friendly Legal Metrology Guide.**\n\nAsk me anything about your weighing scales, verification fees, renewal deadlines, or package label rules! I will explain everything in **super simple and easy words** so you can get things done without any confusion. 😊\n\nTry clicking any of the helpful questions below:`,
+        text: `**Hi! I'm Nikks, your Legal Metrology Guide.**\n\nAsk me anything about your weighing scales, verification fees, renewal deadlines, or package label rules. I will explain everything in simple and easy words so you can get things done without any confusion.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         suggested_followups: [
           'What to do if my certificate is lost?',
@@ -93,7 +93,7 @@ export function useMetrologyChat(portalContext = 'trader') {
         const errorMsg: ChatMessage = {
           id: `err-${Date.now()}`,
           sender: 'assistant',
-          text: `⚠️ Error retrieving statutory answer: ${err?.message || 'Please check your connection and try again.'}`,
+          text: `Error retrieving statutory answer: ${err?.message || 'Please check your connection and try again.'}`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
         setMessages((prev) => [...prev, errorMsg]);
@@ -114,7 +114,7 @@ export function useMetrologyChat(portalContext = 'trader') {
       {
         id: `msg-welcome-${Date.now()}`,
         sender: 'assistant',
-        text: `नमस्ते! I am the **Official Legal Metrology AI Assistant** for the Government of India.\n\nAsk me any question regarding weighing machine registration, fees, renewal timelines, or packaged commodity rules.`,
+        text: `**Namaste! I am the Official Legal Metrology AI Assistant.**\n\nAsk me any question regarding weighing machine registration, fees, renewal timelines, or packaged commodity rules.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         suggested_followups: [
           'How to calculate statutory verification fees?',

@@ -14,7 +14,7 @@ export interface LLMResponse {
 
 export class LLMService {
   private geminiApiKey: string | null = null;
-  private candidateModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
+  private candidateModels = ['gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-2.5-flash-lite', 'gemini-3.5-flash-lite'];
 
   constructor() {
     const rawKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || null;

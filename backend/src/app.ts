@@ -136,36 +136,6 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     timestamp: new Date().toISOString(),
   }));
 
-  // System Reset Endpoint (Cleans all transactions & reseeds 21 approved models)
-  app.post('/api/v1/system/reset-database', async (request, reply) => {
-    const isProd = process.env.NODE_ENV === 'production';
-
-    // In production, database reset is disabled by default to prevent catastrophic data loss
-    if (isProd && process.env.ENABLE_PROD_RESET !== 'true') {
-      return reply.status(403).send({
-        detail: 'Database reset endpoint is permanently disabled in production environments.',
-        statusCode: 403,
-        error: 'Forbidden',
-      });
-    }
-
-    // If explicitly enabled in production, require authenticated ADMIN authorization
-    if (isProd && request.securityContext?.role !== 'ADMIN') {
-      return reply.status(403).send({
-        detail: 'Access denied: Production database reset requires authenticated ADMIN role.',
-        statusCode: 403,
-        error: 'Forbidden',
-      });
-    }
-
-    const { seedDatabase } = await import('./db/seed.js');
-    await seedDatabase();
-    return reply.send({
-      status: 'SUCCESS',
-      message: 'Database reset to clean state with 21 statutory Indian models.',
-      timestamp: new Date().toISOString(),
-    });
-  });
   // 7. Register REST API Routes under /api/v1 prefix
   await app.register(
     async (v1) => {

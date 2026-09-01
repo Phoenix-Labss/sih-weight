@@ -191,10 +191,19 @@ export const httpApplicationService: IApplicationService = {
     });
   },
   async scheduleApplication(tenantId: string, id: string, payload: ApplicationScheduleRequest): Promise<Application> {
-    return request<Application>(`/tenants/${tenantId}/applications/${id}/schedule`, {
+    const role = localStorage.getItem('auth_role') || 'OWNER';
+    const isOfficer = role === 'LMO' || role === 'SUPERVISOR' || role === 'CONTROLLER' || role === 'ADMIN';
+    const endpoint = isOfficer
+      ? `/tenants/${tenantId}/applications/${id}/schedule`
+      : `/tenants/${tenantId}/applications/${id}/appointment`;
+
+    return request<Application>(endpoint, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  },
+  async getSlotAvailability(tenantId: string, jurisdictionId: string, dateStr: string) {
+    return request<any>(`/tenants/${tenantId}/applications/slots/availability?jurisdiction_id=${encodeURIComponent(jurisdictionId)}&date=${encodeURIComponent(dateStr)}`);
   },
 };
 

@@ -1,0 +1,1493 @@
+[
+  {
+    "id": "TC001",
+    "title": "Review scrutiny and issue the digital certificate",
+    "description": "An LMO can review a queued application, complete scrutiny, and issue the digital verification certificate after signing.",
+    "category": "Legal Metrology Officer (LMO) Workspace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the scrutiny queue"
+      },
+      {
+        "type": "action",
+        "description": "Open a pending application from the queue"
+      },
+      {
+        "type": "action",
+        "description": "Complete the scrutiny review steps"
+      },
+      {
+        "type": "action",
+        "description": "Sign and issue the certificate"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the issued certificate is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Verify QR authenticity from a certificate",
+    "description": "This verifies that a citizen can scan or enter a certificate QR token and receive a valid authenticity result without exposing personal data.",
+    "category": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the QR authenticity verification page"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid certificate QR token"
+      },
+      {
+        "type": "action",
+        "description": "Submit the authenticity check"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an authenticity status is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no personal data is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Complete instrument registration and statutory application",
+    "description": "A trader can register an instrument and finish the statutory application flow through submission with the expected confirmation shown.",
+    "category": "Trader & Instrument Lifecycle Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the instrument registration flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required instrument details"
+      },
+      {
+        "type": "action",
+        "description": "Continue through each step of the statutory application wizard"
+      },
+      {
+        "type": "action",
+        "description": "Submit the completed application"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the application submission confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Display a successful digital signature and certificate issuance result",
+    "description": "This verifies that the issuance flow reaches a completed signed-certificate state after successful validation.",
+    "category": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the digital certificate issuance page"
+      },
+      {
+        "type": "action",
+        "description": "Complete the issuance workflow with valid inputs"
+      },
+      {
+        "type": "action",
+        "description": "Submit the final signing step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the certificate is issued successfully"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a signed certificate confirmation is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Block issuance when reference calibration has expired",
+    "description": "This verifies that a user cannot complete a certificate issuance flow when the selected reference standard is outside its calibration validity and the application blocks progression.",
+    "category": "Reference Standards & Traceability Validator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reference standards validation page"
+      },
+      {
+        "type": "action",
+        "description": "Start a new certificate issuance workflow"
+      },
+      {
+        "type": "action",
+        "description": "Select a reference standard whose calibration validity is expired"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to continue the issuance workflow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify issuance is blocked"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a calibration validity error is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Calculate fees and complete payment for an application",
+    "description": "A trader can review the calculated fee for an application and complete payment with a successful payment confirmation shown.",
+    "category": "Trader & Instrument Lifecycle Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open a submitted application ready for payment"
+      },
+      {
+        "type": "action",
+        "description": "Review the calculated fee amount"
+      },
+      {
+        "type": "action",
+        "description": "Proceed to the payment step"
+      },
+      {
+        "type": "action",
+        "description": "Complete the payment flow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the payment success confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Allow issuance with a valid traceability chain",
+    "description": "This verifies that a certificate issuance workflow proceeds successfully when the reference standard chain is valid and within calibration limits.",
+    "category": "Reference Standards & Traceability Validator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reference standards validation page"
+      },
+      {
+        "type": "action",
+        "description": "Start a new certificate issuance workflow"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid reference standard chain"
+      },
+      {
+        "type": "action",
+        "description": "Continue the issuance workflow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the workflow continues successfully"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected reference chain is accepted"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Complete an offline field verification and finalize it after sync",
+    "description": "This verifies that an officer can work offline, capture evidence, and successfully sync a completed field verification so the record is finalized in the system.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the offline field verification workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start a new field verification assignment"
+      },
+      {
+        "type": "action",
+        "description": "Capture or attach evidence for the verification"
+      },
+      {
+        "type": "action",
+        "description": "Complete the verification details and save the record locally"
+      },
+      {
+        "type": "action",
+        "description": "Go back online and sync pending records"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the verification record is finalized after sync"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the submitted evidence is associated with the record"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Show a revoked result for an invalidated QR token",
+    "description": "This verifies that a QR token marked as revoked is reported as revoked to the citizen in the verification view.",
+    "category": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the QR authenticity verification page"
+      },
+      {
+        "type": "action",
+        "description": "Enter a revoked QR token"
+      },
+      {
+        "type": "action",
+        "description": "Submit the authenticity check"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a revoked authenticity status is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the verification result is not treated as valid"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Block issuance when uncertainty exceeds the allowed limit",
+    "description": "This verifies that certificate issuance is prevented when the selected reference standard fails the uncertainty bound check.",
+    "category": "Reference Standards & Traceability Validator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reference standards validation page"
+      },
+      {
+        "type": "action",
+        "description": "Start a new certificate issuance workflow"
+      },
+      {
+        "type": "action",
+        "description": "Select a reference standard with uncertainty above the allowed bound"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to continue the issuance workflow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify issuance is blocked"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an uncertainty validation error is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Track application status through certificate issuance",
+    "description": "A trader can open an application and track it until the issued certificate is available in the vault.",
+    "category": "Trader & Instrument Lifecycle Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the application status view"
+      },
+      {
+        "type": "action",
+        "description": "Review the current application status"
+      },
+      {
+        "type": "action",
+        "description": "Open the certificate vault entry when available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the issued certificate is visible in the vault"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Allow a valid QR lookup without exposing identity details",
+    "description": "This verifies that a successful QR authenticity lookup returns only the expected zero-PII result details.",
+    "category": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the QR authenticity verification page"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid QR token"
+      },
+      {
+        "type": "action",
+        "description": "Submit the authenticity check"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticity result is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify identity details are not displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Create a new user account",
+    "description": "This verifies that a national administrator can provision a new user account for portal access.",
+    "category": "National Administration & Master Data Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the national administration portal"
+      },
+      {
+        "type": "action",
+        "description": "Open the user management area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new user"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required user details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the new user form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user account is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new user appears in the user list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Raise a deficiency during scrutiny and receive trader response",
+    "description": "An LMO can create a deficiency query during scrutiny and later see a trader response available for review.",
+    "category": "Legal Metrology Officer (LMO) Workspace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the scrutiny queue"
+      },
+      {
+        "type": "action",
+        "description": "Open a pending application"
+      },
+      {
+        "type": "action",
+        "description": "Create and submit a deficiency query"
+      },
+      {
+        "type": "action",
+        "description": "Return to the same case after the trader response is available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the trader response is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Open the national admin portal",
+    "description": "This verifies that a national administrator can reach the dedicated governance application and access the admin home experience.",
+    "category": "National Administration & Master Data Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the national administration portal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the admin portal home experience is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Book an appointment after submitting an application",
+    "description": "A trader can book an inspection appointment for a submitted application and see the booked appointment reflected in the portal.",
+    "category": "Trader & Instrument Lifecycle Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open a submitted application"
+      },
+      {
+        "type": "action",
+        "description": "Start the appointment booking flow"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid appointment slot"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the appointment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the booked appointment is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "View statewide pendency aging and workload distribution",
+    "description": "This verifies that a supervisor can open the oversight dashboard and see pendency aging and officer workload information needed to rebalance cases.",
+    "category": "Supervisor & SLA Oversight Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the supervisor oversight dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify pendency aging information is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify workload distribution information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Keep multiple offline verifications queued until sync completes",
+    "description": "This verifies that multiple offline verification records can be saved locally and remain queued until the user syncs them later.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the offline field verification workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start the first field verification assignment"
+      },
+      {
+        "type": "action",
+        "description": "Complete and save the first record locally"
+      },
+      {
+        "type": "action",
+        "description": "Start a second field verification assignment"
+      },
+      {
+        "type": "action",
+        "description": "Complete and save the second record locally"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify both records appear in the local pending queue"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the queue indicates the records are waiting to be synced"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Record seal details and inspection evidence",
+    "description": "An LMO can record physical seal information and inspection evidence so the digital record reflects a completed field inspection.",
+    "category": "Legal Metrology Officer (LMO) Workspace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an inspection record"
+      },
+      {
+        "type": "action",
+        "description": "Record the lead seal details"
+      },
+      {
+        "type": "action",
+        "description": "Add the inspection evidence details"
+      },
+      {
+        "type": "action",
+        "description": "Save the inspection record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the completed inspection record is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC020",
+    "title": "Rebalance assignments across officers",
+    "description": "This verifies that a supervisor can reassign workload from one officer to another and see the updated assignment state.",
+    "category": "Supervisor & SLA Oversight Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the supervisor oversight dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open a pendency item with an assigned officer"
+      },
+      {
+        "type": "action",
+        "description": "Reassign the item to a different officer"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the assignment is updated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item remains in the oversight list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC021",
+    "title": "View and respond to a deficiency query",
+    "description": "A trader can open a deficiency notice, submit a response, and see the case move out of the pending deficiency state.",
+    "category": "Trader & Instrument Lifecycle Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the application with an active deficiency query"
+      },
+      {
+        "type": "action",
+        "description": "Open the deficiency response form"
+      },
+      {
+        "type": "action",
+        "description": "Enter a response and submit it"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deficiency response is recorded"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC022",
+    "title": "Assign a jurisdiction to a user",
+    "description": "This verifies that a national administrator can scope a user to the correct jurisdiction for access control.",
+    "category": "National Administration & Master Data Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the national administration portal"
+      },
+      {
+        "type": "action",
+        "description": "Open the user management area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing user record"
+      },
+      {
+        "type": "action",
+        "description": "Assign a jurisdiction to the user"
+      },
+      {
+        "type": "action",
+        "description": "Save the user changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the jurisdiction assignment is saved"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user record reflects the updated scope"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC023",
+    "title": "Open a pending application from the scrutiny queue",
+    "description": "An LMO can use the queue view to locate a pending application and open its full case details for action.",
+    "category": "Legal Metrology Officer (LMO) Workspace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the scrutiny queue"
+      },
+      {
+        "type": "action",
+        "description": "Select a pending application from the queue"
+      },
+      {
+        "type": "action",
+        "description": "Open the case details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the application case details are visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC024",
+    "title": "Use the assistant to look up a metrology rule",
+    "description": "This verifies that a user can ask the assistant a rule question and receive a grounded answer from the knowledge base.",
+    "category": "Bilingual Ground-Truth AI Assistant & Speech Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the bilingual AI assistant"
+      },
+      {
+        "type": "action",
+        "description": "Enter a metrology rule question"
+      },
+      {
+        "type": "action",
+        "description": "Submit the question to the assistant"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an answer is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rule-based guidance is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC025",
+    "title": "Complete the guided NAWI tolerance calculation",
+    "description": "An LMO can use the guided calculator to enter metrology values and obtain a completed tolerance result needed for scrutiny.",
+    "category": "Legal Metrology Officer (LMO) Workspace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credential field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the guided tolerance calculator"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid metrology inputs"
+      },
+      {
+        "type": "action",
+        "description": "Run the tolerance calculation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tolerance result is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC026",
+    "title": "Filter pendency by aging band",
+    "description": "This verifies that a supervisor can filter the dashboard to isolate cases in a specific pendency aging range.",
+    "category": "Supervisor & SLA Oversight Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the supervisor oversight dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Apply a pendency aging filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard updates to show filtered cases"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected aging band remains visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC027",
+    "title": "Display the current traceability hierarchy for a selected standard",
+    "description": "This verifies that the application shows the full reference standards hierarchy so an officer can inspect traceability before issuance.",
+    "category": "Reference Standards & Traceability Validator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reference standards validation page"
+      },
+      {
+        "type": "action",
+        "description": "Open a reference standard record"
+      },
+      {
+        "type": "action",
+        "description": "Expand the traceability details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the traceability hierarchy is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the calibration lineage is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC028",
+    "title": "Approve a GATC laboratory application",
+    "description": "This verifies that a national administrator can review and approve a GATC laboratory accreditation request.",
+    "category": "National Administration & Master Data Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the national administration portal"
+      },
+      {
+        "type": "action",
+        "description": "Open the GATC laboratory accreditation area"
+      },
+      {
+        "type": "action",
+        "description": "Review a pending laboratory application"
+      },
+      {
+        "type": "action",
+        "description": "Approve the application"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the laboratory application is approved"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the application moves out of the pending queue"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC029",
+    "title": "Import a legacy record through OCR and review its provenance",
+    "description": "This verifies that a legacy paper record can be imported through OCR migration and that the user can review the extracted record provenance.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the legacy migration workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start a new legacy record import"
+      },
+      {
+        "type": "action",
+        "description": "Provide a scanned legacy record for OCR processing"
+      },
+      {
+        "type": "action",
+        "description": "Review the extracted record details"
+      },
+      {
+        "type": "action",
+        "description": "Open the provenance review for the imported record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the imported legacy record is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify provenance information is available for review"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC030",
+    "title": "Switch the assistant language between Hindi and English",
+    "description": "This verifies that a user can change the assistant language and continue using the same help experience in the selected language.",
+    "category": "Bilingual Ground-Truth AI Assistant & Speech Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the bilingual AI assistant"
+      },
+      {
+        "type": "action",
+        "description": "Change the assistant language"
+      },
+      {
+        "type": "action",
+        "description": "Enter a question in the selected language"
+      },
+      {
+        "type": "action",
+        "description": "Submit the question to the assistant"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the response is shown in the selected language"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify bilingual support remains available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC031",
+    "title": "Preserve offline field evidence until the user explicitly syncs",
+    "description": "This verifies that locally captured verification evidence remains available in offline storage before synchronization.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the offline field verification workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start a new field verification assignment"
+      },
+      {
+        "type": "action",
+        "description": "Capture evidence for the assignment"
+      },
+      {
+        "type": "action",
+        "description": "Save the record without syncing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved record is still available in local storage"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the captured evidence is still attached to the saved record"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC032",
+    "title": "Review administrative audit history",
+    "description": "This verifies that a supervisor can access tamper-evident audit history for oversight actions.",
+    "category": "Supervisor & SLA Oversight Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the supervisor oversight dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the administrative audit log view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify audit log entries are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify recent administrative actions are visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC033",
+    "title": "Show a clear error when no valid reference standard is available",
+    "description": "This verifies that the application surfaces a blocking validation message when issuance cannot proceed because no eligible reference standard is available in the workflow.",
+    "category": "Reference Standards & Traceability Validator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reference standards validation page"
+      },
+      {
+        "type": "action",
+        "description": "Start a new certificate issuance workflow"
+      },
+      {
+        "type": "action",
+        "description": "Leave the reference standard selection empty"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to continue the workflow"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a reference standard required error is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC034",
+    "title": "Review a central model approval request",
+    "description": "This verifies that a national administrator can open a model approval request and see its review status.",
+    "category": "National Administration & Master Data Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the national administration portal"
+      },
+      {
+        "type": "action",
+        "description": "Open the central model approval registry"
+      },
+      {
+        "type": "action",
+        "description": "Open a model request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the model request details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the review status is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC035",
+    "title": "Review a low-confidence OCR import before accepting it",
+    "description": "This verifies that a legacy record with uncertain OCR extraction is presented for human review before it is accepted into the migration pipeline.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the legacy migration workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start a new legacy record import"
+      },
+      {
+        "type": "action",
+        "description": "Provide a scanned legacy record for OCR processing"
+      },
+      {
+        "type": "action",
+        "description": "Review the extracted record details"
+      },
+      {
+        "type": "action",
+        "description": "Choose to edit or confirm the extracted data"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the record remains in review until the extracted data is confirmed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the provenance review is still accessible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC036",
+    "title": "Reject an invalid QR token format",
+    "description": "This verifies that the QR verification page prevents submission of malformed token input and shows a validation error.",
+    "category": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the QR authenticity verification page"
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid QR token format"
+      },
+      {
+        "type": "action",
+        "description": "Submit the authenticity check"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a QR token validation error is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC037",
+    "title": "Open a portal deep link from assistant guidance",
+    "description": "This verifies that the assistant can surface a portal deep-link that takes the user to the relevant in-app workflow page.",
+    "category": "Bilingual Ground-Truth AI Assistant & Speech Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the bilingual AI assistant"
+      },
+      {
+        "type": "action",
+        "description": "Ask for help with a portal task"
+      },
+      {
+        "type": "action",
+        "description": "Open the suggested portal deep-link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the linked workflow page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the assistant context remains available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC038",
+    "title": "Maintain several imported legacy records in the migration queue",
+    "description": "This verifies that imported legacy records can accumulate in the migration queue while the user works through them one by one.",
+    "category": "Offline Field Verification & Legacy Migration Pipeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the legacy migration workspace"
+      },
+      {
+        "type": "action",
+        "description": "Start a new legacy record import"
+      },
+      {
+        "type": "action",
+        "description": "Provide a scanned legacy record for OCR processing"
+      },
+      {
+        "type": "action",
+        "description": "Save the imported record for later review"
+      },
+      {
+        "type": "action",
+        "description": "Start another legacy record import"
+      },
+      {
+        "type": "action",
+        "description": "Save the second imported record for later review"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify both imported records appear in the migration queue"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the queue shows pending review status"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC039",
+    "title": "Use voice input to ask a question",
+    "description": "This verifies that a user can submit a spoken query and receive a text answer in the assistant.",
+    "category": "Bilingual Ground-Truth AI Assistant & Speech Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the bilingual AI assistant"
+      },
+      {
+        "type": "action",
+        "description": "Start voice input"
+      },
+      {
+        "type": "action",
+        "description": "Speak a metrology question"
+      },
+      {
+        "type": "action",
+        "description": "Submit the voice transcript"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the transcript is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an assistant response is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

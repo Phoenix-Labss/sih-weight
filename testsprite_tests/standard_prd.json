@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "project": "National Unified Legal Metrology Digital Verification & Lifecycle Management Platform (e-Metrology)",
+    "version": "3.0.0-deep-research",
+    "date": "2026-09-01",
+    "authorities": [
+      "The Legal Metrology Act, 2009 (Act No. 1 of 2010)",
+      "Legal Metrology (General) Rules, 2011 (Seventh & Twelfth Schedules)",
+      "Government Approved Test Centre (GATC) Rules, 2013",
+      "Legal Metrology (Packaged Commodities) Rules, 2011",
+      "OIML R76-1:2006 (Non-automatic weighing instruments)"
+    ]
+  },
+  "product_overview": "A unified, multi-tenant national digital control plane for Legal Metrology instrument verification, physical lead-wire stamping reconciliation, PKCS#7 / Ed25519 digital certification, reference standard calibration hierarchy enforcement, and citizen-facing 256-bit QR authenticity verification in India.",
+  "core_goals": [
+    "Digitize the end-to-end statutory verification lifecycle for 50M+ commercial weighing & measuring instruments",
+    "Enforce 28-digit exact rational decimal arithmetic and OIML R76 stepped Maximum Permissible Error (MPE) calculations with zero binary float drift",
+    "Ensure fail-closed safety by blocking verifications if working standards exceed their 24-month RRSL calibration validity or uncertainty limits",
+    "Preserve physical-to-digital parity linking physical lead-wire seal serials with immutable RFC 8785 JCS Ed25519 digitally signed certificates",
+    "Provide high-entropy 256-bit opaque QR tokens delivering zero-PII real-time authenticity projections with sub-50ms revocation propagation",
+    "Provide dedicated workspaces for Traders, Legal Metrology Officers (LMOs), Supervisors, National Administrators, and GATC Laboratories",
+    "Empower citizens and traders through a bilingual (English/Hindi) Ground-Truth AI assistant powered by Google Gemini 3.6 Flash / 3.5 Flash Lite with Web Speech STT/TTS",
+    "Support offline-first encrypted field verification with transactional outbox synchronization and deterministic server-side re-evaluation",
+    "Migrate and audit historical paper records via OCR parsing with a 4-tier provenance trust state machine",
+    "Reconcile government statutory fees via e-GRAS and BharatKosh double-entry ledgers with idempotent replay protection"
+  ],
+  "tech_stack": {
+    "backend": {
+      "runtime": "Node.js v24.x LTS",
+      "framework": "Fastify 5.x",
+      "database": "PostgreSQL 18 (Prisma ORM 6.x)",
+      "precision_arithmetic": "Decimal.js (28-digit precision, ROUND_HALF_UP)",
+      "cryptography": "Ed25519 DSC, RFC 8785 JCS, SHA-256 Digest",
+      "document_engine": "Pure TypeScript Binary PDF/A-1b Renderer",
+      "ai_rag": "Google Gemini 3.6 Flash / 3.5 Flash Lite + Local Statutory Rule Synthesizer"
+    },
+    "frontend": {
+      "framework": "React 18.x + Vite 6.x",
+      "language": "TypeScript 5.x",
+      "styling": "Tailwind CSS 3.x + Lucide Icons",
+      "voice": "Web Speech API (STT en-IN/hi-IN + TTS with onboundary word tracking)",
+      "qr": "QRCode.js (256-bit high-entropy opaque tokens)"
+    }
+  },
+  "features": [
+    {
+      "id": "statutory_metrology_engine",
+      "name": "Exact Metrology & Stepped MPE Engine",
+      "description": "28-digit rational decimal arithmetic evaluating turning point P, zero error E0, corrected error Ec, 5-position eccentricity, and 3-run repeatability spread for NAWI Class I, II, III, and IIII instruments."
+    },
+    {
+      "id": "reference_standards_pyramid",
+      "name": "Reference Standards & Traceability Validator",
+      "description": "Hierarchy tracking (NPL -> RRSL -> State Secondary -> Working Standards), enforcing 24-month calibration limits and U <= (1/3)MPE uncertainty bounds with automated fail-closed blocking."
+    },
+    {
+      "id": "cryptographic_dsc_and_qr",
+      "name": "Cryptographic DSC & 256-Bit Opaque QR Verification",
+      "description": "RFC 8785 JSON Canonicalization, SHA-256 digests, Ed25519 HSM digital signing, binary PDF/A rendering, and zero-PII 256-bit opaque QR tokens with sub-millisecond revocation."
+    },
+    {
+      "id": "multi_tenant_rbac_security",
+      "name": "Multi-Tenancy & Jurisdictional Access Control",
+      "description": "Logical State/UT partitioning, composite ownership predicates, RBAC/ABAC guards for 8 roles, JWT auth with rotating refresh token families, and append-only audit ledgers."
+    },
+    {
+      "id": "trader_portal",
+      "name": "Trader & Instrument Lifecycle Management",
+      "description": "Instrument registration, 4-step statutory application wizard, Schedule XII automated fee calculation, e-GRAS/BharatKosh payments, appointment booking, and green Form 8 certificate vault."
+    },
+    {
+      "id": "officer_workspace",
+      "name": "Legal Metrology Officer (LMO) Workspace",
+      "description": "Scrutiny queue, deficiency query management, guided 4-step NAWI tolerance calculator, physical lead seal recording, and DSC cryptographic certificate signing."
+    },
+    {
+      "id": "supervisor_sla_dashboard",
+      "name": "Supervisor & SLA Oversight Dashboard",
+      "description": "State-wide pendency aging (<7d, 7-15d, 15-30d, >30d), officer turnaround metrics, workload rebalancing, and tamper-evident administrative audit logs."
+    },
+    {
+      "id": "national_admin_portal",
+      "name": "National Administration & Master Data Portal",
+      "description": "Dedicated governance app (apps/admin-portal), user provisioning, GATC laboratory accreditation, Central Model Approval registry, and 2-person approval workflows."
+    },
+    {
+      "id": "bilingual_ai_voice_rag",
+      "name": "Bilingual Ground-Truth AI Assistant & Speech Engine",
+      "description": "RAG over Legal Metrology Acts/Rules using Google Gemini 3.6 Flash / 3.5 Flash Lite, local deterministic rule fallback, portal deep-linking, and Hindi/English STT/TTS with word boundary speed control."
+    },
+    {
+      "id": "offline_field_and_migration",
+      "name": "Offline Field Verification & Legacy Migration Pipeline",
+      "description": "Encrypted local SQLite storage, assignment pre-caching, transactional outbox sync, client-side photo evidence SHA-256 hashing, and 4-tier legacy trust OCR migration."
+    }
+  ]
+}

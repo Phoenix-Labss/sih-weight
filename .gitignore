@@ -27,3 +27,4 @@ __pycache__/
 
 # TestSprite transient session data (tunnel creds, logs, raw runs)
 testsprite_tests/tmp/
+testsprite_tests/tmp/config.json

@@ -12,6 +12,7 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "js-sha256": "^1.0.0",
+    "jsqr": "^1.4.0",
     "lucide-react": "^0.460.0",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",

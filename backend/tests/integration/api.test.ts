@@ -245,11 +245,24 @@ describe('Fastify REST API & Domain Integration Suite', () => {
       expect(payRes.json().current_status).toBe('PAYMENT_RECONCILED');
     });
 
-    it('5. Schedules verification slot and creates PLANNED session', async () => {
+    it('4.5. Checks live inspection slot availability for date', async () => {
+      const availRes = await app.inject({
+        method: 'GET',
+        url: '/api/v1/tenants/tenant-delhi-central/applications/slots/availability?date=2026-08-28',
+      });
+      expect(availRes.statusCode).toBe(200);
+      const data = availRes.json();
+      expect(data.slots).toHaveLength(6);
+      expect(data.total_fleet_size).toBe(10);
+      expect(data.slots[0].is_available).toBe(true);
+      expect(data.slots[0].total_capacity).toBe(10);
+    });
+
+    it('5. Schedules verification slot and creates PLANNED session (as Trader / OWNER)', async () => {
       const schedRes = await app.inject({
         method: 'POST',
-        url: `/api/v1/tenants/tenant-delhi-central/applications/${createdApplicationId}/schedule`,
-        headers: { 'x-actor-role': 'LMO', 'x-actor-id': 'lmo-officer-01' },
+        url: `/api/v1/tenants/tenant-delhi-central/applications/${createdApplicationId}/appointment`,
+        headers: { 'x-actor-role': 'OWNER', 'x-actor-id': 'usr-trader-01' },
         payload: {
           slot_start: '2026-08-28T10:00:00Z',
           slot_end: '2026-08-28T12:00:00Z',

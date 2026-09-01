@@ -514,7 +514,7 @@ export class ApplicationService {
   ): Promise<any> {
     const app = await this.getRawApplication(tenantId, applicationId);
 
-    const assignedLmoId = input.assigned_lmo_id || actor.userId || 'lmo-officer-01';
+    const assignedLmoId = input.assigned_lmo_id || (actor.role === 'LMO' ? actor.userId : 'lmo-officer-01');
     const slotStart = new Date(input.slot_start);
     const slotEnd = new Date(input.slot_end);
 
@@ -541,6 +541,63 @@ export class ApplicationService {
         scheduled_slot_end: slotEnd,
         assigned_lmo_id: assignedLmoId,
         assigned_gatc_id: input.assigned_gatc_id || null,
+      },
+      include: {
+        fee_assessment: true,
+        instrument: { include: { model: true } },
+        applicant: true,
+      },
+    });
+
+    // Auto-create or verify planned VerificationSession exists
+    const existingSession = await prisma.verificationSession.findFirst({
+      where: { application_id: app.application_id },
+    });
+
+    if (!existingSession) {
+      const procPackChecksum = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+      await prisma.verificationSession.create({
+        data: {
+          tenant_id: tenantId,
+          application_id: app.application_id,
+          instrument_id: app.instrument_id,
+          procedure_pack_id: 'IND-LM-NAWI-CLASS-III-IIII-2026.1',
+          procedure_pack_checksum: procPackChecksum,
+          verifier_id: assignedLmoId,
+          verifier_role: 'LMO',
+          scheduled_date: slotStart,
+          status: 'PLANNED',
+        },
+      });
+    }
+
+    return this.formatApplication(updated);
+  }
+
+  /**
+   * Confirms/books inspection appointment by citizen or officer after fee reconciliation
+   */
+  async bookAppointment(
+    tenantId: string,
+    applicationId: string,
+    input: ApplicationScheduleInput,
+    actor: SecurityContext
+  ): Promise<any> {
+    const app = await this.getRawApplication(tenantId, applicationId);
+
+    const slotStart = new Date(input.slot_start);
+    const slotEnd = new Date(input.slot_end);
+    const assignedLmoId = input.assigned_lmo_id || (actor.role === 'LMO' ? actor.userId : 'lmo-officer-01');
+
+    const updated = await prisma.verificationApplication.update({
+      where: { application_id: app.application_id },
+      data: {
+        current_status: 'SCHEDULED',
+        scheduled_slot_start: slotStart,
+        scheduled_slot_end: slotEnd,
+        assigned_lmo_id: assignedLmoId,
+        assigned_gatc_id: input.assigned_gatc_id || null,
+        version: app.version + 1,
       },
       include: {
         fee_assessment: true,
@@ -636,6 +693,74 @@ export class ApplicationService {
       created_at: fee.created_at?.toISOString(),
     };
   }
+  /**
+   * Retrieves live slot capacity and booked count for an inspection date
+   */
+  async getSlotAvailability(tenantId: string, jurisdictionId: string, dateStr: string): Promise<any> {
+    const STANDARD_SLOTS = [
+      { slotId: '09:00-10:30', startTime: '09:00', endTime: '10:30', period: 'Morning', durationMinutes: 90, totalCapacity: 10 },
+      { slotId: '10:30-12:00', startTime: '10:30', endTime: '12:00', period: 'Morning', durationMinutes: 90, totalCapacity: 10 },
+      { slotId: '13:00-14:30', startTime: '13:00', endTime: '14:30', period: 'Afternoon', durationMinutes: 90, totalCapacity: 10 },
+      { slotId: '14:30-16:00', startTime: '14:30', endTime: '16:00', period: 'Afternoon', durationMinutes: 90, totalCapacity: 10 },
+      { slotId: '16:00-17:30', startTime: '16:00', endTime: '17:30', period: 'Evening', durationMinutes: 90, totalCapacity: 10 },
+      { slotId: '17:30-19:00', startTime: '17:30', endTime: '19:00', period: 'Evening', durationMinutes: 90, totalCapacity: 10 },
+    ];
+
+    const dateStart = new Date(`${dateStr}T00:00:00.000Z`);
+    const dateEnd = new Date(`${dateStr}T23:59:59.999Z`);
+
+    const bookedApps = await prisma.verificationApplication.findMany({
+      where: {
+        tenant_id: tenantId,
+        scheduled_slot_start: {
+          gte: dateStart,
+          lte: dateEnd,
+        },
+      },
+      select: { scheduled_slot_start: true },
+    });
+
+    const bookedCounts: Record<string, number> = {};
+    for (const app of bookedApps) {
+      if (app.scheduled_slot_start) {
+        const timeStr = app.scheduled_slot_start.toISOString().split('T')[1]?.slice(0, 5);
+        for (const slot of STANDARD_SLOTS) {
+          if (slot.startTime === timeStr) {
+            bookedCounts[slot.slotId] = (bookedCounts[slot.slotId] || 0) + 1;
+          }
+        }
+      }
+    }
+
+    const jurisdiction = await prisma.jurisdiction.findFirst({
+      where: {
+        tenant_id: tenantId,
+        OR: [{ jurisdiction_id: jurisdictionId }, { code: jurisdictionId }],
+      },
+    });
+
+    const totalFleetSize = 10;
+    return {
+      date: dateStr,
+      jurisdiction_id: jurisdictionId,
+      jurisdiction_name: jurisdiction ? `${jurisdiction.name} (${jurisdiction.code})` : 'Central Delhi Zone (JUR-DL-01)',
+      total_fleet_size: totalFleetSize,
+      slots: STANDARD_SLOTS.map((slot) => {
+        const booked = bookedCounts[slot.slotId] || 0;
+        const remaining = Math.max(0, slot.totalCapacity - booked);
+        return {
+          slot_id: slot.slotId,
+          start_time: slot.startTime,
+          end_time: slot.endTime,
+          total_capacity: slot.totalCapacity,
+          booked_count: booked,
+          remaining_slots: remaining,
+          is_available: remaining > 0,
+        };
+      }),
+    };
+  }
 }
 
 export const applicationService = new ApplicationService();
+

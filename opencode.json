@@ -3,7 +3,7 @@
   "mcp": {
     "TestSprite": {
       "type": "local",
-      "command": ["npx", "@testsprite/testsprite-mcp@latest"],
+      "command": ["npx", "-y", "@testsprite/testsprite-mcp@latest"],
       "environment": {
         "API_KEY": "sk-member-BDcezecrZJ0W9u8np-55A2v-DfQ8daD2rZk3x5C5YzM"
       }

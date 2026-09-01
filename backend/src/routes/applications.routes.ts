@@ -145,7 +145,7 @@ export const applicationRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.send(paid);
   });
 
-  // POST /tenants/:tenantId/applications/:id/schedule
+  // POST /tenants/:tenantId/applications/:id/schedule (Officer allocation)
   fastify.post<{
     Params: { tenantId: string; id: string };
     Body: {
@@ -168,4 +168,65 @@ export const applicationRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.send(scheduled);
     }
   );
+
+  // POST /tenants/:tenantId/applications/:id/appointment (Citizen / Officer slot confirmation)
+  fastify.post<{
+    Params: { tenantId: string; id: string };
+    Body: {
+      slot_start: string;
+      slot_end: string;
+      assigned_lmo_id?: string;
+      assigned_gatc_id?: string;
+    };
+  }>(
+    '/tenants/:tenantId/applications/:id/appointment',
+    { preHandler: [tenantGuard, requireRoles('OWNER', 'APPLICANT', 'LMO', 'SUPERVISOR', 'CONTROLLER', 'ADMIN')] },
+    async (request, reply) => {
+      const { tenantId, id } = request.params;
+      const scheduled = await applicationService.bookAppointment(
+        tenantId,
+        id,
+        request.body,
+        request.securityContext
+      );
+      return reply.send(scheduled);
+    }
+  );
+
+  // Alias for slot confirmation: POST /tenants/:tenantId/applications/:id/slot
+  fastify.post<{
+    Params: { tenantId: string; id: string };
+    Body: {
+      slot_start: string;
+      slot_end: string;
+      assigned_lmo_id?: string;
+      assigned_gatc_id?: string;
+    };
+  }>(
+    '/tenants/:tenantId/applications/:id/slot',
+    { preHandler: [tenantGuard, requireRoles('OWNER', 'APPLICANT', 'LMO', 'SUPERVISOR', 'CONTROLLER', 'ADMIN')] },
+    async (request, reply) => {
+      const { tenantId, id } = request.params;
+      const scheduled = await applicationService.bookAppointment(
+        tenantId,
+        id,
+        request.body,
+        request.securityContext
+      );
+      return reply.send(scheduled);
+    }
+  );
+
+  // GET /tenants/:tenantId/applications/slots/availability
+  fastify.get<{
+    Params: { tenantId: string };
+    Querystring: { jurisdiction_id?: string; date?: string };
+  }>('/tenants/:tenantId/applications/slots/availability', { preHandler: [tenantGuard] }, async (request, reply) => {
+    const { tenantId } = request.params;
+    const jurisdictionId = request.query.jurisdiction_id || 'JUR-DL-01';
+    const dateStr = request.query.date || new Date().toISOString().split('T')[0];
+    const avail = await applicationService.getSlotAvailability(tenantId, jurisdictionId, dateStr);
+    return reply.send(avail);
+  });
 };
+

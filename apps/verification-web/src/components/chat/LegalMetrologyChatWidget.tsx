@@ -1,33 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  MessageSquare,
   X,
   Send,
-  Sparkles,
-  ShieldCheck,
+  RotateCcw,
   Maximize2,
   Minimize2,
-  RotateCcw,
-  BookOpen,
+  Volume2,
+  Pause,
+  Play,
+  Mic,
+  MicOff,
+  Gauge,
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Bot,
-  User,
-  Scale,
-  Mic,
-  MicOff,
-  Volume2,
-  VolumeX,
-  Play,
-  Pause,
+  BookOpen,
   AlertTriangle,
-  Gauge,
+  User,
 } from 'lucide-react';
 import { useMetrologyChat } from './useMetrologyChat';
 import { useVoice } from './useVoice';
 import { FormattedMarkdown } from './FormattedMarkdown';
-import { ChatMessage, StatutoryCitation, PortalActionLink } from './chatTypes';
+import { PortalActionLink } from './chatTypes';
 import { NikksMascotIcon } from './NikksMascotIcon';
 
 interface ChatWidgetProps {
@@ -123,115 +117,77 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
     }
   };
 
+  const currentDateFormatted = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   return (
     <>
-      {/* 1. Floating Launcher Bubble (Static, Non-Bouncing Pill) */}
+      {/* 1. Floating Launcher Button */}
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-3.5 py-2 rounded-full shadow-lg border border-slate-700 select-none">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
-            <span>Ask Nikks AI (Text &amp; Voice)</span>
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 animate-fade-in">
+          <div className="hidden sm:flex items-center gap-2 bg-white text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-full shadow-lg border border-slate-200 select-none">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Ask Nikks AI</span>
           </div>
 
           <button
             onClick={() => setIsOpen(true)}
-            className="w-14 h-14 rounded-full bg-gov-navy text-white flex items-center justify-center shadow-lg hover:bg-gov-dark transition-colors border-2 border-white/30 relative group cursor-pointer"
-            title="Open Nikks AI Assistant"
-            aria-label="Open Nikks AI Assistant"
+            className="w-14 h-14 rounded-full bg-gov-navy text-white flex items-center justify-center shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border-2 border-white relative cursor-pointer"
+            title="Open Nikks Chatbot"
+            aria-label="Open Nikks Chatbot"
           >
-            <NikksMascotIcon size={36} glow={false} />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900" aria-hidden="true" />
+            <NikksMascotIcon size={34} glow={false} />
+            <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
           </button>
         </div>
       )}
 
-      {/* 2. Floating Chat Modal */}
+      {/* 2. Sendbird-Style Floating Chat Panel */}
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Nikks AI Legal Metrology Assistant"
-          className={`fixed z-50 flex flex-col animate-modal-in bg-white border border-slate-200 shadow-overlay overflow-hidden ${
+          aria-label="Nikks Support Chat"
+          className={`fixed z-50 flex flex-col bg-white border border-slate-200/90 shadow-2xl overflow-hidden transition-all duration-200 animate-modal-in ${
             isExpanded
-              ? 'inset-4 sm:inset-10 rounded-lg'
-              : 'bottom-6 right-6 w-full max-w-[440px] h-[640px] rounded-lg'
+              ? 'inset-3 sm:inset-8 w-auto h-auto rounded-2xl'
+              : 'bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[410px] h-full sm:h-[620px] sm:max-h-[85vh] rounded-none sm:rounded-2xl'
           }`}
         >
           {/* Header */}
-          <div className="bg-gov-navy text-white p-4 flex items-center justify-between border-b border-slate-800">
+          <div className="bg-white border-b border-slate-100 px-4 py-3.5 sm:px-5 sm:py-4 flex items-center justify-between shrink-0">
+            {/* Left: Identity */}
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center shrink-0 p-1">
-                <NikksMascotIcon size={30} glow={false} />
+              <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center p-1 shrink-0">
+                <NikksMascotIcon size={24} glow={false} />
               </div>
               <div>
-                <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
-                  Nikks AI
-                  <span className="text-xs font-mono bg-white/10 text-amber-300 px-1.5 py-0.5 rounded border border-white/20 font-semibold">
-                    Legal Metrology Assistant
-                  </span>
+                <h3 className="font-semibold text-[15px] sm:text-base text-slate-900 leading-tight">
+                  Nikks
                 </h3>
-                <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" aria-hidden="true" />
-                  Grounded in Acts &amp; General Rules 2011 • Text &amp; Voice
+                <p className="text-[11px] text-slate-500 leading-none mt-0.5">
+                  Legal Metrology Guide
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 text-slate-300">
-              {/* Voice Speed Selector Pill & Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                  className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-bold text-amber-300 border border-slate-700 flex items-center gap-1 transition-colors"
-                  title="Voice Speed (आवाज़ की गति)"
-                >
-                  <Gauge className="w-3 h-3 text-amber-400" />
-                  <span>{speechRate}x</span>
-                  <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
-                </button>
-
-                {showSpeedMenu && (
-                  <div className="absolute right-0 top-full mt-1.5 w-32 bg-slate-900 border border-slate-700 rounded-lg shadow-lg py-1 z-50 text-xs">
-                    <div className="px-2.5 py-1 text-xs uppercase font-bold text-slate-400 border-b border-slate-800">
-                      Voice Speed
-                    </div>
-                    {[
-                      { rate: 0.8, label: '0.8x Slow' },
-                      { rate: 1.0, label: '1.0x Normal' },
-                      { rate: 1.2, label: '1.2x Fast' },
-                      { rate: 1.5, label: '1.5x Rapid' },
-                      { rate: 1.8, label: '1.8x Ultra' },
-                    ].map((opt) => (
-                      <button
-                        key={opt.rate}
-                        onClick={() => {
-                          setSpeechRate(opt.rate);
-                          setShowSpeedMenu(false);
-                        }}
-                        className={`w-full text-left px-2.5 py-1.5 hover:bg-slate-800 flex items-center justify-between text-xs ${
-                          speechRate === opt.rate ? 'text-amber-400 font-bold bg-slate-800/80' : 'text-slate-300'
-                        }`}
-                      >
-                        <span>{opt.label}</span>
-                        {speechRate === opt.rate && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Explicit Segmented Language Switcher */}
-              <div className="flex items-center bg-slate-800 p-0.5 rounded-md border border-slate-700">
+            {/* Right: Controls & Actions */}
+            <div className="flex items-center gap-1 text-slate-500">
+              {/* Language Switcher Pill */}
+              <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 mr-1">
                 <button
                   onClick={() => {
                     stopSpeaking();
                     setLanguage('en');
                   }}
-                  className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${
+                  className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
                     language === 'en'
-                      ? 'bg-gov-blue text-white shadow'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-gov-navy text-white shadow-xs'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
-                  title="Switch to English"
+                  title="English"
                 >
                   EN
                 </button>
@@ -240,63 +196,107 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                     stopSpeaking();
                     setLanguage('hi');
                   }}
-                  className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${
+                  className={`px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
                     language === 'hi'
-                      ? 'bg-amber-500 text-slate-950 shadow'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-gov-navy text-white shadow-xs'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
-                  title="Switch to Hindi (हिन्दी भाषा)"
+                  title="हिंदी"
                 >
-                  हिंदी
+                  हिन्दी
                 </button>
               </div>
 
-              {/* Reset Thread */}
+              {/* Voice Speed Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded-full text-[11px] font-semibold text-slate-700 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Voice Speed"
+                >
+                  <Gauge className="w-3 h-3 text-slate-500" />
+                  <span>{speechRate}x</span>
+                  <ChevronDown className="w-2.5 h-2.5 text-slate-400" />
+                </button>
+
+                {showSpeedMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-28 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 text-xs">
+                    {[0.8, 1.0, 1.2, 1.5, 1.8].map((rate) => (
+                      <button
+                        key={rate}
+                        onClick={() => {
+                          setSpeechRate(rate);
+                          setShowSpeedMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center justify-between text-xs cursor-pointer ${
+                          speechRate === rate
+                            ? 'text-gov-navy font-bold bg-slate-50'
+                            : 'text-slate-700'
+                        }`}
+                      >
+                        <span>{rate}x</span>
+                        {speechRate === rate && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-gov-navy" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Restart / Clear Thread */}
               <button
                 onClick={() => {
                   stopSpeaking();
                   clearChat();
                 }}
-                className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
-                title="Clear Chat History"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                title="Restart conversation"
+                aria-label="Restart conversation"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
 
-              {/* Fullscreen Expand/Collapse */}
+              {/* Expand / Minimize */}
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-colors hidden sm:inline-flex"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors hidden sm:inline-flex cursor-pointer"
                 title={isExpanded ? 'Minimize' : 'Expand'}
+                aria-label={isExpanded ? 'Minimize' : 'Expand'}
               >
-                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                {isExpanded ? (
+                  <Minimize2 className="w-4 h-4" />
+                ) : (
+                  <Maximize2 className="w-4 h-4" />
+                )}
               </button>
 
-              {/* Close Button */}
+              {/* Close */}
               <button
                 onClick={() => {
                   stopSpeaking();
                   stopListening();
                   setIsOpen(false);
                 }}
-                className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
-                title="Close"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                title="Close chat"
+                aria-label="Close chat"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Voice Error Notice Banner */}
+          {/* Voice Error Notice */}
           {voiceError && (
-            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-xs flex items-center justify-between">
+            <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-3.5 py-2 text-xs flex items-center justify-between shrink-0">
               <div className="flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 <span>{voiceError}</span>
               </div>
               <button
                 onClick={() => setVoiceError(null)}
-                className="text-amber-700 dark:text-amber-300 hover:text-amber-900 p-0.5"
+                className="text-amber-700 hover:text-amber-900 p-0.5 cursor-pointer"
                 title="Dismiss"
               >
                 <X className="w-3.5 h-3.5" />
@@ -304,111 +304,142 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
             </div>
           )}
 
-          {/* Listening Live Banner */}
+          {/* Voice Listening Bar */}
           {isListening && (
-            <div className="bg-red-500 text-white px-3 py-1.5 text-xs font-semibold flex items-center justify-between animate-pulse">
+            <div className="bg-red-500 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between shrink-0 animate-pulse">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
+                <span className="w-2 h-2 bg-white rounded-full animate-ping" />
                 <span>
-                  {language === 'hi' ? 'बोलिए... (हिंदी आवाज़ सक्रिय)' : 'Listening in English (India)...'}
+                  {language === 'hi'
+                    ? 'बोलिए... (हिंदी आवाज़ सक्रिय)'
+                    : 'Listening in English...'}
                 </span>
               </div>
               <button
                 onClick={stopListening}
-                className="text-xs bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded font-semibold"
+                className="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-0.5 rounded-full font-semibold cursor-pointer"
               >
                 Done
               </button>
             </div>
           )}
 
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100 text-sm">
+          {/* Conversation Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-3.5 space-y-4 bg-white text-sm">
+            {/* Centered Date Separator */}
+            <div className="flex items-center my-2 select-none">
+              <div className="flex-1 border-t border-slate-100" />
+              <span className="px-3 text-[11px] text-slate-400 font-medium">
+                {currentDateFormatted}
+              </span>
+              <div className="flex-1 border-t border-slate-100" />
+            </div>
+
+            {/* Messages */}
             {messages.map((msg) => {
               const isUser = msg.sender === 'user';
               const isCurrentSpeaking = isSpeaking && speakingMsgId === msg.id;
 
               return (
-                <div
-                  key={msg.id}
-                  className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
-                >
+                <div key={msg.id} className="space-y-1.5">
+                  {/* Sender Name above Assistant messages */}
+                  {!isUser && (
+                    <div className="text-[11px] font-medium text-slate-400 ml-9 select-none">
+                      Nikks
+                    </div>
+                  )}
+
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isUser
-                        ? 'bg-gov-blue text-white'
-                        : 'bg-white border border-slate-300 p-0.5 shadow-card'
+                    className={`flex items-end gap-2 ${
+                      isUser ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    {isUser ? <User className="w-4 h-4" /> : <NikksMascotIcon size={22} glow={false} />}
-                  </div>
+                    {/* Assistant Avatar */}
+                    {!isUser && (
+                      <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0 p-0.5">
+                        <NikksMascotIcon size={20} glow={false} />
+                      </div>
+                    )}
 
-                  <div className={`space-y-2 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
+                    {/* Timestamp for User message (placed to the left of user bubble) */}
+                    {isUser && (
+                      <span className="text-[11px] text-slate-400 select-none shrink-0 mb-1">
+                        {msg.timestamp}
+                      </span>
+                    )}
+
+                    {/* Message Bubble Container */}
                     <div
-                      className={`p-3.5 rounded-lg text-sm leading-relaxed shadow-card relative group ${
-                        isUser
-                          ? 'bg-gov-blue text-white rounded-tr-none'
-                          : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                      className={`max-w-[82%] sm:max-w-[78%] ${
+                        isUser ? 'items-end' : 'items-start'
                       }`}
                     >
-                      <FormattedMarkdown content={msg.text} isUser={isUser} />
+                      <div
+                        className={`p-3.5 text-[14px] leading-relaxed ${
+                          isUser
+                            ? 'bg-gov-navy text-white rounded-2xl rounded-tr-sm shadow-xs'
+                            : 'bg-[#F1F3F5] text-slate-900 rounded-2xl rounded-tl-sm'
+                        }`}
+                      >
+                        <FormattedMarkdown content={msg.text} isUser={isUser} />
 
-                      {/* Text-to-Speech Voice Playback Button for Assistant */}
-                      {!isUser && (
-                        <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <button
-                            onClick={() => speak(msg.id, msg.text, language)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
-                              isCurrentSpeaking
-                                ? 'bg-amber-500 text-slate-950 font-bold animate-pulse shadow'
-                                : isPaused && speakingMsgId === msg.id
-                                ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-400/40'
-                                : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                            }`}
-                            title={
-                              isCurrentSpeaking
-                                ? 'Pause voice (रोकें)'
-                                : isPaused && speakingMsgId === msg.id
-                                ? `Resume voice from stopped point at ${speechRate}x`
-                                : `Listen to answer at ${speechRate}x`
-                            }
-                          >
-                            {isCurrentSpeaking ? (
-                              <>
-                                <Pause className="w-3.5 h-3.5" />
-                                <span>Pause</span>
-                              </>
-                            ) : isPaused && speakingMsgId === msg.id ? (
-                              <>
-                                <Play className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
-                                <span>Resume ({speechRate}x)</span>
-                              </>
-                            ) : (
-                              <>
-                                <Volume2 className="w-3.5 h-3.5 text-gov-blue" />
-                                <span>Listen ({speechRate}x)</span>
-                              </>
+                        {/* Audio TTS control inside assistant bubble */}
+                        {!isUser && (
+                          <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                            <button
+                              onClick={() => speak(msg.id, msg.text, language)}
+                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+                                isCurrentSpeaking
+                                  ? 'bg-amber-500 text-slate-950 animate-pulse'
+                                  : isPaused && speakingMsgId === msg.id
+                                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                  : 'bg-white/80 hover:bg-white text-slate-700 border border-slate-200'
+                              }`}
+                              title={
+                                isCurrentSpeaking
+                                  ? 'Pause audio'
+                                  : isPaused && speakingMsgId === msg.id
+                                  ? `Resume audio (${speechRate}x)`
+                                  : `Listen (${speechRate}x)`
+                              }
+                            >
+                              {isCurrentSpeaking ? (
+                                <>
+                                  <Pause className="w-3 h-3" />
+                                  <span>Pause</span>
+                                </>
+                              ) : isPaused && speakingMsgId === msg.id ? (
+                                <>
+                                  <Play className="w-3 h-3 text-amber-700" />
+                                  <span>Resume</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 className="w-3 h-3 text-slate-600" />
+                                  <span>Listen ({speechRate}x)</span>
+                                </>
+                              )}
+                            </button>
+
+                            {msg.provider_used && (
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {msg.provider_used === 'GEMINI_API'
+                                  ? 'Gemini'
+                                  : 'Legal RAG'}
+                              </span>
                             )}
-                          </button>
+                          </div>
+                        )}
+                      </div>
 
-                          {msg.provider_used && (
-                            <span className="text-xs text-slate-400 font-mono">
-                              {msg.provider_used === 'GEMINI_API' ? 'Gemini 1.5' : 'Statutory RAG'}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      {/* Statutory Citations Accordion */}
+                      {!isUser && msg.citations && msg.citations.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          <div className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                            <BookOpen className="w-3 h-3 text-slate-400" />
+                            <span>Legal Citations:</span>
+                          </div>
 
-                    {/* Statutory Citations Accordion */}
-                    {!isUser && msg.citations && msg.citations.length > 0 && (
-                      <div className="space-y-1.5 pt-1">
-                        <div className="text-xs font-semibold text-slate-400 flex items-center gap-1">
-                          <BookOpen className="w-3 h-3 text-blue-400" />
-                          <span>Official Legal Citations:</span>
-                        </div>
-
-                        <div className="space-y-1">
                           {msg.citations.map((cit, idx) => {
                             const citKey = `${msg.id}-${idx}`;
                             const isCitExpanded = expandedCitations[citKey];
@@ -416,17 +447,17 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                             return (
                               <div
                                 key={citKey}
-                                className="bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden"
+                                className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden text-xs"
                               >
                                 <button
                                   onClick={() => toggleCitation(msg.id, idx)}
-                                  className="w-full px-2.5 py-1.5 flex items-center justify-between text-left hover:bg-slate-200/60 dark:hover:bg-slate-800/80 transition-colors"
+                                  className="w-full px-2.5 py-1.5 flex items-center justify-between text-left hover:bg-slate-100 transition-colors cursor-pointer"
                                 >
                                   <div className="flex items-center gap-1.5 truncate">
-                                    <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-950 text-gov-blue dark:text-blue-300 font-mono font-bold text-xs rounded">
+                                    <span className="px-1.5 py-0.5 bg-slate-200 text-slate-800 font-mono font-bold text-[10px] rounded">
                                       {cit.section_rule_ref}
                                     </span>
-                                    <span className="font-medium text-xs text-slate-700 dark:text-slate-300 truncate">
+                                    <span className="font-medium text-slate-700 truncate">
                                       {cit.title}
                                     </span>
                                   </div>
@@ -438,8 +469,8 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                                 </button>
 
                                 {isCitExpanded && (
-                                  <div className="p-2.5 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
-                                    <div className="font-semibold text-slate-900 dark:text-slate-200 mb-1">
+                                  <div className="p-2.5 bg-white border-t border-slate-200 text-[11px] text-slate-600 leading-relaxed font-sans">
+                                    <div className="font-semibold text-slate-800 mb-0.5">
                                       {cit.act_or_rule}
                                     </div>
                                     {cit.snippet}
@@ -449,129 +480,139 @@ export const LegalMetrologyChatWidget: React.FC<ChatWidgetProps> = ({
                             );
                           })}
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Portal Actions Shortcuts */}
-                    {!isUser && msg.portal_actions && msg.portal_actions.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {msg.portal_actions.map((act, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleActionClick(act)}
-                            className="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-gov-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            {act.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {/* Portal Action Links */}
+                      {!isUser && msg.portal_actions && msg.portal_actions.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {msg.portal_actions.map((act, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleActionClick(act)}
+                              className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-gov-navy border border-slate-200 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                            >
+                              <ExternalLink className="w-3 h-3 text-slate-500" />
+                              <span>{act.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Dynamic Follow-up Prompt Chips */}
-                    {!isUser && msg.suggested_followups && msg.suggested_followups.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
+                    {/* Timestamp for Assistant message (placed to the right of assistant bubble) */}
+                    {!isUser && (
+                      <span className="text-[11px] text-slate-400 select-none shrink-0 mb-1">
+                        {msg.timestamp}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Sendbird-Style Quick Suggestion Chips (Right under Assistant Message) */}
+                  {!isUser &&
+                    msg.suggested_followups &&
+                    msg.suggested_followups.length > 0 && (
+                      <div className="ml-9 mt-2 flex flex-col items-start sm:items-end gap-1.5">
                         {msg.suggested_followups.map((sug, i) => (
                           <button
                             key={i}
                             onClick={() => handleSend(sug)}
-                            className="px-2 py-1 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-full text-xs font-medium transition-colors text-left"
+                            className="w-auto max-w-[90%] text-left sm:text-right px-4 py-2 rounded-full border border-gov-navy/35 hover:border-gov-navy hover:bg-gov-navy/5 text-gov-navy text-[13px] font-medium transition-colors cursor-pointer"
                           >
-                            💡 {sug}
+                            {sug}
                           </button>
                         ))}
                       </div>
                     )}
-
-                    <div className="text-xs text-slate-400 px-1">{msg.timestamp}</div>
-                  </div>
                 </div>
               );
             })}
 
-            {/* Loading / Analyzing indicator */}
+            {/* Restrained Loading / Typing Indicator */}
             {loading && (
-              <div className="flex items-center gap-2 text-slate-600 text-sm py-2 px-1" role="status">
-                <div className="w-5 h-5 rounded-full bg-amber-100 text-gov-gold flex items-center justify-center animate-spin border border-amber-200">
-                  <Sparkles className="w-3 h-3" aria-hidden="true" />
+              <div className="flex items-start gap-2 pt-1" role="status">
+                <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0 p-0.5 mt-0.5">
+                  <NikksMascotIcon size={20} glow={false} />
                 </div>
-                <span>Analysing the Legal Metrology Act, Rules &amp; Schedules…</span>
+                <div className="bg-[#F1F3F5] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" />
+                </div>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestion Chips Bar */}
-          <div className="p-2 bg-white border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
-            <span className="text-xs font-semibold text-slate-500 shrink-0 px-1">
-              Suggestions:
-            </span>
-            {suggestions.map((s, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSend(s)}
-                className="whitespace-nowrap px-2.5 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-gov-blue border border-slate-200 rounded-full text-xs font-medium transition-colors shrink-0"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-
-          {/* Input Footer with Microphone (STT) & Send Buttons */}
-          <div className="p-3 bg-white border-t border-slate-200">
-            <div className="relative flex items-center gap-1.5">
-              <div className="relative flex-1 flex items-center">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputVal}
-                  onChange={(e) => setInputVal(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  aria-label="Ask the Legal Metrology assistant"
-                  placeholder={
-                    isListening
-                      ? 'Listening to voice...'
-                      : language === 'hi'
-                      ? 'निक्स एआई (Nikks AI) से विधिक मापविज्ञान, फीस या नियमों के बारे में पूछें...'
-                      : 'Ask Nikks AI about scale registration, verification fees, Section 22, or packaging rules...'
-                  }
-                  className={`w-full px-3 py-2.5 pr-10 text-sm bg-white border rounded-md text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-blue ${
-                    isListening
-                      ? 'border-red-500 ring-2 ring-red-400/50 animate-pulse'
-                      : 'border-slate-300'
-                  }`}
-                />
-
-                {/* Voice Input Microphone Button */}
+          {/* Quick Suggestions Bar (Scrollable Pill Chips) */}
+          {suggestions && suggestions.length > 0 && (
+            <div className="px-4 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+              {suggestions.map((s, idx) => (
                 <button
-                  type="button"
-                  onClick={toggleVoiceInput}
-                  className={`absolute right-1.5 p-1.5 rounded-lg transition-all ${
-                    isListening
-                      ? 'bg-red-500 text-white animate-bounce shadow-md'
-                      : 'text-slate-400 hover:text-gov-blue hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`}
-                  title={isListening ? 'Stop listening' : 'Speak your question (बोलकर पूछें)'}
+                  key={idx}
+                  onClick={() => handleSend(s)}
+                  className="whitespace-nowrap px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-gov-navy border border-slate-200 rounded-full text-xs font-medium transition-colors shrink-0 cursor-pointer"
                 >
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  {s}
                 </button>
-              </div>
+              ))}
+            </div>
+          )}
+
+          {/* Chat Composer / Input Area */}
+          <div className="p-3.5 bg-white border-t border-slate-100 shrink-0">
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 focus-within:border-gov-navy focus-within:ring-2 focus-within:ring-gov-navy/10 rounded-full px-3.5 py-1 transition-all">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                onKeyDown={handleKeyDown}
+                aria-label="Ask Nikks"
+                placeholder={
+                  isListening
+                    ? 'Listening...'
+                    : language === 'hi'
+                    ? 'निक्स से सवाल पूछें...'
+                    : 'Ask Nikks a question...'
+                }
+                className="flex-1 bg-transparent py-2 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              />
+
+              {/* Microphone Voice Button */}
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                  isListening
+                    ? 'bg-red-500 text-white animate-pulse'
+                    : 'text-slate-400 hover:text-gov-navy'
+                }`}
+                title={isListening ? 'Stop listening' : 'Voice input'}
+              >
+                {isListening ? (
+                  <MicOff className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4" />
+                )}
+              </button>
 
               {/* Send Button */}
               <button
                 onClick={() => handleSend()}
                 disabled={!inputVal.trim() || loading}
-                className="p-2.5 bg-gov-blue hover:bg-blue-800 disabled:opacity-40 disabled:hover:bg-gov-blue text-white rounded-xl shadow-md transition-all shrink-0"
-                title="Send Question"
+                className="w-8 h-8 rounded-full bg-gov-navy text-white flex items-center justify-center shrink-0 transition-transform active:scale-95 disabled:opacity-30 disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer"
+                title="Send message"
+                aria-label="Send message"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="text-xs text-center text-slate-400 mt-1.5 flex items-center justify-center gap-1">
-              <span>Voice &amp; Text AI Guide</span>
-              <span aria-hidden="true">•</span>
-              <span>The Legal Metrology Act, 2009</span>
+
+            {/* Clean, subtle footer watermark */}
+            <div className="text-[11px] text-center text-slate-400 mt-2 font-medium flex items-center justify-center gap-1 select-none">
+              <span>Powered by</span>
+              <span className="font-semibold text-slate-600">Legal Metrology</span>
             </div>
           </div>
         </div>

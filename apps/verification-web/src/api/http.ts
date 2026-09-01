@@ -93,7 +93,26 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     defaultHeaders['X-Jurisdiction-Id'] = env.DEFAULT_JURISDICTION_ID;
   }
 
-  const response = await fetch(url, { ...options, headers: { ...defaultHeaders, ...explicitHeaders } });
+  // 10-second AbortController timeout guard to prevent hung TCP connections
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const combinedSignal = options.signal || controller.signal;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: { ...defaultHeaders, ...explicitHeaders },
+      signal: combinedSignal,
+    });
+  } catch (err: any) {
+    if (err?.name === 'AbortError') {
+      throw new HttpError(408, 'Network request timed out after 10 seconds. Please check server connectivity.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (response.status === 401 && token) {
     const refreshed = await trySilentRefresh();

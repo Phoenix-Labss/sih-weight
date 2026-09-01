@@ -20,6 +20,7 @@ import { CertificateModal } from '../trader/CertificateModal';
 import { PhysicalSerialMatchModal } from './PhysicalSerialMatchModal';
 import { PhysicalStamp } from '../../types/stamp';
 import { generateStatutoryNAWITestSteps } from '../../utils/nawiCalculations';
+import { broadcastSyncEvent } from '../../hooks/useRealtimeSync';
 import {
   Scale,
   ShieldCheck,
@@ -820,6 +821,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         onDispositionRecorded={(updated) => {
           setCurrentStatus(updated.status);
           if (updated.outcome) setCurrentOutcome(updated.outcome);
+          broadcastSyncEvent('SESSION_UPDATED');
           onSessionUpdated(updated);
         }}
         onStampRecorded={loadStamps}
@@ -831,6 +833,7 @@ export const TestObservationGrid: React.FC<TestObservationGridProps> = ({
         session={{ ...session, status: currentStatus, outcome: currentOutcome }}
         onCertificateIssued={(cert) => {
           setCurrentStatus('FINALIZED');
+          broadcastSyncEvent('CERTIFICATE_ISSUED');
           onCertificateIssued?.(cert);
           onSessionUpdated({ ...session, status: 'FINALIZED' });
         }}

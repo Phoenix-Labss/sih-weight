@@ -15,6 +15,7 @@ import { CertificateModal } from '../trader/CertificateModal';
 import { WorksheetModal } from './WorksheetModal';
 import { StatusBadge } from '../common/StatusBadge';
 import { truncateHash } from '../../utils/formatters';
+import { useRealtimeSync, broadcastSyncEvent } from '../../hooks/useRealtimeSync';
 import {
   ShieldCheck,
   FileCheck2,
@@ -22,6 +23,7 @@ import {
   Scale,
   Award,
   Lock,
+  RefreshCw,
 } from 'lucide-react';
 
 export const OfficerWorkspace: React.FC = () => {
@@ -71,6 +73,21 @@ export const OfficerWorkspace: React.FC = () => {
       console.error('Failed to load officer data:', err);
     }
   }, [user.tenantId, selectedSessionId, mode, apiVersion]);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Zero-latency cross-tab sync + smart focus revalidation + 15s gentle polling
+  const { broadcast } = useRealtimeSync({
+    onSync: loadData,
+    pollIntervalMs: 15000,
+    enabled: true,
+  });
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await loadData();
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
 
   useEffect(() => {
     loadData();
@@ -148,6 +165,15 @@ export const OfficerWorkspace: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              title="Refresh queue and sessions immediately"
+              className="bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-md border border-white/15 text-xs text-white flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
             <div className="bg-white/10 px-3.5 py-2 rounded-md border border-white/15 text-xs text-slate-200 flex items-center gap-2">
               <Lock className="w-4 h-4 text-amber-400" aria-hidden="true" />
               <span>Key Slot: <strong className="font-mono text-white">HSM-DL-01</strong></span>

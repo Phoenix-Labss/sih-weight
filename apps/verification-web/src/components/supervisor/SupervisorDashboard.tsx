@@ -7,6 +7,7 @@ import { useApiMode } from '../../context/ApiModeContext';
 import { useTranslation } from '../../i18n';
 import { PendencyTable } from './PendencyTable';
 import { AuditTrailViewer } from './AuditTrailViewer';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import {
   FileCheck2,
   Clock,
@@ -16,6 +17,7 @@ import {
   Building2,
   BarChart3,
   TrendingUp,
+  RefreshCw,
 } from 'lucide-react';
 
 export const SupervisorDashboard: React.FC = () => {
@@ -43,6 +45,17 @@ export const SupervisorDashboard: React.FC = () => {
       setIsLoading(false);
     }
   }, [user.tenantId, mode, apiVersion]);
+
+  // Zero-latency cross-tab sync + smart focus revalidation + 15s gentle polling
+  useRealtimeSync({
+    onSync: loadData,
+    pollIntervalMs: 15000,
+    enabled: true,
+  });
+
+  const handleManualRefresh = async () => {
+    await loadData();
+  };
 
   useEffect(() => {
     loadData();
@@ -119,7 +132,16 @@ export const SupervisorDashboard: React.FC = () => {
           <h2 className="text-xl font-bold text-gov-navy">{t.supervisorTitle}</h2>
           <p className="text-xs text-slate-500">{t.supervisorSubtitle}</p>
         </div>
-        <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-lg">
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+          <button
+            onClick={handleManualRefresh}
+            disabled={isLoading}
+            title="Refresh supervisor pendency and metrics immediately"
+            className="px-3 py-1.5 rounded-md text-xs font-bold text-slate-700 hover:text-slate-950 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-gov-blue ${isLoading ? 'animate-spin' : ''}`} />
+            <span>{isLoading ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${

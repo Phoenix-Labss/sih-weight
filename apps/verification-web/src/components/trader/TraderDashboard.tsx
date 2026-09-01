@@ -18,6 +18,7 @@ import { SessionSchedulerModal } from '../officer/SessionSchedulerModal';
 import { ApplicationTimeline } from './ApplicationTimeline';
 import { InstrumentRegistry } from './InstrumentRegistry';
 import { mockModels } from '../../api/mock/mockFixtures';
+import { useRealtimeSync, broadcastSyncEvent } from '../../hooks/useRealtimeSync';
 import {
   Scale,
   FileCheck2,
@@ -28,6 +29,7 @@ import {
   ShieldCheck,
   Building,
   Clock,
+  RefreshCw,
 } from 'lucide-react';
 
 export const TraderDashboard: React.FC = () => {
@@ -77,6 +79,21 @@ export const TraderDashboard: React.FC = () => {
       console.error('Failed to load trader data:', err);
     }
   }, [user.tenantId, mode, apiVersion]);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Zero-latency cross-tab sync + smart focus revalidation + 15s gentle polling
+  const { broadcast } = useRealtimeSync({
+    onSync: loadData,
+    pollIntervalMs: 15000,
+    enabled: true,
+  });
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await loadData();
+    setTimeout(() => setIsRefreshing(false), 500);
+  };
 
   useEffect(() => {
     loadData();
@@ -171,6 +188,15 @@ export const TraderDashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              title="Refresh portal data immediately"
+              className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
             <button
               onClick={() => setIsRegisterModalOpen(true)}
               className="px-3.5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 transition-all cursor-pointer"
@@ -411,6 +437,7 @@ export const TraderDashboard: React.FC = () => {
         models={models}
         onRegistered={() => {
           setSelectedSubTab('instruments');
+          broadcast('APPLICATION_UPDATED');
           loadData();
         }}
       />
@@ -424,6 +451,7 @@ export const TraderDashboard: React.FC = () => {
           preselectedInstrument={preselectedInstrument}
           onApplicationCreated={() => {
             setSelectedSubTab('overview');
+            broadcast('APPLICATION_CREATED');
             loadData();
           }}
         />
@@ -441,6 +469,7 @@ export const TraderDashboard: React.FC = () => {
             prev.map((a) => (a.application_id === updated.application_id ? { ...updated } : a))
           );
           setActiveApplication(updated);
+          broadcast('PAYMENT_RECONCILED');
           loadData();
         }}
       />
@@ -455,7 +484,10 @@ export const TraderDashboard: React.FC = () => {
         isOpen={isQueryModalOpen}
         onClose={() => setIsQueryModalOpen(false)}
         application={activeApplication}
-        onQueryResponded={loadData}
+        onQueryResponded={() => {
+          broadcast('APPLICATION_UPDATED');
+          loadData();
+        }}
       />
 
       <CertificateModal
@@ -479,6 +511,7 @@ export const TraderDashboard: React.FC = () => {
               )
             );
           }
+          broadcast('SLOT_SCHEDULED');
           loadData();
         }}
       />

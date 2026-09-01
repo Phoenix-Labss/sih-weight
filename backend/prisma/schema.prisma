@@ -486,6 +486,8 @@ model VerificationApplication {
   @@index([tenant_id])
   @@index([applicant_id])
   @@index([current_status])
+  @@index([tenant_id, current_status, created_at])
+  @@index([tenant_id, applicant_id])
   @@map("verification_applications")
 }
 
@@ -547,6 +549,8 @@ model VerificationSession {
 
   @@index([tenant_id])
   @@index([status])
+  @@index([tenant_id, status, scheduled_date])
+  @@index([tenant_id, application_id])
   @@map("verification_sessions")
 }
 
@@ -650,6 +654,8 @@ model Certificate {
   @@index([tenant_id])
   @@index([certificate_status])
   @@index([valid_until])
+  @@index([tenant_id, certificate_status, valid_until])
+  @@index([tenant_id, owner_id])
   @@map("certificates")
 }
 

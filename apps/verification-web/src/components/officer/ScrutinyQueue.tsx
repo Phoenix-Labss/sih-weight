@@ -10,6 +10,7 @@ import { SessionSchedulerModal } from './SessionSchedulerModal';
 import { CertificateModal } from '../trader/CertificateModal';
 import { ReceiptViewer } from '../trader/ReceiptViewer';
 import { WorksheetModal } from './WorksheetModal';
+import { broadcastSyncEvent } from '../../hooks/useRealtimeSync';
 import {
   Search,
   CheckCircle2,
@@ -773,6 +774,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
         onClose={() => setIsScrutinyModalOpen(false)}
         application={selectedAppForScrutiny}
         onActionCompleted={() => {
+          broadcastSyncEvent('APPLICATION_UPDATED');
           onApplicationUpdated();
         }}
       />
@@ -782,6 +784,7 @@ export const ScrutinyQueue: React.FC<ScrutinyQueueProps> = ({
         onClose={() => setIsSchedulerModalOpen(false)}
         application={selectedAppForSchedule}
         onScheduled={() => {
+          broadcastSyncEvent('SLOT_SCHEDULED');
           onApplicationUpdated();
         }}
       />

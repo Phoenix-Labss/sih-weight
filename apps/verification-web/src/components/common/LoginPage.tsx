@@ -215,12 +215,12 @@ interface DemoRoleOption {
 const DEMO_ROLES: DemoRoleOption[] = [
   {
     id: 'trader',
-    name: 'Commercial Trader / Scale Owner',
-    category: 'Owner / Merchant Persona',
+    name: 'Commercial Trader / Establishment Applicant',
+    category: 'Owner / Applicant Persona',
     email: 'trader@example.com',
     password: 'Trader@2026',
-    badge: 'Trader',
-    description: 'Retail stores, kirana shops, wholesale mandi merchants, weighbridge owners',
+    badge: 'Applicant',
+    description: 'For new establishment registration, weighing machine registration, and statutory verification.',
   },
   {
     id: 'lmo',
@@ -258,15 +258,14 @@ const DEMO_ROLES: DemoRoleOption[] = [
     badge: 'GATC Lab',
     description: 'Government Approved Test Center laboratory testing & verification',
   },
-  {
-    id: 'applicant',
-    name: 'Scale Applicant / New Business',
-    category: 'Applicant Persona',
-    email: 'applicant.delhi@example.com',
-    password: 'Applicant@2026',
-    badge: 'Applicant',
-    description: 'Initial instrument registration, verification scheduling & status tracking',
-  },
+];
+
+// Visible roles in the Demo User selector dropdown (Admin removed, ordered: LMO -> Supervisor -> GATC -> Applicant)
+const DEMO_MENU_ROLES: DemoRoleOption[] = [
+  DEMO_ROLES[1], // Legal Metrology Officer (LMO)
+  DEMO_ROLES[2], // Supervisor / SLA Manager
+  DEMO_ROLES[4], // GATC Testing Center Verifier
+  DEMO_ROLES[0], // Commercial Trader / Establishment Applicant
 ];
 
 export type NavSection = 'home' | 'about' | 'information' | 'eservices' | 'faq' | 'contact' | 'archive';
@@ -346,90 +345,128 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100/90 text-slate-900 selection:bg-amber-500 selection:text-slate-950 font-sans">
-      {/* 1. LAYER 1: UTILITY BAR (Low-contrast, quiet metadata) */}
-      <div className="bg-slate-100/90 text-slate-500 text-xs border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2 select-none">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-slate-700">{t.govOfIndia}</span>
-          <span className="text-slate-300">|</span>
-          <span className="text-slate-500 hidden md:inline">{t.ministryName}</span>
-          <span className="text-slate-300 hidden md:inline">|</span>
-          <span className="text-slate-500 hidden sm:inline">{t.deptName}</span>
-        </div>
-
-        <div className="flex items-center gap-3 text-slate-500 shrink-0">
-          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400">
-            <Shield className="w-3 h-3 text-emerald-700" />
-            <span>NIC / MeitY Aligned</span>
-          </span>
-          <span className="text-slate-300 hidden sm:inline">|</span>
-          <div className="flex items-center gap-1 text-xs text-slate-400 font-mono">
-            <span className="cursor-pointer hover:text-slate-700 px-0.5">A-</span>
-            <span className="cursor-pointer hover:text-slate-700 px-0.5 font-bold">A</span>
-            <span className="cursor-pointer hover:text-slate-700 px-0.5">A+</span>
+      {/* 1. TOP GOVERNMENT IDENTITY BAR (Official Government of India Masthead Strip) */}
+      <div className="bg-[#F3F5F7] border-b border-[#CBD5E1] px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 select-none">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
+          {/* LEFT: Official State Emblem of India + Institutional Hierarchy */}
+          <div className="flex items-center gap-3 self-start md:self-center">
+            {/* State Emblem of India (Ashoka Lion Capital) */}
+            <img
+              src="/emblem-of-india.svg"
+              alt="State Emblem of India"
+              title="State Emblem of India - Satyameva Jayate"
+              className="h-12 sm:h-14 w-auto object-contain shrink-0"
+              width="40"
+              height="60"
+            />
+            <div className="h-9 w-px bg-[#CBD5E1] hidden sm:block shrink-0" aria-hidden="true" />
+            <div className="text-left leading-tight font-sans">
+              <div className="text-[15px] sm:text-[16px] font-semibold text-[#0F2D46] tracking-tight">
+                Government of India
+              </div>
+              <div className="text-[13px] sm:text-[14px] font-medium text-[#172B4D]">
+                Ministry of Consumer Affairs, Food &amp; Public Distribution
+              </div>
+              <div className="text-[12px] sm:text-[13px] font-normal text-[#475569]">
+                Department of Legal Metrology
+              </div>
+            </div>
           </div>
-          <span className="text-slate-300">|</span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-              className="px-1.5 py-0.5 text-gov-navy text-xs font-bold hover:underline transition-colors cursor-pointer"
-              aria-label="Switch portal language"
-            >
-              {language === 'en' ? 'हिन्दी (HI)' : 'ENGLISH (EN)'}
-            </button>
+
+          {/* RIGHT: Institutional Alignment, Accessibility & Language Switcher */}
+          <div className="flex items-center gap-3 text-xs text-[#475569] shrink-0 self-end md:self-center">
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[12px] text-[#1F4FA3] font-medium">
+              <Shield className="w-3.5 h-3.5 text-[#16A34A]" />
+              <span>NIC / MeitY Aligned</span>
+            </span>
+            <span className="text-[#CBD5E1] hidden sm:inline" aria-hidden="true">|</span>
+            <div className="flex items-center gap-1 text-xs text-[#172B4D] font-mono" aria-label="Font size controls">
+              <button
+                type="button"
+                className="cursor-pointer hover:text-[#0F2D46] px-1 py-0.5"
+                title="Decrease font size"
+              >
+                A-
+              </button>
+              <button
+                type="button"
+                className="cursor-pointer hover:text-[#0F2D46] px-1 py-0.5 font-bold"
+                title="Default font size"
+              >
+                A
+              </button>
+              <button
+                type="button"
+                className="cursor-pointer hover:text-[#0F2D46] px-1 py-0.5"
+                title="Increase font size"
+              >
+                A+
+              </button>
+            </div>
+            <span className="text-[#CBD5E1]" aria-hidden="true">|</span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+                className="px-2 py-0.5 text-[#0F2D46] text-xs font-bold hover:underline transition-colors cursor-pointer"
+                aria-label="Switch portal language"
+              >
+                {language === 'en' ? 'हिन्दी (HI)' : 'ENGLISH (EN)'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. LAYER 2: INSTITUTIONAL MASTHEAD */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-card">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
+      {/* 2. MAIN BRAND & SERVICE IDENTIFIER (Sticky Header) */}
+      <header className="bg-white border-b border-[#CBD5E1] sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 lg:gap-6">
             
-            {/* LEFT: Legal Metrology Emblem & Institutional Identity */}
-            <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
-              <div className="w-11 h-11 rounded border border-amber-400/50 bg-amber-50 flex items-center justify-center shrink-0 shadow-card">
-                <Scale className="h-6 w-6 text-amber-700" />
+            {/* LEFT: e-Metrology Service Identity */}
+            <div className="flex items-center gap-3.5 shrink-0 self-start md:self-auto">
+              <div className="w-11 h-11 rounded border border-[#1F4FA3]/30 bg-[#F3F5F7] flex items-center justify-center shrink-0">
+                <Scale className="h-6 w-6 text-[#1F4FA3]" />
               </div>
-              <div className="text-left leading-tight">
-                <div className="text-xl sm:text-2xl font-bold tracking-tight text-gov-navy leading-none">
-                  {t.brandTitle}
+              <div className="text-left leading-tight font-sans">
+                <div className="text-2xl sm:text-[28px] font-bold tracking-tight text-[#0F2D46] leading-none">
+                  e-Metrology
                 </div>
-                <div className="text-xs font-semibold text-slate-700 mt-0.5">
+                <div className="text-[13px] sm:text-[14px] font-semibold text-[#1F4FA3] mt-1">
                   National Legal Metrology Verification System
                 </div>
-                <div className="text-xs text-slate-400 font-normal hidden sm:block">
+                <div className="text-[12px] text-[#475569] font-normal hidden sm:block mt-0.5">
                   Statutory Portal under The Legal Metrology Act, 2009 &amp; General Rules, 2011
                 </div>
               </div>
             </div>
 
             {/* RIGHT: Institutional Header Actions */}
-            <div className="flex items-center gap-2 shrink-0 self-end md:self-auto select-none">
+            <div className="flex items-center gap-2.5 shrink-0 self-end md:self-auto select-none">
               {/* New Registration Button */}
               <button
                 type="button"
                 onClick={() => setIsRegisterOpen(true)}
-                className="px-3.5 py-1.5 sm:py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 text-xs sm:text-sm font-bold border border-amber-500 shadow-card transition-all cursor-pointer flex items-center gap-1.5"
+                className="h-10 px-4 rounded border border-[#B45309] bg-[#F4B41A] hover:bg-[#D97706] text-[#0F2D46] text-xs sm:text-sm font-bold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
                 title="Register New Commercial Establishment"
               >
-                <UserPlus className="w-4 h-4 text-slate-950 shrink-0" />
+                <UserPlus className="w-4 h-4 text-[#0F2D46] shrink-0" />
                 <span>New Registration</span>
               </button>
 
               {/* Enter as Demo User Button + Role Switcher */}
-              <div className="relative inline-flex items-center shadow-card rounded" ref={demoMenuRef}>
+              <div className="relative inline-flex items-center rounded" ref={demoMenuRef}>
                 <button
                   type="button"
                   disabled={authenticatingRoleId !== null}
                   onClick={() => handleDemoSelect(DEMO_ROLES[0])}
-                  className="px-3 py-1.5 sm:py-2 rounded-l bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-gov-navy font-bold text-xs sm:text-sm border border-slate-300 transition-all cursor-pointer flex items-center gap-1.5"
+                  className="h-10 px-3.5 sm:px-4 rounded-l border border-[#CBD5E1] bg-white hover:bg-[#F3F5F7] text-[#0F2D46] font-bold text-xs sm:text-sm transition-colors flex items-center gap-2 cursor-pointer"
                   title="Direct 1-click login as Demo Trader"
                 >
                   {authenticatingRoleId === 'trader' ? (
-                    <Loader2 className="w-3.5 h-3.5 text-gov-blue animate-spin" />
+                    <Loader2 className="w-4 h-4 text-[#1F4FA3] animate-spin" />
                   ) : (
-                    <UserCheck className="w-3.5 h-3.5 text-amber-700" />
+                    <UserCheck className="w-4 h-4 text-[#1F4FA3]" />
                   )}
                   <span>Enter as Demo User</span>
                 </button>
@@ -437,33 +474,33 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setDemoMenuOpen(!demoMenuOpen)}
-                  className="px-2 py-1.5 sm:py-2 rounded-r bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold border border-l-0 border-slate-300 transition-all cursor-pointer flex items-center justify-center"
+                  className="h-10 px-2.5 rounded-r border border-l-0 border-[#CBD5E1] bg-white hover:bg-[#F3F5F7] text-[#0F2D46] font-bold transition-colors flex items-center justify-center cursor-pointer"
                   aria-expanded={demoMenuOpen}
                   aria-haspopup="true"
-                  title="Choose other stakeholder roles (Officer, Supervisor, GATC, Admin)"
+                  title="Choose other stakeholder roles (Officer, Supervisor, GATC, Applicant)"
                 >
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${demoMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${demoMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu for Demo Roles */}
                 {demoMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 bg-white rounded-md shadow-lg border border-slate-300 text-slate-900 py-2 z-50 animate-fade-in text-left">
-                    <div className="px-4 py-2 border-b border-slate-200 bg-slate-50">
+                  <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 bg-white rounded-md shadow-xl border border-[#CBD5E1] text-slate-900 py-2 z-50 animate-fade-in text-left">
+                    <div className="px-4 py-2 border-b border-[#CBD5E1] bg-[#F3F5F7]">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-gov-navy uppercase tracking-wider">
+                        <span className="text-xs font-bold text-[#0F2D46] uppercase tracking-wider">
                           Select Stakeholder Role
                         </span>
-                        <span className="text-xs font-bold text-slate-700 bg-amber-400/30 border border-amber-400/50 px-2 py-0.5 rounded">
+                        <span className="text-xs font-bold text-[#0F2D46] bg-[#F4B41A]/30 border border-[#F4B41A] px-2 py-0.5 rounded">
                           1-Click Direct Entry
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-[#475569] mt-0.5">
                         Click any role to enter the portal immediately:
                       </p>
                     </div>
 
                     <div className="max-h-[360px] overflow-y-auto p-1.5 space-y-1">
-                      {DEMO_ROLES.map((role) => {
+                      {DEMO_MENU_ROLES.map((role) => {
                         const isThisRoleAuthenticating = authenticatingRoleId === role.id;
                         return (
                           <button
@@ -471,14 +508,14 @@ export const LoginPage: React.FC = () => {
                             type="button"
                             disabled={authenticatingRoleId !== null}
                             onClick={() => handleDemoSelect(role)}
-                            className="w-full text-left p-2 rounded-sm hover:bg-amber-50/80 border border-transparent hover:border-amber-300 transition-all flex items-start justify-between gap-2.5 group cursor-pointer disabled:opacity-60"
+                            className="w-full text-left p-2 rounded-sm hover:bg-[#F3F5F7] border border-transparent hover:border-[#CBD5E1] transition-all flex items-start justify-between gap-2.5 group cursor-pointer disabled:opacity-60"
                           >
                             <div className="space-y-0.5 flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-bold text-slate-800 group-hover:text-gov-navy">
+                                <span className="text-xs font-bold text-slate-800 group-hover:text-[#0F2D46]">
                                   {role.name}
                                 </span>
-                                <span className="text-xs font-semibold text-gov-navy bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200 shrink-0">
+                                <span className="text-xs font-semibold text-[#0F2D46] bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200 shrink-0">
                                   {role.badge}
                                 </span>
                               </div>
@@ -489,9 +526,9 @@ export const LoginPage: React.FC = () => {
                             </div>
                             <div className="shrink-0 pt-1">
                               {isThisRoleAuthenticating ? (
-                                <Loader2 className="w-4 h-4 text-gov-blue animate-spin" />
+                                <Loader2 className="w-4 h-4 text-[#1F4FA3] animate-spin" />
                               ) : (
-                                <span className="text-xs font-bold text-slate-900 bg-amber-400 border border-amber-500 px-2 py-0.5 rounded group-hover:bg-amber-300 transition-colors">
+                                <span className="text-xs font-bold text-[#0F2D46] bg-[#F4B41A] border border-[#B45309] px-2 py-0.5 rounded group-hover:bg-[#D97706] transition-colors">
                                   Enter Portal →
                                 </span>
                               )}
@@ -501,12 +538,12 @@ export const LoginPage: React.FC = () => {
                       })}
                     </div>
 
-                    <div className="px-4 py-2 border-t border-slate-200 bg-slate-50 text-xs text-slate-600 flex items-center justify-between">
+                    <div className="px-4 py-2 border-t border-[#CBD5E1] bg-[#F3F5F7] text-xs text-slate-600 flex items-center justify-between">
                       <span>Clicking any role redirects inside</span>
                       <button
                         type="button"
                         onClick={() => setDemoMenuOpen(false)}
-                        className="text-slate-700 hover:text-slate-950 font-bold"
+                        className="text-[#0F2D46] hover:underline font-bold cursor-pointer"
                       >
                         Close
                       </button>
@@ -519,10 +556,10 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3. LAYER 3: CONVENTIONAL GOVERNMENT-PORTAL NAVIGATION STRIP (DEEP NAVY NTA-INSPIRED SECTION TABS) */}
-        <div className="bg-gov-navy text-white text-[15px] sm:text-base border-t border-slate-800 select-none shadow-sm relative z-20">
-          <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-            <nav className="flex items-center flex-wrap lg:flex-nowrap">
+        {/* 3. LAYER 3: CONVENTIONAL GOVERNMENT-PORTAL NAVIGATION STRIP (GIGW-STYLE FLAT TABS) */}
+        <div className="bg-[#0F2D46] text-white select-none border-t border-[#091E2F]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex items-center flex-wrap lg:flex-nowrap" aria-label="Portal Primary Navigation">
               {/* Home */}
               <button
                 type="button"
@@ -530,10 +567,10 @@ export const LoginPage: React.FC = () => {
                   setActiveSection('home');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-5 sm:px-6 py-2.5 sm:py-3 font-bold flex items-center transition-colors cursor-pointer shrink-0 ${
+                className={`h-11 px-4 sm:px-5 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'home'
-                    ? 'bg-amber-400 text-slate-950 shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>Home</span>
@@ -547,10 +584,10 @@ export const LoginPage: React.FC = () => {
                   setAboutSubtopic('overview');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'about'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>About Us</span>
@@ -564,10 +601,10 @@ export const LoginPage: React.FC = () => {
                   setInfoSubtopic('standards');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'information'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>Information</span>
@@ -580,10 +617,10 @@ export const LoginPage: React.FC = () => {
                   setActiveSection('eservices');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'eservices'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>e-Services</span>
@@ -596,10 +633,10 @@ export const LoginPage: React.FC = () => {
                   setActiveSection('faq');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'faq'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>FAQ</span>
@@ -613,10 +650,10 @@ export const LoginPage: React.FC = () => {
                   setContactSubtopic('contact-hq');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'contact'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>Contact Us</span>
@@ -630,10 +667,10 @@ export const LoginPage: React.FC = () => {
                   setArchiveSubtopic('gazette');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-4 sm:px-5 py-2.5 sm:py-3 font-semibold transition-colors flex items-center cursor-pointer ${
+                className={`h-11 px-3.5 sm:px-4 text-[14px] sm:text-[15px] font-medium flex items-center border-b-2 transition-colors cursor-pointer shrink-0 ${
                   activeSection === 'archive'
-                    ? 'bg-amber-400 text-slate-950 font-bold shadow-card'
-                    : 'text-slate-100 hover:text-amber-300 hover:bg-slate-800/70'
+                    ? 'bg-[#1F4FA3] text-white border-[#F4B41A] font-semibold'
+                    : 'text-slate-100 hover:bg-[#123A5A] hover:text-white border-transparent'
                 }`}
               >
                 <span>Archive</span>
@@ -646,10 +683,10 @@ export const LoginPage: React.FC = () => {
                   window.location.hash = '#public';
                   window.dispatchEvent(new HashChangeEvent('hashchange'));
                 }}
-                className="px-4 sm:px-5 py-2.5 sm:py-3 font-bold text-amber-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-1.5 cursor-pointer ml-auto"
+                className="h-11 px-4 sm:px-5 text-[14px] sm:text-[15px] font-semibold text-[#F4B41A] hover:text-white hover:bg-[#123A5A] transition-colors flex items-center gap-1.5 ml-auto cursor-pointer border-b-2 border-transparent"
                 title="Verify genuine scale digital certificates with Zero-PII QR scan"
               >
-                <QrCode className="w-4 h-4 text-amber-400" />
+                <QrCode className="w-4 h-4 text-[#F4B41A]" />
                 <span>Verify Public QR</span>
               </a>
             </nav>
@@ -1591,18 +1628,25 @@ export const LoginPage: React.FC = () => {
         </div>
       </main>
 
-      {/* 4. Footer */}
-      <footer className="bg-gov-dark text-slate-400 text-xs border-t border-slate-800 py-6 mt-auto">
+      {/* 4. Institutional Footer */}
+      <footer className="bg-[#0F2D46] text-slate-300 text-xs border-t border-[#091E2F] py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div>
-            © {new Date().getFullYear()} Department of Legal Metrology, Ministry of Consumer Affairs, Government of India.
+          <div className="space-y-0.5 text-center sm:text-left">
+            <div className="font-semibold text-white">© {new Date().getFullYear()} Department of Legal Metrology</div>
+            <div className="text-slate-300">
+              Ministry of Consumer Affairs, Food &amp; Public Distribution, Government of India
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>NIC / MeitY Guidelines</span>
-            <span>•</span>
-            <span>DPDP Act 2023 Compliant</span>
-            <span>•</span>
-            <span>OIML R 76-1 Standards</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-slate-300">
+            <span>NIC / MeitY</span>
+            <span aria-hidden="true">•</span>
+            <span>Privacy Policy</span>
+            <span aria-hidden="true">•</span>
+            <span>Terms of Service</span>
+            <span aria-hidden="true">•</span>
+            <span>Accessibility</span>
+            <span aria-hidden="true">•</span>
+            <span>Contact</span>
           </div>
         </div>
       </footer>

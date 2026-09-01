@@ -12,6 +12,7 @@ interface VerificationWizardProps {
   isOpen: boolean;
   onClose: () => void;
   instruments: Instrument[];
+  preselectedInstrument?: Instrument | null;
   onApplicationCreated: () => void;
 }
 
@@ -19,13 +20,14 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
   isOpen,
   onClose,
   instruments,
+  preselectedInstrument,
   onApplicationCreated,
 }) => {
   const { user } = useAuth();
   const { notify } = useNotification();
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [currentStep, setCurrentStep] = useState<number>(preselectedInstrument ? 2 : 1);
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<string>(
-    instruments[0]?.instrument_id || ''
+    preselectedInstrument?.instrument_id || instruments[0]?.instrument_id || ''
   );
   const [applicationType, setApplicationType] = useState<ApplicationType>('PERIODICAL_REVERIFICATION');
   const [serviceMode, setServiceMode] = useState<ServiceMode>('ON_SITE');
@@ -35,7 +37,10 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
   const [declarationAccepted, setDeclarationAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedInst = instruments.find((i) => i.instrument_id === selectedInstrumentId) || instruments[0];
+  const selectedInst =
+    instruments.find((i) => i.instrument_id === selectedInstrumentId) ||
+    preselectedInstrument ||
+    instruments[0];
 
   // Calculate estimated fee
   const baseFee = selectedInst?.model?.accuracy_class === 'CLASS_II' ? 1500 : 1000;
@@ -160,6 +165,31 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
       {/* Step 2: Mode & Schedule */}
       {currentStep === 2 && (
         <div className="space-y-4">
+          {/* Selected Instrument Summary */}
+          {selectedInst && (
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-blue-50 text-gov-blue">
+                  <Scale className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-900">
+                    {selectedInst.model?.model_name || 'Standard Scale'}
+                  </div>
+                  <div className="text-xs text-slate-500 font-mono">
+                    Serial: {selectedInst.serial_number} | Class: {selectedInst.model?.accuracy_class} | Max: {selectedInst.model?.max_capacity} {selectedInst.model?.capacity_unit}
+                  </div>
+                </div>
+              </div>
+              {selectedInst.installation_location_notes && (
+                <div className="text-xs text-slate-500 flex items-center gap-1 hidden sm:flex">
+                  <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                  <span className="truncate max-w-xs">{selectedInst.installation_location_notes}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Verification Purpose *
@@ -283,6 +313,14 @@ export const VerificationWizard: React.FC<VerificationWizardProps> = ({
               <div>
                 <span className="text-slate-500 block">Accuracy Class:</span>
                 <span className="font-semibold text-slate-800">{selectedInst?.model?.accuracy_class}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Max Capacity:</span>
+                <span className="font-semibold text-slate-800">{selectedInst?.model?.max_capacity} {selectedInst?.model?.capacity_unit}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Location:</span>
+                <span className="font-semibold text-slate-800 truncate block">{selectedInst?.installation_location_notes || 'Registered Premises'}</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Application Type:</span>

@@ -72,14 +72,23 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-6 sm:flex-row">
-          <div>
-            © {new Date().getFullYear()} National Legal Metrology Platform. All Rights Reserved.
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-6 sm:flex-row text-xs">
+          <div className="space-y-0.5 text-center sm:text-left">
+            <div className="font-semibold text-white">© {new Date().getFullYear()} Department of Legal Metrology</div>
+            <div className="text-slate-400">
+              Ministry of Consumer Affairs, Food &amp; Public Distribution, Government of India
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>DPDP Act 2023 Aligned</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-slate-400">
+            <span>NIC / MeitY</span>
             <span aria-hidden="true">•</span>
-            <span>Deterministic Metrological Engine</span>
+            <span>Privacy Policy</span>
+            <span aria-hidden="true">•</span>
+            <span>Terms of Service</span>
+            <span aria-hidden="true">•</span>
+            <span>Accessibility</span>
+            <span aria-hidden="true">•</span>
+            <span>Contact</span>
           </div>
         </div>
       </div>

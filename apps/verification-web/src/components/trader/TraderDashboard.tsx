@@ -43,6 +43,7 @@ export const TraderDashboard: React.FC = () => {
   // Modals
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isApplyWizardOpen, setIsApplyWizardOpen] = useState(false);
+  const [preselectedInstrument, setPreselectedInstrument] = useState<Instrument | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [isQueryModalOpen, setIsQueryModalOpen] = useState(false);
@@ -141,6 +142,16 @@ export const TraderDashboard: React.FC = () => {
     }
   };
 
+  const handleOpenApplyWizard = (instrument?: Instrument) => {
+    setPreselectedInstrument(instrument || null);
+    setIsApplyWizardOpen(true);
+  };
+
+  const handleCloseApplyWizard = () => {
+    setIsApplyWizardOpen(false);
+    setPreselectedInstrument(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Trader Header Welcome Banner (Clean Government Style) */}
@@ -168,7 +179,7 @@ export const TraderDashboard: React.FC = () => {
               <span>{t.btnRegisterInstrument}</span>
             </button>
             <button
-              onClick={() => setIsApplyWizardOpen(true)}
+              onClick={() => handleOpenApplyWizard()}
               className="px-4 py-2 rounded bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-xs font-bold text-slate-950 flex items-center gap-1.5 shadow-card border border-amber-500 transition-all cursor-pointer"
             >
               <Scale className="w-4 h-4 text-slate-950" />
@@ -273,7 +284,7 @@ export const TraderDashboard: React.FC = () => {
               <span>Active Statutory Verification Applications</span>
             </h3>
             <button
-              onClick={() => setIsApplyWizardOpen(true)}
+              onClick={() => handleOpenApplyWizard()}
               className="text-xs font-semibold text-gov-blue hover:text-blue-800 flex items-center gap-1"
             >
               <span>+ New Application</span>
@@ -388,7 +399,7 @@ export const TraderDashboard: React.FC = () => {
           instruments={instruments}
           models={models}
           onOpenRegisterModal={() => setIsRegisterModalOpen(true)}
-          onOpenApplyWizard={() => setIsApplyWizardOpen(true)}
+          onOpenApplyWizard={handleOpenApplyWizard}
           onViewCertificate={handleViewCertificate}
         />
       )}
@@ -404,15 +415,19 @@ export const TraderDashboard: React.FC = () => {
         }}
       />
 
-      <VerificationWizard
-        isOpen={isApplyWizardOpen}
-        onClose={() => setIsApplyWizardOpen(false)}
-        instruments={instruments}
-        onApplicationCreated={() => {
-          setSelectedSubTab('overview');
-          loadData();
-        }}
-      />
+      {isApplyWizardOpen && (
+        <VerificationWizard
+          key={preselectedInstrument ? preselectedInstrument.instrument_id : 'general'}
+          isOpen={isApplyWizardOpen}
+          onClose={handleCloseApplyWizard}
+          instruments={instruments}
+          preselectedInstrument={preselectedInstrument}
+          onApplicationCreated={() => {
+            setSelectedSubTab('overview');
+            loadData();
+          }}
+        />
+      )}
 
       <FeePaymentModal
         isOpen={isPaymentModalOpen}

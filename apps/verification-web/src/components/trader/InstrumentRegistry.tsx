@@ -8,7 +8,7 @@ interface InstrumentRegistryProps {
   instruments: Instrument[];
   models: InstrumentModel[];
   onOpenRegisterModal: () => void;
-  onOpenApplyWizard: () => void;
+  onOpenApplyWizard: (instrument?: Instrument) => void;
   onViewCertificate?: (certificateId: string) => void;
 }
 
@@ -58,7 +58,7 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
             <span>Register Instrument</span>
           </button>
           <button
-            onClick={onOpenApplyWizard}
+            onClick={() => onOpenApplyWizard()}
             className="px-3.5 py-2 rounded-lg bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-card transition-colors"
           >
             <FileText className="w-4 h-4" />
@@ -164,7 +164,7 @@ export const InstrumentRegistry: React.FC<InstrumentRegistryProps> = ({
                         </button>
                       ) : (
                         <button
-                          onClick={onOpenApplyWizard}
+                          onClick={() => onOpenApplyWizard(inst)}
                           className="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold inline-flex items-center gap-1 transition-colors"
                         >
                           <span>Apply</span>

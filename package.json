@@ -4,6 +4,9 @@
   "description": "National Legal Metrology Digital Verification, Stamping and Certification Platform",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "start": "node run.js",
     "dev": "node run.js",
@@ -12,9 +15,13 @@
     "admin": "cd apps/admin-portal && npm run dev",
     "test": "cd backend && npm test",
     "test:coverage": "cd backend && npm run test:coverage",
-    "build": "cd apps/verification-web && npm run build && cd ../admin-portal && npm run build",
+    "build": "cd apps/verification-web && npm run build && cd ../admin-portal && npm run build && cd ../../backend && npm run build",
     "db:push": "cd backend && npx prisma db push",
     "db:generate": "cd backend && npx prisma generate",
     "db:seed": "cd backend && npm run prisma:seed"
+  },
+  "devDependencies": {
+    "@neon/config": "^1.1.0",
+    "@neon/env": "^1.1.6"
   }
 }

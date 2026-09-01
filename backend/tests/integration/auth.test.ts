@@ -280,5 +280,39 @@ describe('Auth Suite', () => {
       expect(existingAvail.statusCode).toBe(200);
       expect(JSON.parse(existingAvail.body).available).toBe(false);
     });
+
+    it('tolerates trailing slashes and root aliases for auth/register and auth/verify-otp', async () => {
+      // 1. /api/v1/auth/register/ (trailing slash) returns 422 validation rather than 404
+      const resSlash = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/register/',
+        payload: {},
+      });
+      expect(resSlash.statusCode).toBe(422);
+
+      // 2. /auth/register (root alias without /api/v1) returns 422 validation rather than 404
+      const resRoot = await app.inject({
+        method: 'POST',
+        url: '/auth/register',
+        payload: {},
+      });
+      expect(resRoot.statusCode).toBe(422);
+
+      // 3. /api/v1/auth/verify-otp/ (trailing slash) returns 422 validation rather than 404
+      const resOtpSlash = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/verify-otp/',
+        payload: {},
+      });
+      expect(resOtpSlash.statusCode).toBe(422);
+
+      // 4. /auth/verify-otp (root alias without /api/v1) returns 422 validation rather than 404
+      const resOtpRoot = await app.inject({
+        method: 'POST',
+        url: '/auth/verify-otp',
+        payload: {},
+      });
+      expect(resOtpRoot.statusCode).toBe(422);
+    });
   });
 });

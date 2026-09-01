@@ -23,6 +23,9 @@ import { chatRoutes } from './routes/chat.routes.js';
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     logger: false,
+    routerOptions: {
+      ignoreTrailingSlash: true,
+    },
     ...opts,
   });
 
@@ -33,8 +36,37 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   });
 
   // 2. Cross-Origin Resource Sharing (CORS)
+  const isProduction = process.env.NODE_ENV === 'production';
+  const configuredOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.ADMIN_URL,
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
+  ]
+    .filter(Boolean)
+    .flatMap((url) => (url as string).split(','))
+    .map((url) => url.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
   await app.register(cors, {
-    origin: true,
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server, health checks)
+      if (!origin) {
+        return cb(null, true);
+      }
+      // In development/testing, allow all local origins
+      if (!isProduction) {
+        return cb(null, true);
+      }
+      // In production, enforce configured frontend origins
+      const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+      if (configuredOrigins.length === 0) {
+        return cb(null, true);
+      }
+      if (configuredOrigins.includes(normalizedOrigin)) {
+        return cb(null, true);
+      }
+      return cb(new Error(`Origin '${origin}' not allowed by CORS policy.`), false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: [
@@ -101,7 +133,27 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   }));
 
   // System Reset Endpoint (Cleans all transactions & reseeds 21 approved models)
-  app.post('/api/v1/system/reset-database', async (_request, reply) => {
+  app.post('/api/v1/system/reset-database', async (request, reply) => {
+    const isProd = process.env.NODE_ENV === 'production';
+
+    // In production, database reset is disabled by default to prevent catastrophic data loss
+    if (isProd && process.env.ENABLE_PROD_RESET !== 'true') {
+      return reply.status(403).send({
+        detail: 'Database reset endpoint is permanently disabled in production environments.',
+        statusCode: 403,
+        error: 'Forbidden',
+      });
+    }
+
+    // If explicitly enabled in production, require authenticated ADMIN authorization
+    if (isProd && request.securityContext?.role !== 'ADMIN') {
+      return reply.status(403).send({
+        detail: 'Access denied: Production database reset requires authenticated ADMIN role.',
+        statusCode: 403,
+        error: 'Forbidden',
+      });
+    }
+
     const { seedDatabase } = await import('./db/seed.js');
     await seedDatabase();
     return reply.send({
@@ -127,7 +179,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     { prefix: '/api/v1' }
   );
 
-  // 8. Register Root Scanner & Certificate Aliases
+  // 8. Register Root Scanner, Auth & Certificate Aliases
+  await app.register(authRoutes);
   await app.register(publicRoutes);
   await app.register(certificateRoutes);
 

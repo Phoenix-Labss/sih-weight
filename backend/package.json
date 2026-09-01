@@ -4,6 +4,9 @@
   "description": "Legal Metrology Instrument Verification Control Plane & Domain Engine",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",

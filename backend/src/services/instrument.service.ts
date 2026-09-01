@@ -1,7 +1,16 @@
+import { InstrumentModel, Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma.js';
 import { NotFoundError, ValidationError } from '../core/errors.js';
 import { generateInstrumentToken } from '../security/qr-token.js';
 import { PaginatedResult } from '../core/types.js';
+
+type InstrumentWithRelations = Prisma.InstrumentGetPayload<{
+  include: {
+    model: true;
+    facility: true;
+    owner: true;
+  };
+}>;
 
 export interface RegisterInstrumentInput {
   jurisdiction_id?: string;
@@ -65,7 +74,7 @@ export class InstrumentService {
       }),
     ]);
 
-    const items = rawItems.map((inst) => this.formatInstrument(inst));
+    const items = (rawItems as InstrumentWithRelations[]).map((inst: InstrumentWithRelations) => this.formatInstrument(inst));
     const totalPages = Math.ceil(total / pageSize) || 1;
 
     return {
@@ -214,10 +223,10 @@ export class InstrumentService {
       orderBy: { model_name: 'asc' },
     });
 
-    return rawModels.map((m) => this.formatModel(m));
+    return (rawModels as InstrumentModel[]).map((m: InstrumentModel) => this.formatModel(m));
   }
 
-  public formatInstrument(inst: any): any {
+  public formatInstrument(inst: InstrumentWithRelations | any): any {
     return {
       instrument_id: inst.instrument_id,
       public_instrument_token: inst.public_instrument_token,
@@ -241,7 +250,7 @@ export class InstrumentService {
     };
   }
 
-  public formatModel(m: any): any {
+  public formatModel(m: InstrumentModel | any): any {
     return {
       model_id: m.model_id,
       category: m.category,
